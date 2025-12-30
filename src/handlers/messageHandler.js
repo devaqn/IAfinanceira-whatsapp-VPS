@@ -1,7 +1,7 @@
 const NLPProcessor = require('../services/nlp');
 const ReportGenerator = require('../services/reports');
 const ErrorMessages = require('../utils/errorMessages');
-//TA COM ERRO AQUI 
+
 class MessageHandler {
   constructor(dao, whatsappService) {
     this.dao = dao;
@@ -9,7 +9,7 @@ class MessageHandler {
     this.nlp = new NLPProcessor();
     this.reports = new ReportGenerator(dao);
     this.recentlyProcessed = {};
-    this.pendingResets = {}; // Sistema de confirmação de zeragem
+    this.pendingResets = {};
   }
 
   async process(message) {
@@ -71,14 +71,13 @@ class MessageHandler {
 
     } catch (error) {
       console.error('❌ Erro ao processar mensagem:', error);
-      // 🆕 GARANTIR resposta mesmo em caso de erro
       try {
         const timestamp = this.reports.getCurrentBrazilTimestamp();
         await this.whatsapp.replyMessage(message, 
           '❌ *Erro ao processar comando*\n\n' +
           '📌 Ocorreu um erro inesperado\n' +
           '💡 Tente novamente ou use `/ajuda`\n\n' +
-          '🕒 ' + timestamp.formatted
+          '🕐 ' + timestamp.formatted
         );
       } catch (e) {
         console.error('❌ Erro ao enviar mensagem de erro:', e);
@@ -91,8 +90,6 @@ class MessageHandler {
     const timestamp = this.reports.getCurrentBrazilTimestamp();
 
     try {
-      // ============ SALDO PRINCIPAL ============
-      
       if (command.command === 'setBalance') {
         if (command.amount && command.amount > 0) {
           this.dao.setInitialBalance(user.whatsapp_id, command.amount);
@@ -100,13 +97,13 @@ class MessageHandler {
           
           response = '✅ *SALDO DEFINIDO COM SUCESSO*\n\n' +
             `💰 *Valor:* ${this.reports.formatMoney(command.amount)}\n` +
-            `🕒 *Data/Hora:* ${timestamp.formatted}\n\n` +
+            `🕐 *Data/Hora:* ${timestamp.formatted}\n\n` +
             'Agora você pode registrar seus gastos!\n' +
             'Use `/ajuda` para ver todos os comandos.';
           
           console.log('💰 ' + user.name + ': saldo inicial ' + command.amount);
         } else {
-          response = ErrorMessages.INVALID_VALUE() + '\n\n🕒 ' + timestamp.formatted;
+          response = ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted;
         }
       }
       
@@ -120,7 +117,7 @@ class MessageHandler {
             
             response = '✅ *SALDO ADICIONADO COM SUCESSO*\n\n' +
               `💵 *Valor adicionado:* ${this.reports.formatMoney(command.amount)}\n` +
-              `🕒 *Data/Hora:* ${timestamp.formatted}\n\n` +
+              `🕐 *Data/Hora:* ${timestamp.formatted}\n\n` +
               '💰 *NOVO SALDO*\n' +
               `   Principal: *${this.reports.formatMoney(updatedUser.current_balance)}*\n`;
             
@@ -136,10 +133,10 @@ class MessageHandler {
             
             console.log('💰 ' + user.name + ': adicionou ' + command.amount);
           } else {
-            response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕒 ' + timestamp.formatted;
+            response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕐 ' + timestamp.formatted;
           }
         } else {
-          response = ErrorMessages.INVALID_VALUE() + '\n\n🕒 ' + timestamp.formatted;
+          response = ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted;
         }
       }
       
@@ -148,15 +145,13 @@ class MessageHandler {
         response = this.reports.generateBalanceReport(updatedUser);
       }
       
-      // ============ POUPANÇA ============
-      
       else if (command.command === 'getSavings') {
         const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);
         response = '🏷 *POUPANÇA*\n\n' +
           `💵 Saldo guardado: *${this.reports.formatMoney(updatedUser.savings_balance)}*\n\n` +
           'Use `/guardar 100` para guardar dinheiro\n' +
           'Use `/retirar 50` para retirar\n\n' +
-          '🕒 ' + timestamp.formatted;
+          '🕐 ' + timestamp.formatted;
       }
       
       else if (command.command === 'depositSavings') {
@@ -168,10 +163,10 @@ class MessageHandler {
             response = this.reports.generateSavingsConfirmation('deposit', command.amount, updatedUser);
             console.log('🏷 ' + user.name + ': guardou ' + command.amount);
           } else {
-            response = ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n🕒 ' + timestamp.formatted;
+            response = ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n🕐 ' + timestamp.formatted;
           }
         } else {
-          response = ErrorMessages.INVALID_VALUE() + '\n\n🕒 ' + timestamp.formatted;
+          response = ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted;
         }
       }
       
@@ -184,14 +179,12 @@ class MessageHandler {
             response = this.reports.generateSavingsConfirmation('withdraw', command.amount, updatedUser);
             console.log('🏷 ' + user.name + ': retirou ' + command.amount);
           } else {
-            response = ErrorMessages.INSUFFICIENT_BALANCE('Poupança') + '\n\n🕒 ' + timestamp.formatted;
+            response = ErrorMessages.INSUFFICIENT_BALANCE('Poupança') + '\n\n🕐 ' + timestamp.formatted;
           }
         } else {
-          response = ErrorMessages.INVALID_VALUE() + '\n\n🕒 ' + timestamp.formatted;
+          response = ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted;
         }
       }
-      
-      // ============ RESERVA DE EMERGÊNCIA ============
       
       else if (command.command === 'getEmergency') {
         const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);
@@ -199,7 +192,7 @@ class MessageHandler {
           `💵 Saldo reservado: *${this.reports.formatMoney(updatedUser.emergency_fund)}*\n\n` +
           'Use `/reservar 200` para adicionar\n' +
           'Use `/usar 100` para utilizar\n\n' +
-          '🕒 ' + timestamp.formatted;
+          '🕐 ' + timestamp.formatted;
       }
       
       else if (command.command === 'depositEmergency') {
@@ -211,10 +204,10 @@ class MessageHandler {
             response = this.reports.generateEmergencyConfirmation('deposit', command.amount, updatedUser);
             console.log('🚨 ' + user.name + ': reservou ' + command.amount);
           } else {
-            response = ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n🕒 ' + timestamp.formatted;
+            response = ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n🕐 ' + timestamp.formatted;
           }
         } else {
-          response = ErrorMessages.INVALID_VALUE() + '\n\n🕒 ' + timestamp.formatted;
+          response = ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted;
         }
       }
       
@@ -227,14 +220,12 @@ class MessageHandler {
             response = this.reports.generateEmergencyConfirmation('withdraw', command.amount, updatedUser);
             console.log('🚨 ' + user.name + ': usou reserva ' + command.amount);
           } else {
-            response = ErrorMessages.INSUFFICIENT_BALANCE('Reserva') + '\n\n🕒 ' + timestamp.formatted;
+            response = ErrorMessages.INSUFFICIENT_BALANCE('Reserva') + '\n\n🕐 ' + timestamp.formatted;
           }
         } else {
-          response = ErrorMessages.INVALID_VALUE() + '\n\n🕒 ' + timestamp.formatted;
+          response = ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted;
         }
       }
-      
-      // ============ RELATÓRIOS ============
       
       else if (command.command === 'reportDaily') {
         response = this.reports.generateDailyReport(user.id);
@@ -248,20 +239,18 @@ class MessageHandler {
         response = this.reports.generateMonthlyReport(user.id);
       }
       
-      // ============ PARCELAMENTOS ============
-      
       else if (command.command === 'getInstallments') {
         response = this.reports.generateInstallmentsList(user.id);
       }
       
       else if (command.command === 'payInstallment') {
         if (!command.description) {
-          response = ErrorMessages.INVALID_VALUE() + '\n\n💡 Use: `/pagar [nome do produto]`\n\n🕒 ' + timestamp.formatted;
+          response = ErrorMessages.INVALID_VALUE() + '\n\n💡 Use: `/pagar [nome do produto]`\n\n🕐 ' + timestamp.formatted;
         } else {
           const installment = this.dao.findInstallmentByDescription(user.id, command.description);
           
           if (!installment) {
-            response = ErrorMessages.NO_DATA_FOUND('parcelamento com este nome') + '\n\n💡 Use `/parcelamentos` para ver a lista\n\n🕒 ' + timestamp.formatted;
+            response = ErrorMessages.NO_DATA_FOUND('parcelamento com este nome') + '\n\n💡 Use `/parcelamentos` para ver a lista\n\n🕐 ' + timestamp.formatted;
           } else {
             const nextPayment = this.dao.getNextPendingPayment(installment.id);
             
@@ -269,7 +258,7 @@ class MessageHandler {
               response = '✅ *PARCELAMENTO QUITADO*\n\n' +
                 `📦 ${installment.description}\n\n` +
                 'Este parcelamento já foi totalmente pago!\n\n' +
-                '🕒 ' + timestamp.formatted;
+                '🕐 ' + timestamp.formatted;
             } else {
               const success = this.dao.payInstallment(nextPayment.id, user.id);
               
@@ -281,25 +270,19 @@ class MessageHandler {
                 response = this.reports.generatePaymentConfirmation(installment, updatedPayment, updatedUser);
                 console.log('💳 ' + user.name + ': pagou parcela ' + nextPayment.installment_number + '/' + installment.total_installments);
               } else {
-                response = ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n💡 Use `/saldo` para verificar\n\n🕒 ' + timestamp.formatted;
+                response = ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n💡 Use `/saldo` para verificar\n\n🕐 ' + timestamp.formatted;
               }
             }
           }
         }
       }
       
-      // ============ LEMBRETES ============
-      
       else if (command.command === 'getReminders' || command.command === 'getDuePayments') {
         response = this.reports.generateRemindersList(user.id);
       }
       
-      // ============ ZERAGEM (COM CONFIRMAÇÃO OBRIGATÓRIA) ============
-      
       else if (command.command === 'resetBalance') {
-        // Verificar confirmação pendente
         if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'balance') {
-          // Segunda execução = confirmar
           delete this.pendingResets[user.id];
           const success = this.dao.resetBalance(user.id);
           
@@ -307,14 +290,12 @@ class MessageHandler {
             response = this.reports.generateResetConfirmation('balance');
             console.log('☢️ ' + user.name + ': zerou saldo principal');
           } else {
-            response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕒 ' + timestamp.formatted;
+            response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕐 ' + timestamp.formatted;
           }
         } else {
-          // Primeira execução = pedir confirmação
           this.pendingResets[user.id] = { type: 'balance', timestamp: Date.now() };
           response = this.reports.generateResetWarning('balance');
           
-          // Limpar após 2 minutos
           const self = this;
           setTimeout(function() {
             if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'balance') {
@@ -333,7 +314,7 @@ class MessageHandler {
             response = this.reports.generateResetConfirmation('savings');
             console.log('☢️ ' + user.name + ': zerou poupança');
           } else {
-            response = ErrorMessages.NO_DATA_FOUND('poupança') + '\n\n🕒 ' + timestamp.formatted;
+            response = ErrorMessages.NO_DATA_FOUND('poupança') + '\n\n🕐 ' + timestamp.formatted;
           }
         } else {
           this.pendingResets[user.id] = { type: 'savings', timestamp: Date.now() };
@@ -357,7 +338,7 @@ class MessageHandler {
             response = this.reports.generateResetConfirmation('emergency');
             console.log('☢️ ' + user.name + ': zerou reserva de emergência');
           } else {
-            response = ErrorMessages.NO_DATA_FOUND('reserva de emergência') + '\n\n🕒 ' + timestamp.formatted;
+            response = ErrorMessages.NO_DATA_FOUND('reserva de emergência') + '\n\n🕐 ' + timestamp.formatted;
           }
         } else {
           this.pendingResets[user.id] = { type: 'emergency', timestamp: Date.now() };
@@ -381,7 +362,7 @@ class MessageHandler {
             response = this.reports.generateResetConfirmation('installments');
             console.log('☢️ ' + user.name + ': zerou parcelamentos');
           } else {
-            response = ErrorMessages.NO_DATA_FOUND('parcelamentos') + '\n\n🕒 ' + timestamp.formatted;
+            response = ErrorMessages.NO_DATA_FOUND('parcelamentos') + '\n\n🕐 ' + timestamp.formatted;
           }
         } else {
           this.pendingResets[user.id] = { type: 'installments', timestamp: Date.now() };
@@ -397,11 +378,9 @@ class MessageHandler {
       }
       
       else if (command.command === 'resetEverything' || command.command === 'confirmReset') {
-        // Sistema especial para zerar tudo - requer texto exato
         const textLower = this.whatsapp.getMessageText(message).toLowerCase().trim();
         
         if (textLower === 'confirmar zerar tudo' || command.command === 'confirmReset') {
-          // Confirmar zeragem total
           if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'everything') {
             delete this.pendingResets[user.id];
             const success = this.dao.resetEverything(user.id);
@@ -410,15 +389,14 @@ class MessageHandler {
               response = this.reports.generateResetConfirmation('everything');
               console.log('☢️☢️☢️ ' + user.name + ': ZEROU TODO O SISTEMA');
             } else {
-              response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕒 ' + timestamp.formatted;
+              response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕐 ' + timestamp.formatted;
             }
           } else {
             response = '❌ *Nenhuma operação pendente*\n\n' +
               'Use `/zerar tudo` primeiro para iniciar o processo.\n\n' +
-              '🕒 ' + timestamp.formatted;
+              '🕐 ' + timestamp.formatted;
           }
         } else {
-          // Primeira execução - pedir confirmação com texto exato
           this.pendingResets[user.id] = { type: 'everything', timestamp: Date.now() };
           response = this.reports.generateResetWarning('everything');
           
@@ -431,8 +409,6 @@ class MessageHandler {
         }
       }
       
-      // ============ OUTROS ============
-      
       else if (command.command === 'help') {
         response = this.reports.generateHelpMessage();
       }
@@ -442,7 +418,7 @@ class MessageHandler {
       }
       
       else {
-        response = ErrorMessages.COMMAND_NOT_FOUND() + '\n\n🕒 ' + timestamp.formatted;
+        response = ErrorMessages.COMMAND_NOT_FOUND() + '\n\n🕐 ' + timestamp.formatted;
       }
 
     } catch (error) {
@@ -450,15 +426,14 @@ class MessageHandler {
       response = '❌ *Erro ao executar comando*\n\n' +
         `📌 ${error.message}\n` +
         '💡 Tente novamente ou use `/ajuda`\n\n' +
-        '🕒 ' + timestamp.formatted;
+        '🕐 ' + timestamp.formatted;
     }
 
-    // 🔴 CRÍTICO: GARANTIR que SEMPRE há resposta
     if (!response || response.trim() === '') {
       response = '⚠️ *Comando processado sem confirmação*\n\n' +
         `📌 Comando: ${command.command}\n` +
         '💡 Use `/ajuda` para ver comandos disponíveis\n\n' +
-        '🕒 ' + timestamp.formatted;
+        '🕐 ' + timestamp.formatted;
       console.error('⚠️ AVISO: Comando sem resposta - ' + command.command);
     }
 
@@ -472,12 +447,12 @@ class MessageHandler {
 
     try {
       if (!this.nlp.isValidAmount(expense.amount)) {
-        await this.whatsapp.replyMessage(message, ErrorMessages.INVALID_VALUE() + '\n\n🕒 ' + timestamp.formatted);
+        await this.whatsapp.replyMessage(message, ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted);
         return;
       }
 
       if (user.initial_balance === 0) {
-        await this.whatsapp.replyMessage(message, ErrorMessages.INITIAL_BALANCE_REQUIRED() + '\n\n🕒 ' + timestamp.formatted);
+        await this.whatsapp.replyMessage(message, ErrorMessages.INITIAL_BALANCE_REQUIRED() + '\n\n🕐 ' + timestamp.formatted);
         return;
       }
 
@@ -499,7 +474,6 @@ class MessageHandler {
 
       console.log('💸 ' + user.name + ': ' + this.reports.formatMoney(expense.amount) + ' - ' + expense.description + ' (' + category.name + ')');
 
-      // Aviso de saldo baixo (apenas uma vez)
       const totalMoney = updatedUser.current_balance + updatedUser.savings_balance + updatedUser.emergency_fund;
       const percentageRemaining = updatedUser.initial_balance > 0 
         ? (totalMoney / updatedUser.initial_balance) * 100 
@@ -510,7 +484,7 @@ class MessageHandler {
           '🚨 *ATENÇÃO!*\n\n' +
           'Seu saldo está negativo!\n' +
           'Você está gastando mais do que tem.\n\n' +
-          '🕒 ' + timestamp.formatted
+          '🕐 ' + timestamp.formatted
         );
       } 
       else if (percentageRemaining <= 30 && !updatedUser.low_balance_warned) {
@@ -520,7 +494,7 @@ class MessageHandler {
           'Você já gastou 70% do seu dinheiro!\n' +
           `Restam apenas ${percentageRemaining.toFixed(0)}% do total.\n\n` +
           '💡 *Dica:* Considere reduzir gastos ou adicionar mais saldo.\n\n' +
-          '🕒 ' + timestamp.formatted
+          '🕐 ' + timestamp.formatted
         );
       }
 
@@ -530,7 +504,7 @@ class MessageHandler {
         '❌ *Erro ao registrar gasto*\n\n' +
         `📌 ${error.message}\n` +
         '💡 Tente novamente ou use `/ajuda`\n\n' +
-        '🕒 ' + timestamp.formatted
+        '🕐 ' + timestamp.formatted
       );
     }
   }
@@ -542,19 +516,18 @@ class MessageHandler {
 
     try {
       if (!this.nlp.isValidAmount(installment.totalAmount)) {
-        await this.whatsapp.replyMessage(message, ErrorMessages.INVALID_VALUE() + '\n\n🕒 ' + timestamp.formatted);
+        await this.whatsapp.replyMessage(message, ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted);
         return;
       }
 
       if (user.initial_balance === 0) {
-        await this.whatsapp.replyMessage(message, ErrorMessages.INITIAL_BALANCE_REQUIRED() + '\n\n🕒 ' + timestamp.formatted);
+        await this.whatsapp.replyMessage(message, ErrorMessages.INITIAL_BALANCE_REQUIRED() + '\n\n🕐 ' + timestamp.formatted);
         return;
       }
 
       const categoryId = this.dao.identifyCategory(installment.description);
       const category = this.dao.getCategoryById(categoryId);
 
-      // Calcular primeira data de vencimento (próximo mês, dia 5)
       const firstDueDate = new Date();
       firstDueDate.setMonth(firstDueDate.getMonth() + 1);
       firstDueDate.setDate(5);
@@ -581,7 +554,7 @@ class MessageHandler {
         '❌ *Erro ao registrar parcelamento*\n\n' +
         `📌 ${error.message}\n` +
         '💡 Tente novamente ou use `/ajuda`\n\n' +
-        '🕒 ' + timestamp.formatted
+        '🕐 ' + timestamp.formatted
       );
     }
   }
