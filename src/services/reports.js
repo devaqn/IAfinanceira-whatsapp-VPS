@@ -3,8 +3,6 @@ class ReportGenerator {
     this.dao = dao;
   }
 
-  // ============ 🔧 CORREÇÃO 1: TIMEZONE BRASIL (America/Sao_Paulo) ============
-  
   getCurrentBrazilTimestamp() {
     process.env.TZ = 'America/Sao_Paulo';
     const now = new Date();
@@ -121,85 +119,6 @@ class ReportGenerator {
     report += `   *${this.formatMoney(totalMoney)}*\n\n`;
     
     report += '═══════════════════════════════════════';
-
-    return report;
-  }
-
-  generateDailyReport(userId) {
-    const timestamp = this.getCurrentBrazilTimestamp();
-    const user = this.dao.getUserById(userId);
-    
-    if (!user) {
-      return '❌ *Erro ao gerar relatório*\n\n📌 Usuário não encontrado\n🕑 ' + timestamp.formatted;
-    }
-    
-    const today = this.getBrazilDate(new Date());
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const expenses = this.dao.getExpensesByUser(userId, {
-      startDate: today.toISOString(),
-      endDate: tomorrow.toISOString(),
-      transactionType: 'expense'
-    });
-
-    let totalExpenses = 0;
-    for (let i = 0; i < expenses.length; i++) {
-      totalExpenses += expenses[i].amount;
-    }
-    
-    const byCategory = this.dao.getExpensesByCategory(userId, today.toISOString(), tomorrow.toISOString());
-    const totalMoney = user.current_balance + user.savings_balance + user.emergency_fund;
-
-    let report = '╔═══════════════════════════════════════╗\n';
-    report += '📅 *RELATÓRIO DIÁRIO*\n';
-    report += '╚═══════════════════════════════════════╝\n\n';
-    
-    report += `👤 *Usuário:* ${user.name}\n`;
-    report += `📆 *Data:* ${this.formatDateShort(today)}\n`;
-    report += `🕑 *Gerado em:* ${timestamp.formatted}\n\n`;
-    
-    report += '💸 *MOVIMENTAÇÃO HOJE*\n';
-    report += `   Gastos: ${this.formatMoney(totalExpenses)}\n`;
-    report += `   Transações: ${expenses.length}\n\n`;
-    
-    report += '💰 *SITUAÇÃO ATUAL*\n';
-    report += `   Saldo: ${this.formatMoney(user.current_balance)}\n`;
-    if (user.savings_balance > 0) {
-      report += `   Poupança: ${this.formatMoney(user.savings_balance)}\n`;
-    }
-    if (user.emergency_fund > 0) {
-      report += `   Emergência: ${this.formatMoney(user.emergency_fund)}\n`;
-    }
-    report += `   *Total: ${this.formatMoney(totalMoney)}*\n\n`;
-
-    if (byCategory.length > 0) {
-      report += '🏷️ *GASTOS POR CATEGORIA*\n';
-      for (let i = 0; i < Math.min(byCategory.length, 5); i++) {
-        const cat = byCategory[i];
-        const percent = ((cat.total / totalExpenses) * 100).toFixed(0);
-        report += `   ${cat.emoji} ${cat.category}: ${this.formatMoney(cat.total)} (${percent}%)\n`;
-      }
-      report += '\n';
-    }
-
-    if (expenses.length > 0) {
-      report += '📋 *ÚLTIMOS GASTOS*\n';
-      const limit = Math.min(expenses.length, 5);
-      for (let i = 0; i < limit; i++) {
-        const exp = expenses[i];
-        const d = this.getBrazilDate(exp.date);
-        const time = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-        report += `   • ${time} - ${exp.description}\n`;
-        report += `     ${this.formatMoney(exp.amount)}\n`;
-      }
-    } else {
-      report += '✅ *Nenhum gasto hoje!*\n';
-      report += 'Você está no controle! 🎯\n';
-    }
-    
-    report += '\n═══════════════════════════════════════';
 
     return report;
   }
@@ -400,6 +319,10 @@ class ReportGenerator {
   }
 
   generateSavingsConfirmation(action, amount, user) {
+    if (!user) {
+      return '❌ *Erro ao processar*\n\nUsuário não encontrado.';
+    }
+    
     const timestamp = this.getCurrentBrazilTimestamp();
     let msg = action === 'deposit' ? '✅ *DINHEIRO GUARDADO*\n\n' : '✅ *DINHEIRO RETIRADO*\n\n';
     
@@ -421,6 +344,10 @@ class ReportGenerator {
   }
 
   generateEmergencyConfirmation(action, amount, user) {
+    if (!user) {
+      return '❌ *Erro ao processar*\n\nUsuário não encontrado.';
+    }
+    
     const timestamp = this.getCurrentBrazilTimestamp();
     let msg = action === 'deposit' ? '✅ *RESERVA CRIADA*\n\n' : '✅ *RESERVA UTILIZADA*\n\n';
     
@@ -741,7 +668,6 @@ class ReportGenerator {
     help += '_⚠️ Lembretes só funcionam com o bot ligado_\n\n';
     
     help += '📊 *RELATÓRIOS*\n';
-    help += '• `/relatorio diario` ou `/hoje` - Hoje\n';
     help += '• `/relatorio semanal` ou `/semana` - 7 dias\n';
     help += '• `/relatorio mensal` ou `/mes` - Mês atual\n\n';
     
