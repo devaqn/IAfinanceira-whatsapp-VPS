@@ -20,116 +20,90 @@ const AUTH_PATH = process.env.AUTH_PATH || path.join(__dirname, 'auth_info');
 
 async function initializeDatabase() {
   console.log('📊 Passo 1/3: Inicializando banco de dados\n');
-  
+
   const dbDir = path.dirname(DB_PATH);
   if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
   }
-  
+
   const schema = new DatabaseSchema(DB_PATH);
   await schema.init();
   schema.initialize();
-  
+
   console.log('');
   return schema.getDatabase();
 }
 
 async function main() {
-  try {
-    const db = await initializeDatabase();
+  const db = await initializeDatabase();
 
-    console.log('🔧 Passo 2/3: Configurando serviços\n');
-    
-    const dao = new DAO(DB_PATH);
-    dao.setDatabase(db);
-    
-    const whatsapp = new WhatsAppService(AUTH_PATH);
-    const messageHandler = new MessageHandler(dao, whatsapp);
-    
-    console.log('✅ DAO inicializado');
-    console.log('✅ WhatsApp service inicializado');
-    console.log('✅ Message handler inicializado\n');
+  console.log('🔧 Passo 2/3: Configurando serviços\n');
 
-    // ============ 🆕 SISTEMA DE LEMBRETES AUTOMÁTICOS ============
+  const dao = new DAO(DB_PATH);
+  dao.setDatabase(db);
 
-    async function checkReminders() {
-      try {
-        // Verificar parcelas vencendo hoje
-        const dueToday = dao.getDueTodayPayments();
-        
-        for (const payment of dueToday) {
+  const whatsapp = new WhatsAppService(AUTH_PATH);
+  const messageHandler = new MessageHandler(dao, whatsapp);
+
+  console.log('✅ DAO inicializado');
+  console.log('✅ WhatsApp service inicializado');
+  console.log('✅ Message handler inicializado\n');
+
+  // ============ 🔔 SISTEMA DE LEMBRETES ============
+
+  async function checkReminders() {
+    try {
+      const dueToday = dao.getDueTodayPayments();
+
+      for (const payment of dueToday) {
+        const message = messageHandler.reports.generateReminderMessage(payment);
+        await whatsapp.sendMessage(payment.chat_id, message);
+        dao.markAsReminded(payment.id);
+        console.log('🔔 Lembrete enviado:', payment.description);
+      }
+
+      const overdue = dao.getOverduePayments();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      for (const payment of overdue) {
+        const lastReminded = payment.reminded_at ? new Date(payment.reminded_at) : null;
+        if (!lastReminded || lastReminded < today) {
           const message = messageHandler.reports.generateReminderMessage(payment);
           await whatsapp.sendMessage(payment.chat_id, message);
           dao.markAsReminded(payment.id);
-          console.log('🔔 Lembrete enviado: ' + payment.description + ' - Parcela ' + payment.installment_number);
+          console.log('❌ Lembrete vencido:', payment.description);
         }
-        
-        // Verificar parcelas vencidas (apenas 1x por dia)
-        const overdue = dao.getOverduePayments();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        for (const payment of overdue) {
-          const lastReminded = payment.reminded_at ? new Date(payment.reminded_at) : null;
-          
-          // Enviar lembrete apenas se não foi enviado hoje
-          if (!lastReminded || lastReminded < today) {
-            const message = messageHandler.reports.generateReminderMessage(payment);
-            await whatsapp.sendMessage(payment.chat_id, message);
-            dao.markAsReminded(payment.id);
-            console.log('❌ Lembrete vencida: ' + payment.description + ' - Parcela ' + payment.installment_number);
-          }
-        }
-      } catch (error) {
-        console.error('❌ Erro ao verificar lembretes:', error.message);
       }
+    } catch (error) {
+      console.error('❌ Erro ao verificar lembretes:', error.message);
     }
-
-    // Verificar lembretes a cada 1 hora
-    const reminderInterval = setInterval(checkReminders, 60 * 60 * 1000);
-
-    // Verificar na inicialização (após 1 minuto)
-    setTimeout(checkReminders, 60 * 1000);
-
-    console.log('📱 Passo 3/3: Conectando ao WhatsApp\n');
-    
-    await whatsapp.connect(async (message) => {
-      await messageHandler.process(message);
-    });
-
-    process.on('SIGINT', async () => {
-      console.log('\n\n🛑 Encerrando bot...');
-      clearInterval(reminderInterval);
-      await whatsapp.disconnect();
-      dao.close();
-      console.log('👋 Bot encerrado\n');
-      process.exit(0);
-    });
-
-    process.on('SIGTERM', async () => {
-      console.log('\n\n🛑 Encerrando bot...');
-      clearInterval(reminderInterval);
-      await whatsapp.disconnect();
-      dao.close();
-      console.log('👋 Bot encerrado\n');
-      process.exit(0);
-    });
-
-  } catch (error) {
-    console.error('\n❌ Erro fatal:', error.message);
-    console.error(error.stack);
-    process.exit(1);
   }
+
+  setInterval(checkReminders, 60 * 60 * 1000);
+  setTimeout(checkReminders, 60 * 1000);
+
+  console.log('📱 Passo 3/3: Conectando ao WhatsApp\n');
+
+  await whatsapp.connect(async (message) => {
+    await messageHandler.process(message);
+  });
 }
 
-process.on('uncaughtException', (error) => {
-  console.error('\n❌ Erro não capturado:', error);
-  process.exit(1);
+// 🛡️ PROTEÇÃO TOTAL CONTRA LOGOUT / PM2
+function keepAlive() {
+  console.log('🛡️ PM2 signal recebido — WhatsApp NÃO será deslogado.');
+}
+
+process.on('SIGINT', keepAlive);
+process.on('SIGTERM', keepAlive);
+
+process.on('uncaughtException', (err) => {
+  console.error('❌ Erro não capturado:', err);
 });
 
 process.on('unhandledRejection', (reason) => {
-  console.error('\n❌ Promise rejeitada:', reason);
-  process.exit(1);
+  console.error('❌ Promise rejeitada:', reason);
 });
 
 main();

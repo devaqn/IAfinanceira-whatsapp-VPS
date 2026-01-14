@@ -68,21 +68,31 @@ class WhatsAppService {
         }
 
         if (connection === 'close') {
-          const shouldReconnect = lastDisconnect && lastDisconnect.error && lastDisconnect.error.output && 
-            lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut;
-          
-          console.log('🔌 Conexão fechada');
-          
-          if (shouldReconnect) {
-            console.log('🔄 Reconectando em 5 segundos...\n');
-            setTimeout(function() {
-              self.connect(messageHandler);
-            }, 5000);
-          } else {
-            console.log('❌ Deslogado. Remova a pasta auth_info e reinicie.\n');
-            process.exit(1);
-          }
-        }
+  const reason = lastDisconnect?.error?.output?.statusCode;
+
+  console.log('🔌 Conexão fechada');
+
+  if (reason === DisconnectReason.loggedOut) {
+    console.log('❌ Sessão inválida. Apagando auth_info e solicitando novo QR...\n');
+
+    try {
+      fs.rmSync(self.authPath, { recursive: true, force: true });
+      fs.mkdirSync(self.authPath, { recursive: true });
+    } catch (e) {
+      console.error('Erro ao limpar auth_info:', e.message);
+    }
+
+    setTimeout(() => {
+      self.connect(messageHandler);
+    }, 3000);
+
+  } else {
+    console.log('🔄 Conexão caiu. Tentando reconectar...\n');
+    setTimeout(() => {
+      self.connect(messageHandler);
+    }, 5000);
+  }
+}
 
         if (connection === 'open') {
           console.log('✅ Conectado ao WhatsApp!\n');
