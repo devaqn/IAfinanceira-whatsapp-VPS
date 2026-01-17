@@ -20,9 +20,9 @@ class MessageHandler {
       return;
     }
 
-    if (this.whatsapp.isFromMe(message)) {
-      return;
-    }
+   if (message.key.fromMe) {
+  return;
+}
       const text = this.whatsapp.getMessageText(message);
       if (!text || text.trim() === '') return;
 
