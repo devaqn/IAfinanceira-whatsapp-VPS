@@ -3,9 +3,9 @@ const ReportGenerator = require('../services/reports');
 const ErrorMessages = require('../utils/ErrorMessages');
 
 class MessageHandler {
-  constructor(dao, whatsappService) {
-    this.dao = dao;
-    this.whatsapp = whatsappService;
+ constructor(dao, whatsapp) {
+  this.dao = dao;
+  this.whatsapp = whatsapp;
     this.nlp = new NLPProcessor();
     this.reports = new ReportGenerator(dao);
     this.recentlyProcessed = {};
