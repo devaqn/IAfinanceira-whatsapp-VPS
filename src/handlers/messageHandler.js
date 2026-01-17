@@ -185,8 +185,6 @@ class MessageHandler {
           response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;
         }
         
-        await this.whatsapp.replyMessage(message, response);
-        return;
       }
       
       else if (command.command === 'withdrawSavings') {
@@ -208,8 +206,6 @@ class MessageHandler {
           response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;
         }
         
-        await this.whatsapp.replyMessage(message, response);
-        return;
       }
       
       else if (command.command === 'getEmergency') {
@@ -241,8 +237,6 @@ class MessageHandler {
           response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;
         }
         
-        await this.whatsapp.replyMessage(message, response);
-        return;
       }
       
       else if (command.command === 'withdrawEmergency') {
@@ -264,8 +258,6 @@ class MessageHandler {
           response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;
         }
         
-        await this.whatsapp.replyMessage(message, response);
-        return;
       }
       
       // 🔧 CORREÇÃO: RELATÓRIO DIÁRIO REMOVIDO
@@ -419,8 +411,8 @@ class MessageHandler {
       
       else if (command.command === 'resetEverything' || command.command === 'confirmReset') {
         const textLower = this.whatsapp.getMessageText(message).toLowerCase().trim();
-        
-        if (textLower === 'confirmar zerar tudo' || command.command === 'confirmReset') {
+
+if (textLower === 'sim, zerar tudo' || textLower === 'sim zerar tudo' || command.command === 'confirmReset') {
           if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'everything') {
             delete this.pendingResets[user.id];
             const success = this.dao.resetEverything(user.id);
