@@ -606,19 +606,20 @@ class ReportGenerator {
         msg += '• Remover parcelas pendentes\n';
         break;
       case 'everything':
-        msg += '☢️ *VOCÊ ESTÁ PRESTES A ZERAR TODO O SISTEMA!*\n\n';
-        msg += '⚠️ Isso irá remover PERMANENTEMENTE:\n\n';
-        msg += '• Saldo principal e inicial\n';
-        msg += '• Poupança completa\n';
-        msg += '• Reserva de emergência\n';
-        msg += '• Todos os parcelamentos\n';
-        msg += '• Todo o histórico de gastos\n\n';
-        msg += '❌ *ESTA AÇÃO NÃO PODE SER DESFEITA!*\n\n';
-        msg += 'Para confirmar, digite exatamente:\n\n';
-        msg += '*confirmar zerar tudo*\n\n';
-        msg += 'Qualquer outra resposta cancelará.\n\n';
-        msg += '🕑 ' + timestamp.formatted;
-        return msg;
+  msg += '☢️ *VOCÊ ESTÁ PRESTES A ZERAR TODO O SISTEMA!*\n\n';
+  msg += '⚠️ Isso irá remover PERMANENTEMENTE:\n\n';
+  msg += '• Saldo principal e inicial\n';
+  msg += '• Poupança completa\n';
+  msg += '• Reserva de emergência\n';
+  msg += '• Todos os parcelamentos\n';
+  msg += '• Todo o histórico de gastos\n\n';
+  msg += '❌ *ESTA AÇÃO NÃO PODE SER DESFEITA!*\n\n';
+  msg += '⏱️ **Você tem 2 minutos para confirmar**\n\n';
+  msg += 'Para confirmar, digite novamente:\n\n';
+  msg += '`/zerar tudo`\n\n';
+  msg += 'Qualquer outro comando cancelará a operação.\n\n';
+  msg += '🕒 ' + timestamp.formatted;
+  return msg;
     }
     
     msg += '\n⚠️ *Esta ação NÃO pode ser desfeita!*\n\n';

@@ -409,16 +409,10 @@ class MessageHandler {
         }
       }
       
-      else if (command.command === 'resetEverything' || command.command === 'confirmReset') {
-  const textLower = this.whatsapp.getMessageText(message).toLowerCase().trim();
-  const textClean = textLower.replace(/[,\s]/g, ''); // Remove vírgulas e espaços
-  
-  // Aceita: "confirmar zerar tudo", "SIM ZERAR TUDO", "SIM, ZERAR TUDO"
-  const isConfirming = textClean === 'confirmarzeratudo' || 
-                       textClean === 'simzeratudo' || 
-                       command.command === 'confirmReset';
-  
-  if (isConfirming && this.pendingResets[user.id] && this.pendingResets[user.id].type === 'everything') {
+     else if (command.command === 'resetEverything') {
+  // Verificar se já tem uma confirmação pendente
+  if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'everything') {
+    // Segunda vez que digitou /zerar tudo - EXECUTAR
     delete this.pendingResets[user.id];
     const success = this.dao.resetEverything(user.id);
     
@@ -426,14 +420,10 @@ class MessageHandler {
       response = this.reports.generateResetConfirmation('everything');
       console.log('☢️☢️☢️ ' + user.name + ': ZEROU TODO O SISTEMA');
     } else {
-      response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕑 ' + timestamp.formatted;
+      response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕒 ' + timestamp.formatted;
     }
-  } else if (isConfirming && (!this.pendingResets[user.id] || this.pendingResets[user.id].type !== 'everything')) {
-    response = '❌ *Nenhuma operação pendente*\n\n' +
-      'Use `/zerar tudo` primeiro para iniciar o processo.\n\n' +
-      '🕑 ' + timestamp.formatted;
   } else {
-    // Iniciando processo de zeragem
+    // Primeira vez - PEDIR CONFIRMAÇÃO
     this.pendingResets[user.id] = { type: 'everything', timestamp: Date.now() };
     response = this.reports.generateResetWarning('everything');
     
@@ -442,10 +432,9 @@ class MessageHandler {
       if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'everything') {
         delete self.pendingResets[user.id];
       }
-    }, 120000);
+    }, 120000); // 2 minutos para confirmar
   }
-}
-      
+}      
       else if (command.command === 'help') {
         response = this.reports.generateHelpMessage();
       }
