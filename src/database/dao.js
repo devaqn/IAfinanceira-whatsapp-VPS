@@ -114,7 +114,17 @@ class DAO {
       [newCurrent, newSavings, userId]
     );
     
-    const categoryId = this.getCategoryByName('Poupança').id;
+    // ✅ CORREÇÃO: Buscar categoria ou usar "Outros" (ID 11)
+    let categoryId = 11; // Fallback para "Outros"
+    try {
+      const category = this.getCategoryByName('Poupança');
+      if (category && category.id) {
+        categoryId = category.id;
+      }
+    } catch (e) {
+      console.log('⚠️ Categoria Poupança não encontrada, usando Outros');
+    }
+    
     this.createTransaction({
       userId: userId,
       amount: amount,
@@ -142,7 +152,17 @@ class DAO {
       [newSavings, newCurrent, userId]
     );
     
-    const categoryId = this.getCategoryByName('Poupança').id;
+    // ✅ CORREÇÃO: Buscar categoria ou usar "Outros" (ID 11)
+    let categoryId = 11; // Fallback para "Outros"
+    try {
+      const category = this.getCategoryByName('Poupança');
+      if (category && category.id) {
+        categoryId = category.id;
+      }
+    } catch (e) {
+      console.log('⚠️ Categoria Poupança não encontrada, usando Outros');
+    }
+    
     this.createTransaction({
       userId: userId,
       amount: amount,
@@ -171,7 +191,17 @@ class DAO {
       [newCurrent, newEmergency, userId]
     );
     
-    const categoryId = this.getCategoryByName('Emergência').id;
+    // ✅ CORREÇÃO: Buscar categoria ou usar "Outros" (ID 11)
+    let categoryId = 11; // Fallback para "Outros"
+    try {
+      const category = this.getCategoryByName('Emergência');
+      if (category && category.id) {
+        categoryId = category.id;
+      }
+    } catch (e) {
+      console.log('⚠️ Categoria Emergência não encontrada, usando Outros');
+    }
+    
     this.createTransaction({
       userId: userId,
       amount: amount,
@@ -199,7 +229,17 @@ class DAO {
       [newEmergency, newCurrent, userId]
     );
     
-    const categoryId = this.getCategoryByName('Emergência').id;
+    // ✅ CORREÇÃO: Buscar categoria ou usar "Outros" (ID 11)
+    let categoryId = 11; // Fallback para "Outros"
+    try {
+      const category = this.getCategoryByName('Emergência');
+      if (category && category.id) {
+        categoryId = category.id;
+      }
+    } catch (e) {
+      console.log('⚠️ Categoria Emergência não encontrada, usando Outros');
+    }
+    
     this.createTransaction({
       userId: userId,
       amount: amount,
@@ -283,7 +323,6 @@ class DAO {
   // ============ TRANSAÇÕES ============
   
   createTransaction(transaction) {
-  try {
     const { userId, amount, description, categoryId, transactionType, chatId, messageId } = transaction;
     const type = transactionType || 'expense';
     
@@ -304,16 +343,9 @@ class DAO {
     
     this.save();
     return savedExpense;
-  } catch (error) {
-    console.error('❌ Erro CRÍTICO em createTransaction:', error);
-    console.error('📋 Stack trace:', error.stack);
-    console.error('📦 Dados recebidos:', JSON.stringify({ userId, amount, description, categoryId, transactionType, chatId, messageId }, null, 2));
-    throw error;
   }
-}
 
   createExpense(expense) {
-  try {
     const { userId, amount, description, categoryId, chatId, messageId } = expense;
     
     if (!this.hasTransactionType) {
@@ -340,12 +372,7 @@ class DAO {
     
     this.save();
     return savedExpense;
-  } catch (error) {
-    console.error('❌ Erro em createExpense:', error);
-    console.error('Dados:', { userId, amount, description, categoryId, chatId, messageId });
-    throw error;
   }
-}
 
   getExpensesByUser(userId, filters = {}) {
     let query = `
@@ -712,119 +739,115 @@ class DAO {
   // ============ 🆕 FUNÇÕES DE ZERAGEM ============
 
   resetBalance(userId) {
-  const user = this.getUserById(userId);
-  if (!user) return false;
-  
-  this.db.run(
-    'UPDATE users SET current_balance = 0, initial_balance = 0, low_balance_warned = 0 WHERE id = ?',
-    [userId]
-  );
-  
-  // Registrar histórico
-  this.db.run(
-    'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [userId, 0, 'Saldo zerado', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
-  );
-  
-  this.save();
-  return true;
-}
+    const user = this.getUserById(userId);
+    if (!user) return false;
+    
+    this.db.run(
+      'UPDATE users SET current_balance = 0, initial_balance = 0, low_balance_warned = 0 WHERE id = ?',
+      [userId]
+    );
+    
+    // Registrar histórico
+    this.db.run(
+      'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type) VALUES (?, ?, ?, ?, ?, ?)',
+      [userId, 0, 'Saldo zerado', 1, new Date().toISOString(), 'reset']
+    );
+    
+    this.save();
+    return true;
+  }
 
   resetSavings(userId) {
-  const user = this.getUserById(userId);
-  if (!user || user.savings_balance === 0) return false;
-  
-  this.db.run(
-    'UPDATE users SET savings_balance = 0 WHERE id = ?',
-    [userId]
-  );
-  
-  // Registrar histórico
-  this.db.run(
-    'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [userId, 0, 'Poupança zerada', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
-  );
-  
-  this.save();
-  return true;
-}
+    const user = this.getUserById(userId);
+    if (!user || user.savings_balance === 0) return false;
+    
+    this.db.run(
+      'UPDATE users SET savings_balance = 0 WHERE id = ?',
+      [userId]
+    );
+    
+    // Registrar histórico
+    this.db.run(
+      'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type) VALUES (?, ?, ?, ?, ?, ?)',
+      [userId, 0, 'Poupança zerada', 1, new Date().toISOString(), 'reset']
+    );
+    
+    this.save();
+    return true;
+  }
 
   resetEmergencyFund(userId) {
-  const user = this.getUserById(userId);
-  if (!user || user.emergency_fund === 0) return false;
-  
-  this.db.run(
-    'UPDATE users SET emergency_fund = 0 WHERE id = ?',
-    [userId]
-  );
-  
-  // Registrar histórico
-  this.db.run(
-    'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [userId, 0, 'Reserva de emergência zerada', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
-  );
-  
-  this.save();
-  return true;
-}
+    const user = this.getUserById(userId);
+    if (!user || user.emergency_fund === 0) return false;
+    
+    this.db.run(
+      'UPDATE users SET emergency_fund = 0 WHERE id = ?',
+      [userId]
+    );
+    
+    // Registrar histórico
+    this.db.run(
+      'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type) VALUES (?, ?, ?, ?, ?, ?)',
+      [userId, 0, 'Reserva de emergência zerada', 1, new Date().toISOString(), 'reset']
+    );
+    
+    this.save();
+    return true;
+  }
 
   resetInstallments(userId) {
-  const user = this.getUserById(userId);
-  if (!user) return false;
-  
-  // Buscar todos os parcelamentos do usuário
-  const installments = this.getInstallmentsByUser(userId);
-  if (installments.length === 0) return false;
-  
-  // Deletar todos os pagamentos
-  this.db.run('DELETE FROM installment_payments WHERE installment_id IN (SELECT id FROM installments WHERE user_id = ?)', [userId]);
-  
-  // Deletar todos os parcelamentos
-  this.db.run('DELETE FROM installments WHERE user_id = ?', [userId]);
-  
-  // Registrar histórico
-  this.db.run(
-    'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [userId, 0, 'Parcelamentos zerados', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
-  );
-  
-  this.save();
-  return true;
-}
+    // Buscar todos os parcelamentos do usuário
+    const installments = this.getInstallmentsByUser(userId);
+    if (installments.length === 0) return false;
+    
+    // Deletar todos os pagamentos
+    this.db.run('DELETE FROM installment_payments WHERE installment_id IN (SELECT id FROM installments WHERE user_id = ?)', [userId]);
+    
+    // Deletar todos os parcelamentos
+    this.db.run('DELETE FROM installments WHERE user_id = ?', [userId]);
+    
+    // Registrar histórico
+    this.db.run(
+      'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type) VALUES (?, ?, ?, ?, ?, ?)',
+      [userId, 0, 'Parcelamentos zerados', 1, new Date().toISOString(), 'reset']
+    );
+    
+    this.save();
+    return true;
+  }
 
   resetEverything(userId) {
-  const user = this.getUserById(userId);
-  if (!user) return false;
-  
-  // Zerar tudo
-  this.db.run(
-    'UPDATE users SET current_balance = 0, initial_balance = 0, savings_balance = 0, emergency_fund = 0, low_balance_warned = 0 WHERE id = ?',
-    [userId]
-  );
-  
-  // Deletar parcelas
-  this.db.run('DELETE FROM installment_payments WHERE installment_id IN (SELECT id FROM installments WHERE user_id = ?)', [userId]);
-  this.db.run('DELETE FROM installments WHERE user_id = ?', [userId]);
-  
-  // Deletar gastos
-  this.db.run('DELETE FROM expenses WHERE user_id = ?', [userId]);
-  
-  // Registrar histórico da zeragem completa
-  this.db.run(
-    'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [userId, 0, 'Sistema totalmente zerado', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
-  );
-  
-  this.save();
-  return true;
-}
+    const user = this.getUserById(userId);
+    if (!user) return false;
+    
 
-  close() {
-    if (this.db) {
-      this.save();
-      this.db.close();
-    }
-  }
-}
+  
+  //Zerar tudo
+this.db.run(
+'UPDATE users SET current_balance = 0, initial_balance = 0, savings_balance = 0, emergency_fund = 0, low_balance_warned = 0 WHERE id = ?',
+[userId]
+);
+// Deletar parcelas
+this.db.run('DELETE FROM installment_payments WHERE installment_id IN (SELECT id FROM installments WHERE user_id = ?)', [userId]);
+this.db.run('DELETE FROM installments WHERE user_id = ?', [userId]);
 
+// Deletar gastos
+this.db.run('DELETE FROM expenses WHERE user_id = ?', [userId]);
+
+// Registrar histórico da zeragem completa
+this.db.run(
+  'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type) VALUES (?, ?, ?, ?, ?, ?)',
+  [userId, 0, 'Sistema totalmente zerado', 1, new Date().toISOString(), 'reset']
+);
+
+this.save();
+return true;
+}
+close() {
+if (this.db) {
+this.save();
+this.db.close();
+}
+}
+}
 module.exports = DAO;
