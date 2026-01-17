@@ -10,17 +10,6 @@ export interface Label {
     /** WhatsApp has 5 predefined labels (New customer, New order & etc) */
     predefinedId?: string;
 }
-export interface LabelActionBody {
-    id: string;
-    /** Label name */
-    name?: string;
-    /** Label color ID */
-    color?: number;
-    /** Is label has been deleted */
-    deleted?: boolean;
-    /** WhatsApp has 5 predefined labels (New customer, New order & etc) */
-    predefinedId?: number;
-}
 /** WhatsApp has 20 predefined colors */
 export declare enum LabelColor {
     Color1 = 0,
@@ -44,4 +33,3 @@ export declare enum LabelColor {
     Color19 = 18,
     Color20 = 19
 }
-//# sourceMappingURL=Label.d.ts.map

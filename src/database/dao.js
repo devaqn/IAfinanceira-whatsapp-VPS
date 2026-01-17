@@ -736,9 +736,9 @@ class DAO {
     this.save();
   }
 
-  // ============ 🆕 FUNÇÕES DE ZERAGEM ============
+ // ============ 🆕 FUNÇÕES DE ZERAGEM ============
 
-  resetBalance(userId) {
+resetBalance(userId) {
   const user = this.getUserById(userId);
   if (!user) return false;
   
@@ -757,7 +757,7 @@ class DAO {
   return true;
 }
 
-  resetSavings(userId) {
+resetSavings(userId) {
   const user = this.getUserById(userId);
   if (!user || user.savings_balance === 0) return false;
   
@@ -776,7 +776,7 @@ class DAO {
   return true;
 }
 
-  resetEmergencyFund(userId) {
+resetEmergencyFund(userId) {
   const user = this.getUserById(userId);
   if (!user || user.emergency_fund === 0) return false;
   
@@ -795,8 +795,9 @@ class DAO {
   return true;
 }
 
- resetInstallments(userId) {
+resetInstallments(userId) {
   const user = this.getUserById(userId);
+  if (!user) return false;
   
   // Buscar todos os parcelamentos do usuário
   const installments = this.getInstallmentsByUser(userId);
@@ -818,26 +819,39 @@ class DAO {
   return true;
 }
 
-resetInstallments(userId) {
+resetEverything(userId) {
   const user = this.getUserById(userId);
-  if (!user) return false; // 👈 ADICIONAR ESTA VALIDAÇÃO
+  if (!user) return false;
   
-  // Buscar todos os parcelamentos do usuário
-  const installments = this.getInstallmentsByUser(userId);
-  if (installments.length === 0) return false;
+  // Zerar tudo
+  this.db.run(
+    'UPDATE users SET current_balance = 0, initial_balance = 0, savings_balance = 0, emergency_fund = 0, low_balance_warned = 0 WHERE id = ?',
+    [userId]
+  );
   
-  // Deletar todos os pagamentos
+  // Deletar parcelas
   this.db.run('DELETE FROM installment_payments WHERE installment_id IN (SELECT id FROM installments WHERE user_id = ?)', [userId]);
-  
-  // Deletar todos os parcelamentos
   this.db.run('DELETE FROM installments WHERE user_id = ?', [userId]);
   
-  // Registrar histórico (COM chat_id!)
+  // Deletar gastos
+  this.db.run('DELETE FROM expenses WHERE user_id = ?', [userId]);
+  
+  // Registrar histórico da zeragem completa (COM chat_id!)
   this.db.run(
     'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [userId, 0, 'Parcelamentos zerados', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
+    [userId, 0, 'Sistema totalmente zerado', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
   );
   
   this.save();
   return true;
-}};
+}
+
+close() {
+  if (this.db) {
+    this.save();
+    this.db.close();
+  }
+}
+}
+
+module.exports = DAO;
