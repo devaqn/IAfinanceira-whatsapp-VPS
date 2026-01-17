@@ -854,4 +854,4 @@ close() {
 }
 }
 
-module.exports = DAO;
+module.exports = { DAO };

@@ -2,7 +2,7 @@ require('dotenv').config();
 const path = require('path');
 const fs = require('fs');
 const DatabaseSchema = require('./src/database/schema');
-const DAO = require('./src/database/dao');
+const { DAO } = require('./src/database/dao');
 const WhatsAppService = require('./src/services/whatsapp');
 const MessageHandler = require('./src/handlers/messageHandler');
 
