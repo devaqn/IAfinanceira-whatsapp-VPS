@@ -13,11 +13,16 @@ class MessageHandler {
   }
 
   async process(message) {
-    try {
-      if (this.whatsapp.isFromMe(message)) {
-        return;
-      }
+  try {
+    // ✅ VALIDAÇÕES EXTRAS
+    if (!message || !message.key) {
+      console.log('⚠️ Mensagem inválida recebida');
+      return;
+    }
 
+    if (this.whatsapp.isFromMe(message)) {
+      return;
+    }
       const text = this.whatsapp.getMessageText(message);
       if (!text || text.trim() === '') return;
 

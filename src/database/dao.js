@@ -283,6 +283,7 @@ class DAO {
   // ============ TRANSAÇÕES ============
   
   createTransaction(transaction) {
+  try {
     const { userId, amount, description, categoryId, transactionType, chatId, messageId } = transaction;
     const type = transactionType || 'expense';
     
@@ -303,9 +304,16 @@ class DAO {
     
     this.save();
     return savedExpense;
+  } catch (error) {
+    console.error('❌ Erro CRÍTICO em createTransaction:', error);
+    console.error('📋 Stack trace:', error.stack);
+    console.error('📦 Dados recebidos:', JSON.stringify({ userId, amount, description, categoryId, transactionType, chatId, messageId }, null, 2));
+    throw error;
   }
+}
 
   createExpense(expense) {
+  try {
     const { userId, amount, description, categoryId, chatId, messageId } = expense;
     
     if (!this.hasTransactionType) {
@@ -332,7 +340,12 @@ class DAO {
     
     this.save();
     return savedExpense;
+  } catch (error) {
+    console.error('❌ Erro em createExpense:', error);
+    console.error('Dados:', { userId, amount, description, categoryId, chatId, messageId });
+    throw error;
   }
+}
 
   getExpensesByUser(userId, filters = {}) {
     let query = `
