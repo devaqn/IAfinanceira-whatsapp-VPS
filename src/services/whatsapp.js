@@ -146,21 +146,7 @@ class WhatsAppService {
     );
   }
   
-  async markAsRead(jid, messageId) {
-    if (!this.sock || !this.isConnected) return;
-    
-    try {
-      await this.sock.readMessages([{
-        remoteJid: jid,
-        id: messageId,
-        participant: undefined
-      }]);
-    } catch (error) {
-      console.error('⚠️ Erro ao marcar como lido:', error.message);
-    }
-  }
-
- async markAsRead(jid, messageId) {
+    async markAsRead(jid, messageId) {
     if (!this.sock || !this.isConnected) return;
     
     try {
@@ -205,4 +191,4 @@ class WhatsAppService {
   }
 }
 
-module.exports = WhatsAppService
+module.exports = WhatsAppService;
