@@ -60,21 +60,32 @@ class WhatsAppService {
             }
           }
 
-          if (connection === 'close') {
-            this.isConnected = false;
+         if (connection === 'close') {
+  this.isConnected = false;
+  const reason = lastDisconnect?.error?.output?.statusCode;
+  
+  console.log('🔌 Conexão fechada');
+  console.log('📊 Motivo:', reason);
+  console.log('📊 Descrição:', lastDisconnect?.error?.message);
 
-            const reason = lastDisconnect?.error?.output?.statusCode;
-            console.log('🔌 Conexão fechada');
-
-            if (reason === DisconnectReason.loggedOut) {
-              console.log('❌ Sessão inválida. Limpando auth...\n');
-              fs.rmSync(this.authPath, { recursive: true, force: true });
-              fs.mkdirSync(this.authPath, { recursive: true });
-            }
-
-            setTimeout(() => this.connect(messageHandler), 5000);
-          }
-
+  if (reason === DisconnectReason.loggedOut) {
+    console.log('❌ Sessão inválida. Limpando auth...\n');
+    fs.rmSync(this.authPath, { recursive: true, force: true });
+    fs.mkdirSync(this.authPath, { recursive: true });
+    setTimeout(() => this.connect(messageHandler), 5000);
+  } else if (reason === DisconnectReason.restartRequired) {
+    console.log('🔄 Restart necessário...\n');
+    setTimeout(() => this.connect(messageHandler), 3000);
+  } else if (reason === DisconnectReason.connectionClosed ||
+             reason === DisconnectReason.connectionLost) {
+    console.log('⚠️ Conexão perdida, reconectando...\n');
+    setTimeout(() => this.connect(messageHandler), 5000);
+  } else {
+    // Para outros erros, aguardar mais tempo
+    console.log('⏸️ Aguardando 10s antes de reconectar...\n');
+    setTimeout(() => this.connect(messageHandler), 10000);
+  }
+}
           if (connection === 'open') {
             this.isConnected = true;
             this.qrAttempts = 0;

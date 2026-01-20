@@ -1,3 +1,3 @@
-/// <reference types="node" />
-import { BinaryInfo } from './BinaryInfo';
-export declare const encodeWAM: (binaryInfo: BinaryInfo) => Buffer;
+import { BinaryInfo } from './BinaryInfo.js';
+export declare const encodeWAM: (binaryInfo: BinaryInfo) => Buffer<ArrayBuffer>;
+//# sourceMappingURL=encode.d.ts.map

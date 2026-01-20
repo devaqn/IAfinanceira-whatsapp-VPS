@@ -40,7 +40,7 @@ const info = {
   messageId: message.key.id
 };
 
-      const messageKey = sender + '-' + messageId;
+      const messageKey = sender + '-' + info.messageId;
       if (this.recentlyProcessed[messageKey]) {
         return;
       }
@@ -51,8 +51,8 @@ const info = {
         delete self.recentlyProcessed[messageKey];
       }, 30000);
 
-      await this.whatsapp.markAsRead(chatId, messageId);
-      await this.whatsapp.sendPresence(chatId, 'composing');
+      await this.whatsapp.markAsRead(info.chatId, info.messageId);
+      await this.whatsapp.sendPresence(info.chatId, 'composing');
 
       let user = this.dao.getUserByWhatsAppId(sender);
       if (!user) {
@@ -61,13 +61,13 @@ const info = {
         console.log('👤 Novo usuário: ' + name + ' (' + sender + ')');
         
         await this.whatsapp.replyMessage(message, this.reports.generateWelcomeMessage(name));
-        await this.whatsapp.sendPresence(chatId, 'available');
+        await this.whatsapp.sendPresence(info.chatId, 'available');
         return;
       }
 
       if (isGroup) {
-        const groupName = chatId.split('@')[0];
-        this.dao.upsertGroup(chatId, groupName);
+        const groupName = info.chatId.split('@')[0];
+        this.dao.upsertGroup(info.chatId, groupName);
       }
 
       const processed = this.nlp.processMessage(text);
@@ -80,7 +80,7 @@ const info = {
         await this.handleInstallment(processed, user, message);
       }
 
-      await this.whatsapp.sendPresence(chatId, 'available');
+      await this.whatsapp.sendPresence(info.chatId, 'available');
 
     } catch (error) {
       console.error('❌ Erro ao processar mensagem:', error);

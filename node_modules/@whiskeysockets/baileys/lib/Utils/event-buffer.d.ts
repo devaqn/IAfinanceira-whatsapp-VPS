@@ -1,5 +1,5 @@
-import { Logger } from 'pino';
-import { BaileysEventEmitter, BaileysEventMap } from '../Types';
+import type { BaileysEventEmitter, BaileysEventMap } from '../Types/index.js';
+import type { ILogger } from './logger.js';
 /**
  * A map that contains a list of all events that have been triggered
  *
@@ -10,26 +10,25 @@ import { BaileysEventEmitter, BaileysEventMap } from '../Types';
 type BaileysEventData = Partial<BaileysEventMap>;
 type BaileysBufferableEventEmitter = BaileysEventEmitter & {
     /** Use to process events in a batch */
-    process(handler: (events: BaileysEventData) => void | Promise<void>): (() => void);
+    process(handler: (events: BaileysEventData) => void | Promise<void>): () => void;
     /**
      * starts buffering events, call flush() to release them
      * */
     buffer(): void;
     /** buffers all events till the promise completes */
-    createBufferedFunction<A extends any[], T>(work: (...args: A) => Promise<T>): ((...args: A) => Promise<T>);
+    createBufferedFunction<A extends any[], T>(work: (...args: A) => Promise<T>): (...args: A) => Promise<T>;
     /**
      * flushes all buffered events
-     * @param force if true, will flush all data regardless of any pending buffers
      * @returns returns true if the flush actually happened, otherwise false
      */
-    flush(force?: boolean): boolean;
+    flush(): boolean;
     /** is there an ongoing buffer */
     isBuffering(): boolean;
 };
 /**
  * The event buffer logically consolidates different events into a single event
  * making the data processing more efficient.
- * @param ev the baileys event emitter
  */
-export declare const makeEventBuffer: (logger: Logger) => BaileysBufferableEventEmitter;
+export declare const makeEventBuffer: (logger: ILogger) => BaileysBufferableEventEmitter;
 export {};
+//# sourceMappingURL=event-buffer.d.ts.map
