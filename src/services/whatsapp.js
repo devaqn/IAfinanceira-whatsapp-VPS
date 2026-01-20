@@ -145,6 +145,56 @@ class WhatsAppService {
       ''
     );
   }
+  
+  async markAsRead(jid, messageId) {
+    if (!this.sock || !this.isConnected) return;
+    
+    try {
+      await this.sock.readMessages([{
+        remoteJid: jid,
+        id: messageId,
+        participant: undefined
+      }]);
+    } catch (error) {
+      console.error('⚠️ Erro ao marcar como lido:', error.message);
+    }
+  }
+
+ async markAsRead(jid, messageId) {
+    if (!this.sock || !this.isConnected) return;
+    
+    try {
+      await this.sock.readMessages([{
+        remoteJid: jid,
+        id: messageId,
+        participant: undefined
+      }]);
+    } catch (error) {
+      console.error('⚠️ Erro ao marcar como lido:', error.message);
+    }
+  }
+
+  async sendPresence(jid, type) {
+    if (!this.sock || !this.isConnected) return;
+    
+    try {
+      await this.sock.sendPresenceUpdate(type, jid);
+    } catch (error) {
+      console.error('⚠️ Erro ao enviar presença:', error.message);
+    }
+  }
+
+  getSenderInfo(message) {
+    const isGroup = message.key.remoteJid.endsWith('@g.us');
+    const sender = isGroup ? message.key.participant : message.key.remoteJid;
+    
+    return {
+      sender: sender,
+      chatId: message.key.remoteJid,
+      isGroup: isGroup,
+      messageId: message.key.id
+    };
+  }
 
   async disconnect() {
     if (this.sock) {
@@ -155,4 +205,4 @@ class WhatsAppService {
   }
 }
 
-module.exports = WhatsAppService;
+module.exports = WhatsAppService
