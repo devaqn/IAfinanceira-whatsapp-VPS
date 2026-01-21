@@ -6,29 +6,6 @@ const { DAO } = require('./src/database/dao');
 const WhatsAppService = require('./src/services/whatsapp');
 const MessageHandler = require('./src/handlers/messageHandler');
 
-// 🛡️ PROTEÇÃO CONTRA MÚLTIPLAS INSTÂNCIAS
-const LOCK_FILE = path.join(__dirname, '.bot.lock');
-
-if (fs.existsSync(LOCK_FILE)) {
-  console.error('❌ ERRO: O bot já está rodando!');
-  console.error('❌ Se você tem certeza que não está, delete o arquivo .bot.lock');
-  process.exit(1);
-}
-
-fs.writeFileSync(LOCK_FILE, process.pid.toString());
-
-process.on('exit', () => {
-  try {
-    fs.unlinkSync(LOCK_FILE);
-  } catch (e) {}
-});
-
-process.on('SIGINT', () => {
-  try {
-    fs.unlinkSync(LOCK_FILE);
-  } catch (e) {}
-  process.exit(0);
-});
 console.log('╔═══════════════════════════════════════════════════════════╗');
 console.log('║                                                           ║');
 console.log('║     🤖  BOT FINANCEIRO WHATSAPP - VERSÃO TERMUX  🤖      ║');

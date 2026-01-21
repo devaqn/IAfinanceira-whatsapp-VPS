@@ -322,105 +322,132 @@ const info = {
       }
       
       else if (command.command === 'resetBalance') {
-        if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'balance') {
-          delete this.pendingResets[user.id];
-          const success = this.dao.resetBalance(user.id);
-          
-          if (success) {
-            response = this.reports.generateResetConfirmation('balance');
-            console.log('☢️ ' + user.name + ': zerou saldo principal');
-          } else {
-            response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕑 ' + timestamp.formatted;
-          }
-        } else {
-          this.pendingResets[user.id] = { type: 'balance', timestamp: Date.now() };
-          response = this.reports.generateResetWarning('balance');
-          
-          const self = this;
-          setTimeout(function() {
-            if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'balance') {
-              delete self.pendingResets[user.id];
-            }
-          }, 120000);
-        }
+  // ✅ CORREÇÃO: Verificar timestamp para evitar loop
+  const pending = this.pendingResets[user.id];
+  const now = Date.now();
+  
+  if (pending && pending.type === 'balance' && (now - pending.timestamp) < 120000) {
+    // Segunda vez DENTRO do prazo de 2 minutos - EXECUTAR
+    delete this.pendingResets[user.id];
+    const success = this.dao.resetBalance(user.id);
+    
+    if (success) {
+      response = this.reports.generateResetConfirmation('balance');
+      console.log('☢️ ' + user.name + ': zerou saldo principal');
+    } else {
+      response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕐 ' + timestamp.formatted;
+    }
+  } else {
+    // Primeira vez OU expirou - PEDIR CONFIRMAÇÃO
+    this.pendingResets[user.id] = { type: 'balance', timestamp: now };
+    response = this.reports.generateResetWarning('balance');
+    
+    const self = this;
+    setTimeout(function() {
+      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'balance') {
+        delete self.pendingResets[user.id];
       }
+    }, 120000);
+  }
+}
       
       else if (command.command === 'resetSavings') {
-        if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'savings') {
-          delete this.pendingResets[user.id];
-          const success = this.dao.resetSavings(user.id);
-          
-          if (success) {
-            response = this.reports.generateResetConfirmation('savings');
-            console.log('☢️ ' + user.name + ': zerou poupança');
-          } else {
-            response = ErrorMessages.NO_DATA_FOUND('poupança') + '\n\n🕑 ' + timestamp.formatted;
-          }
-        } else {
-          this.pendingResets[user.id] = { type: 'savings', timestamp: Date.now() };
-          response = this.reports.generateResetWarning('savings');
-          
-          const self = this;
-          setTimeout(function() {
-            if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'savings') {
-              delete self.pendingResets[user.id];
-            }
-          }, 120000);
-        }
+  // ✅ CORREÇÃO: Verificar timestamp para evitar loop
+  const pending = this.pendingResets[user.id];
+  const now = Date.now();
+  
+  if (pending && pending.type === 'savings' && (now - pending.timestamp) < 120000) {
+    // Segunda vez DENTRO do prazo de 2 minutos - EXECUTAR
+    delete this.pendingResets[user.id];
+    const success = this.dao.resetSavings(user.id);
+    
+    if (success) {
+      response = this.reports.generateResetConfirmation('savings');
+      console.log('☢️ ' + user.name + ': zerou poupança');
+    } else {
+      response = ErrorMessages.NO_DATA_FOUND('poupança') + '\n\n🕐 ' + timestamp.formatted;
+    }
+  } else {
+    // Primeira vez OU expirou - PEDIR CONFIRMAÇÃO
+    this.pendingResets[user.id] = { type: 'savings', timestamp: now };
+    response = this.reports.generateResetWarning('savings');
+    
+    const self = this;
+    setTimeout(function() {
+      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'savings') {
+        delete self.pendingResets[user.id];
       }
+    }, 120000);
+  }
+}
       
       else if (command.command === 'resetEmergency') {
-        if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'emergency') {
-          delete this.pendingResets[user.id];
-          const success = this.dao.resetEmergencyFund(user.id);
-          
-          if (success) {
-            response = this.reports.generateResetConfirmation('emergency');
-            console.log('☢️ ' + user.name + ': zerou reserva de emergência');
-          } else {
-            response = ErrorMessages.NO_DATA_FOUND('reserva de emergência') + '\n\n🕑 ' + timestamp.formatted;
-          }
-        } else {
-          this.pendingResets[user.id] = { type: 'emergency', timestamp: Date.now() };
-          response = this.reports.generateResetWarning('emergency');
-          
-          const self = this;
-          setTimeout(function() {
-            if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'emergency') {
-              delete self.pendingResets[user.id];
-            }
-          }, 120000);
-        }
+  // ✅ CORREÇÃO: Verificar timestamp para evitar loop
+  const pending = this.pendingResets[user.id];
+  const now = Date.now();
+  
+  if (pending && pending.type === 'emergency' && (now - pending.timestamp) < 120000) {
+    // Segunda vez DENTRO do prazo de 2 minutos - EXECUTAR
+    delete this.pendingResets[user.id];
+    const success = this.dao.resetEmergencyFund(user.id);
+    
+    if (success) {
+      response = this.reports.generateResetConfirmation('emergency');
+      console.log('☢️ ' + user.name + ': zerou reserva de emergência');
+    } else {
+      response = ErrorMessages.NO_DATA_FOUND('reserva de emergência') + '\n\n🕐 ' + timestamp.formatted;
+    }
+  } else {
+    // Primeira vez OU expirou - PEDIR CONFIRMAÇÃO
+    this.pendingResets[user.id] = { type: 'emergency', timestamp: now };
+    response = this.reports.generateResetWarning('emergency');
+    
+    const self = this;
+    setTimeout(function() {
+      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'emergency') {
+        delete self.pendingResets[user.id];
       }
+    }, 120000);
+  }
+}
       
       else if (command.command === 'resetInstallments') {
-        if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'installments') {
-          delete this.pendingResets[user.id];
-          const success = this.dao.resetInstallments(user.id);
-          
-          if (success) {
-            response = this.reports.generateResetConfirmation('installments');
-            console.log('☢️ ' + user.name + ': zerou parcelamentos');
-          } else {
-            response = ErrorMessages.NO_DATA_FOUND('parcelamentos') + '\n\n🕑 ' + timestamp.formatted;
-          }
-        } else {
-          this.pendingResets[user.id] = { type: 'installments', timestamp: Date.now() };
-          response = this.reports.generateResetWarning('installments');
-          
-          const self = this;
-          setTimeout(function() {
-            if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'installments') {
-              delete self.pendingResets[user.id];
-            }
-          }, 120000);
-        }
+  // ✅ CORREÇÃO: Verificar timestamp para evitar loop
+  const pending = this.pendingResets[user.id];
+  const now = Date.now();
+  
+  if (pending && pending.type === 'installments' && (now - pending.timestamp) < 120000) {
+    // Segunda vez DENTRO do prazo de 2 minutos - EXECUTAR
+    delete this.pendingResets[user.id];
+    const success = this.dao.resetInstallments(user.id);
+    
+    if (success) {
+      response = this.reports.generateResetConfirmation('installments');
+      console.log('☢️ ' + user.name + ': zerou parcelamentos');
+    } else {
+      response = ErrorMessages.NO_DATA_FOUND('parcelamentos') + '\n\n🕐 ' + timestamp.formatted;
+    }
+  } else {
+    // Primeira vez OU expirou - PEDIR CONFIRMAÇÃO
+    this.pendingResets[user.id] = { type: 'installments', timestamp: now };
+    response = this.reports.generateResetWarning('installments');
+    
+    const self = this;
+    setTimeout(function() {
+      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'installments') {
+        delete self.pendingResets[user.id];
       }
+    }, 120000);
+  }
+}
       
-     else if (command.command === 'resetEverything') {
-  // Verificar se já tem uma confirmação pendente
-  if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'everything') {
-    // Segunda vez que digitou /zerar tudo - EXECUTAR
+   else if (command.command === 'resetEverything') {
+  // ✅ CORREÇÃO: Verificar timestamp para evitar loop
+  const pending = this.pendingResets[user.id];
+  const now = Date.now();
+  
+  if (pending && pending.type === 'everything' && (now - pending.timestamp) < 120000) {
+    // Segunda vez DENTRO do prazo de 2 minutos - EXECUTAR
     delete this.pendingResets[user.id];
     const success = this.dao.resetEverything(user.id);
     
@@ -428,11 +455,11 @@ const info = {
       response = this.reports.generateResetConfirmation('everything');
       console.log('☢️☢️☢️ ' + user.name + ': ZEROU TODO O SISTEMA');
     } else {
-      response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕒 ' + timestamp.formatted;
+      response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕐 ' + timestamp.formatted;
     }
   } else {
-    // Primeira vez - PEDIR CONFIRMAÇÃO
-    this.pendingResets[user.id] = { type: 'everything', timestamp: Date.now() };
+    // Primeira vez OU expirou - PEDIR CONFIRMAÇÃO
+    this.pendingResets[user.id] = { type: 'everything', timestamp: now };
     response = this.reports.generateResetWarning('everything');
     
     const self = this;
@@ -440,9 +467,9 @@ const info = {
       if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'everything') {
         delete self.pendingResets[user.id];
       }
-    }, 120000); // 2 minutos para confirmar
+    }, 120000);
   }
-}      
+}
       else if (command.command === 'help') {
         response = this.reports.generateHelpMessage();
       }

@@ -80,11 +80,17 @@ class WhatsAppService {
              reason === DisconnectReason.connectionLost) {
     console.log('⚠️ Conexão perdida, reconectando...\n');
     setTimeout(() => this.connect(messageHandler), 5000);
-  } else {
-    // Para outros erros, aguardar mais tempo
-    console.log('⏸️ Aguardando 10s antes de reconectar...\n');
-    setTimeout(() => this.connect(messageHandler), 10000);
-  }
+ } else if (reason === 440) {
+  // ✅ ERRO 440 = CONFLITO (múltiplas sessões)
+  console.log('⚠️ CONFLITO DETECTADO!');
+  console.log('🚨 Outra instância está conectada neste número.');
+  console.log('📌 Feche outros bots/apps usando este WhatsApp.\n');
+  console.log('⏸️ Aguardando 30s antes de reconectar...\n');
+  setTimeout(() => this.connect(messageHandler), 30000);
+} else {
+  console.log('⏸️ Aguardando 10s antes de reconectar...\n');
+  setTimeout(() => this.connect(messageHandler), 10000);
+}
 }
           if (connection === 'open') {
             this.isConnected = true;

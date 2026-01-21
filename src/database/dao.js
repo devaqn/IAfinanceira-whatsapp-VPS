@@ -746,14 +746,14 @@ resetBalance(userId) {
     'UPDATE users SET current_balance = 0, initial_balance = 0, low_balance_warned = 0 WHERE id = ?',
     [userId]
   );
+  this.save(); // ✅ SALVAR IMEDIATAMENTE
   
-  // Registrar histórico (COM chat_id!)
   this.db.run(
     'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [userId, 0, 'Saldo zerado', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
   );
+  this.save(); // ✅ SALVAR NOVAMENTE
   
-  this.save();
   return true;
 }
 
@@ -765,14 +765,14 @@ resetSavings(userId) {
     'UPDATE users SET savings_balance = 0 WHERE id = ?',
     [userId]
   );
+  this.save(); // ✅ SALVAR IMEDIATAMENTE
   
-  // Registrar histórico (COM chat_id!)
   this.db.run(
     'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [userId, 0, 'Poupança zerada', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
   );
+  this.save(); // ✅ SALVAR NOVAMENTE
   
-  this.save();
   return true;
 }
 
@@ -784,14 +784,14 @@ resetEmergencyFund(userId) {
     'UPDATE users SET emergency_fund = 0 WHERE id = ?',
     [userId]
   );
+  this.save(); // ✅ SALVAR IMEDIATAMENTE
   
-  // Registrar histórico (COM chat_id!)
   this.db.run(
     'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [userId, 0, 'Reserva de emergência zerada', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
   );
+  this.save(); // ✅ SALVAR NOVAMENTE
   
-  this.save();
   return true;
 }
 
@@ -805,17 +805,19 @@ resetInstallments(userId) {
   
   // Deletar todos os pagamentos
   this.db.run('DELETE FROM installment_payments WHERE installment_id IN (SELECT id FROM installments WHERE user_id = ?)', [userId]);
+  this.save(); // ✅ SALVAR IMEDIATAMENTE
   
   // Deletar todos os parcelamentos
   this.db.run('DELETE FROM installments WHERE user_id = ?', [userId]);
+  this.save(); // ✅ SALVAR IMEDIATAMENTE
   
   // Registrar histórico (COM chat_id!)
   this.db.run(
     'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [userId, 0, 'Parcelamentos zerados', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
   );
+  this.save(); // ✅ SALVAR NOVAMENTE
   
-  this.save();
   return true;
 }
 
@@ -828,21 +830,26 @@ resetEverything(userId) {
     'UPDATE users SET current_balance = 0, initial_balance = 0, savings_balance = 0, emergency_fund = 0, low_balance_warned = 0 WHERE id = ?',
     [userId]
   );
+  this.save(); // ✅ SALVAR IMEDIATAMENTE
   
   // Deletar parcelas
   this.db.run('DELETE FROM installment_payments WHERE installment_id IN (SELECT id FROM installments WHERE user_id = ?)', [userId]);
+  this.save(); // ✅ SALVAR IMEDIATAMENTE
+  
   this.db.run('DELETE FROM installments WHERE user_id = ?', [userId]);
+  this.save(); // ✅ SALVAR IMEDIATAMENTE
   
   // Deletar gastos
   this.db.run('DELETE FROM expenses WHERE user_id = ?', [userId]);
+  this.save(); // ✅ SALVAR IMEDIATAMENTE
   
   // Registrar histórico da zeragem completa (COM chat_id!)
   this.db.run(
     'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
     [userId, 0, 'Sistema totalmente zerado', 1, new Date().toISOString(), 'reset', user.whatsapp_id]
   );
+  this.save(); // ✅ SALVAR FINALMENTE
   
-  this.save();
   return true;
 }
 
