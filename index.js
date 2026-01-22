@@ -5,6 +5,58 @@ const DatabaseSchema = require('./src/database/schema');
 const { DAO } = require('./src/database/dao');
 const WhatsAppService = require('./src/services/whatsapp');
 const MessageHandler = require('./src/handlers/messageHandler');
+// SISTEMA DE MEMÓRIA
+let conversationMemory = {};
+let userStates = {};
+let messageHistory = {};
+
+// MUDE PARA SEU NÚMERO (formato: 5581XXXXXXXXX@s.whatsapp.net, pra por de ADM pra limpar memoria)
+const ADMIN_NUMBER = '558198191625@s.whatsapp.net';
+
+function limparMemoriaGlobal() {
+  const usuariosAntes = Object.keys(conversationMemory).length;
+  conversationMemory = {};
+  userStates = {};
+  messageHistory = {};
+  console.log('🧹 MEMÓRIA GLOBAL LIMPA!');
+  return `✅ Memória global limpa!\n\n📊 ${usuariosAntes} usuários removidos.`;
+}
+
+function limparMemoriaUsuario(userId) {
+  const existia = conversationMemory[userId] !== undefined;
+  delete conversationMemory[userId];
+  delete userStates[userId];
+  delete messageHistory[userId];
+  console.log(`🧹 Memória do usuário ${userId} limpa!`);
+  return existia 
+    ? '✅ Sua memória foi limpa!'
+    : '⚠️ Você não tinha dados em memória.';
+}
+
+function verStatusMemoria() {
+  const totalUsuarios = Object.keys(conversationMemory).length;
+  const totalMensagens = Object.keys(messageHistory).length;
+  const totalEstados = Object.keys(userStates).length;
+  
+  return `📊 *STATUS DA MEMÓRIA*\n\n` +
+         `👥 Usuários: *${totalUsuarios}*\n` +
+         `💬 Conversas: *${totalMensagens}*\n` +
+         `🔄 Estados: *${totalEstados}*\n\n` +
+         `*COMANDOS:*\n` +
+         `!limpar - Limpa sua memória\n` +
+         `!limpartudo - Limpa TUDO\n` +
+         `!status - Este status\n` +
+         `!ajuda - Ajuda`;
+}
+
+function mostrarAjuda() {
+  return `🤖 *COMANDOS ADMIN*\n\n` +
+         `!status - Ver memória\n` +
+         `!limpar - Limpar sua conversa\n` +
+         `!limpartudo - Limpar TUDO\n` +
+         `!ajuda - Esta ajuda`;
+}
+// ==================== FIM DO SISTEMA DE MEMÓRIA ====================
 
 console.log('╔═══════════════════════════════════════════════════════════╗');
 console.log('║                                                           ║');

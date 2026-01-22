@@ -2,10 +2,19 @@ const NLPProcessor = require('../services/nlp');
 const ReportGenerator = require('../services/reports');
 const ErrorMessages = require('../utils/ErrorMessages');
 
+// ⭐ IMPORT DO SISTEMA DE MEMÓRIA
+const { 
+  ADMIN_NUMBER, 
+  limparMemoriaGlobal, 
+  limparMemoriaUsuario, 
+  verStatusMemoria, 
+  mostrarAjuda 
+} = require('../utils/memoryManager');
+
 class MessageHandler {
- constructor(dao, whatsapp) {
-  this.dao = dao;
-  this.whatsapp = whatsapp;
+  constructor(dao, whatsappService) {
+    this.dao = dao;
+    this.whatsapp = whatsappService;
     this.nlp = new NLPProcessor();
     this.reports = new ReportGenerator(dao);
     this.recentlyProcessed = {};
@@ -13,34 +22,59 @@ class MessageHandler {
   }
 
   async process(message) {
-  try {
-    // ✅ VALIDAÇÕES EXTRAS
-    if (!message || !message.key) {
-      console.log('⚠️ Mensagem inválida recebida');
-      return;
-    }
+    try {
+      if (this.whatsapp.isFromMe(message)) {
+        return;
+      }
 
-   if (message.key.fromMe) {
-  return;
-}
-      const msg = message.message;
-const text = msg.conversation ||
-  (msg.extendedTextMessage && msg.extendedTextMessage.text) ||
-  (msg.imageMessage && msg.imageMessage.caption) ||
-  (msg.videoMessage && msg.videoMessage.caption) ||
-  '';
+      const text = this.whatsapp.getMessageText(message);
       if (!text || text.trim() === '') return;
 
-      const isGroup = message.key.remoteJid.endsWith('@g.us');
-const sender = isGroup ? message.key.participant : message.key.remoteJid;
-const info = {
-  sender: sender,
-  chatId: message.key.remoteJid,
-  isGroup: isGroup,
-  messageId: message.key.id
-};
+      const info = this.whatsapp.getSenderInfo(message);
+      const sender = info.sender;
+      const chatId = info.chatId;
+      const isGroup = info.isGroup;
+      const messageId = info.messageId;
 
-      const messageKey = sender + '-' + info.messageId;
+      // ==================== ⭐ COMANDOS ADMINISTRATIVOS ⭐ ====================
+      if (sender === ADMIN_NUMBER) {
+        const comando = text.toLowerCase().trim();
+        
+        if (comando === '!limpartudo') {
+          console.log('🧹 Admin executou: !limpartudo');
+          const resposta = limparMemoriaGlobal();
+          await this.whatsapp.replyMessage(message, resposta);
+          await this.whatsapp.sendPresence(chatId, 'available');
+          return;
+        }
+        
+        if (comando === '!limpar') {
+          console.log('🧹 Admin executou: !limpar');
+          const resposta = limparMemoriaUsuario(sender);
+          await this.whatsapp.replyMessage(message, resposta);
+          await this.whatsapp.sendPresence(chatId, 'available');
+          return;
+        }
+        
+        if (comando === '!status') {
+          console.log('📊 Admin executou: !status');
+          const resposta = verStatusMemoria();
+          await this.whatsapp.replyMessage(message, resposta);
+          await this.whatsapp.sendPresence(chatId, 'available');
+          return;
+        }
+        
+        if (comando === '!ajuda' || comando === '!help') {
+          console.log('❓ Admin executou: !ajuda');
+          const resposta = mostrarAjuda();
+          await this.whatsapp.replyMessage(message, resposta);
+          await this.whatsapp.sendPresence(chatId, 'available');
+          return;
+        }
+      }
+      // ==================== FIM DOS COMANDOS ADMINISTRATIVOS ====================
+
+      const messageKey = sender + '-' + messageId;
       if (this.recentlyProcessed[messageKey]) {
         return;
       }
@@ -51,8 +85,8 @@ const info = {
         delete self.recentlyProcessed[messageKey];
       }, 30000);
 
-      await this.whatsapp.markAsRead(info.chatId, info.messageId);
-      await this.whatsapp.sendPresence(info.chatId, 'composing');
+      await this.whatsapp.markAsRead(chatId, messageId);
+      await this.whatsapp.sendPresence(chatId, 'composing');
 
       let user = this.dao.getUserByWhatsAppId(sender);
       if (!user) {
@@ -61,13 +95,13 @@ const info = {
         console.log('👤 Novo usuário: ' + name + ' (' + sender + ')');
         
         await this.whatsapp.replyMessage(message, this.reports.generateWelcomeMessage(name));
-        await this.whatsapp.sendPresence(info.chatId, 'available');
+        await this.whatsapp.sendPresence(chatId, 'available');
         return;
       }
 
       if (isGroup) {
-        const groupName = info.chatId.split('@')[0];
-        this.dao.upsertGroup(info.chatId, groupName);
+        const groupName = chatId.split('@')[0];
+        this.dao.upsertGroup(chatId, groupName);
       }
 
       const processed = this.nlp.processMessage(text);
@@ -80,7 +114,7 @@ const info = {
         await this.handleInstallment(processed, user, message);
       }
 
-      await this.whatsapp.sendPresence(info.chatId, 'available');
+      await this.whatsapp.sendPresence(chatId, 'available');
 
     } catch (error) {
       console.error('❌ Erro ao processar mensagem:', error);
@@ -101,6 +135,8 @@ const info = {
   async handleCommand(command, user, message) {
     let response = '';
     const timestamp = this.reports.getCurrentBrazilTimestamp();
+    const info = this.whatsapp.getSenderInfo(message);
+    const sender = info.sender;
 
     try {
       if (command.command === 'setBalance') {
@@ -166,14 +202,13 @@ const info = {
       
       else if (command.command === 'getSavings') {
         const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);
-        response = '🏷 *POUPANÇA*\n\n' +
+        response = '🐷 *POUPANÇA*\n\n' +
           `💵 Saldo guardado: *${this.reports.formatMoney(updatedUser.savings_balance)}*\n\n` +
           'Use `/guardar 100` para guardar dinheiro\n' +
           'Use `/retirar 50` para retirar\n\n' +
           '🕑 ' + timestamp.formatted;
       }
       
-      // 🔧 CORREÇÃO: Validação de user antes de gerar confirmação
       else if (command.command === 'depositSavings') {
         if (command.amount && command.amount > 0) {
           const success = this.dao.addToSavings(user.id, command.amount);
@@ -182,7 +217,7 @@ const info = {
             const updatedUser = this.dao.getUserById(user.id);
             if (updatedUser) {
               response = this.reports.generateSavingsConfirmation('deposit', command.amount, updatedUser);
-              console.log('🏷 ' + user.name + ': guardou ' + command.amount);
+              console.log('🐷 ' + user.name + ': guardou ' + command.amount);
             } else {
               response = '❌ *Erro ao buscar dados atualizados*\n\n🕑 ' + timestamp.formatted;
             }
@@ -193,6 +228,8 @@ const info = {
           response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;
         }
         
+        await this.whatsapp.replyMessage(message, response);
+        return;
       }
       
       else if (command.command === 'withdrawSavings') {
@@ -203,7 +240,7 @@ const info = {
             const updatedUser = this.dao.getUserById(user.id);
             if (updatedUser) {
               response = this.reports.generateSavingsConfirmation('withdraw', command.amount, updatedUser);
-              console.log('🏷 ' + user.name + ': retirou ' + command.amount);
+              console.log('🐷 ' + user.name + ': retirou ' + command.amount);
             } else {
               response = '❌ *Erro ao buscar dados atualizados*\n\n🕑 ' + timestamp.formatted;
             }
@@ -214,6 +251,8 @@ const info = {
           response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;
         }
         
+        await this.whatsapp.replyMessage(message, response);
+        return;
       }
       
       else if (command.command === 'getEmergency') {
@@ -225,7 +264,6 @@ const info = {
           '🕑 ' + timestamp.formatted;
       }
       
-      // 🔧 CORREÇÃO: Validação de user antes de gerar confirmação
       else if (command.command === 'depositEmergency') {
         if (command.amount && command.amount > 0) {
           const success = this.dao.addToEmergencyFund(user.id, command.amount);
@@ -245,6 +283,8 @@ const info = {
           response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;
         }
         
+        await this.whatsapp.replyMessage(message, response);
+        return;
       }
       
       else if (command.command === 'withdrawEmergency') {
@@ -266,10 +306,9 @@ const info = {
           response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;
         }
         
+        await this.whatsapp.replyMessage(message, response);
+        return;
       }
-      
-      // 🔧 CORREÇÃO: RELATÓRIO DIÁRIO REMOVIDO
-      // else if (command.command === 'reportDaily') { ... }
       
       else if (command.command === 'reportWeekly') {
         response = this.reports.generateWeeklyReport(user.id);
@@ -322,160 +361,166 @@ const info = {
       }
       
       else if (command.command === 'resetBalance') {
-  // ✅ CORREÇÃO: Verificar timestamp para evitar loop
-  const pending = this.pendingResets[user.id];
-  const now = Date.now();
-  
-  if (pending && pending.type === 'balance' && (now - pending.timestamp) < 120000) {
-    // Segunda vez DENTRO do prazo de 2 minutos - EXECUTAR
-    delete this.pendingResets[user.id];
-    const success = this.dao.resetBalance(user.id);
-    
-    if (success) {
-      response = this.reports.generateResetConfirmation('balance');
-      console.log('☢️ ' + user.name + ': zerou saldo principal');
-    } else {
-      response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕐 ' + timestamp.formatted;
-    }
-  } else {
-    // Primeira vez OU expirou - PEDIR CONFIRMAÇÃO
-    this.pendingResets[user.id] = { type: 'balance', timestamp: now };
-    response = this.reports.generateResetWarning('balance');
-    
-    const self = this;
-    setTimeout(function() {
-      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'balance') {
-        delete self.pendingResets[user.id];
+        if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'balance') {
+          delete this.pendingResets[user.id];
+          const success = this.dao.resetBalance(user.id);
+          
+          if (success) {
+            response = this.reports.generateResetConfirmation('balance');
+            console.log('☢️ ' + user.name + ': zerou saldo principal');
+          } else {
+            response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕑 ' + timestamp.formatted;
+          }
+        } else {
+          this.pendingResets[user.id] = { type: 'balance', timestamp: Date.now() };
+          response = this.reports.generateResetWarning('balance');
+          
+          const self = this;
+          setTimeout(function() {
+            if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'balance') {
+              delete self.pendingResets[user.id];
+            }
+          }, 120000);
+        }
       }
-    }, 120000);
-  }
-}
       
       else if (command.command === 'resetSavings') {
-  // ✅ CORREÇÃO: Verificar timestamp para evitar loop
-  const pending = this.pendingResets[user.id];
-  const now = Date.now();
-  
-  if (pending && pending.type === 'savings' && (now - pending.timestamp) < 120000) {
-    // Segunda vez DENTRO do prazo de 2 minutos - EXECUTAR
-    delete this.pendingResets[user.id];
-    const success = this.dao.resetSavings(user.id);
-    
-    if (success) {
-      response = this.reports.generateResetConfirmation('savings');
-      console.log('☢️ ' + user.name + ': zerou poupança');
-    } else {
-      response = ErrorMessages.NO_DATA_FOUND('poupança') + '\n\n🕐 ' + timestamp.formatted;
-    }
-  } else {
-    // Primeira vez OU expirou - PEDIR CONFIRMAÇÃO
-    this.pendingResets[user.id] = { type: 'savings', timestamp: now };
-    response = this.reports.generateResetWarning('savings');
-    
-    const self = this;
-    setTimeout(function() {
-      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'savings') {
-        delete self.pendingResets[user.id];
+        if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'savings') {
+          delete this.pendingResets[user.id];
+          const success = this.dao.resetSavings(user.id);
+          
+          if (success) {
+            response = this.reports.generateResetConfirmation('savings');
+            console.log('☢️ ' + user.name + ': zerou poupança');
+          } else {
+            response = ErrorMessages.NO_DATA_FOUND('poupança') + '\n\n🕑 ' + timestamp.formatted;
+          }
+        } else {
+          this.pendingResets[user.id] = { type: 'savings', timestamp: Date.now() };
+          response = this.reports.generateResetWarning('savings');
+          
+          const self = this;
+          setTimeout(function() {
+            if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'savings') {
+              delete self.pendingResets[user.id];
+            }
+          }, 120000);
+        }
       }
-    }, 120000);
-  }
-}
       
       else if (command.command === 'resetEmergency') {
-  // ✅ CORREÇÃO: Verificar timestamp para evitar loop
-  const pending = this.pendingResets[user.id];
-  const now = Date.now();
-  
-  if (pending && pending.type === 'emergency' && (now - pending.timestamp) < 120000) {
-    // Segunda vez DENTRO do prazo de 2 minutos - EXECUTAR
-    delete this.pendingResets[user.id];
-    const success = this.dao.resetEmergencyFund(user.id);
-    
-    if (success) {
-      response = this.reports.generateResetConfirmation('emergency');
-      console.log('☢️ ' + user.name + ': zerou reserva de emergência');
-    } else {
-      response = ErrorMessages.NO_DATA_FOUND('reserva de emergência') + '\n\n🕐 ' + timestamp.formatted;
-    }
-  } else {
-    // Primeira vez OU expirou - PEDIR CONFIRMAÇÃO
-    this.pendingResets[user.id] = { type: 'emergency', timestamp: now };
-    response = this.reports.generateResetWarning('emergency');
-    
-    const self = this;
-    setTimeout(function() {
-      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'emergency') {
-        delete self.pendingResets[user.id];
+        if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'emergency') {
+          delete this.pendingResets[user.id];
+          const success = this.dao.resetEmergencyFund(user.id);
+          
+          if (success) {
+            response = this.reports.generateResetConfirmation('emergency');
+            console.log('☢️ ' + user.name + ': zerou reserva de emergência');
+          } else {
+            response = ErrorMessages.NO_DATA_FOUND('reserva de emergência') + '\n\n🕑 ' + timestamp.formatted;
+          }
+        } else {
+          this.pendingResets[user.id] = { type: 'emergency', timestamp: Date.now() };
+          response = this.reports.generateResetWarning('emergency');
+          
+          const self = this;
+          setTimeout(function() {
+            if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'emergency') {
+              delete self.pendingResets[user.id];
+            }
+          }, 120000);
+        }
       }
-    }, 120000);
-  }
-}
       
       else if (command.command === 'resetInstallments') {
-  // ✅ CORREÇÃO: Verificar timestamp para evitar loop
-  const pending = this.pendingResets[user.id];
-  const now = Date.now();
-  
-  if (pending && pending.type === 'installments' && (now - pending.timestamp) < 120000) {
-    // Segunda vez DENTRO do prazo de 2 minutos - EXECUTAR
-    delete this.pendingResets[user.id];
-    const success = this.dao.resetInstallments(user.id);
-    
-    if (success) {
-      response = this.reports.generateResetConfirmation('installments');
-      console.log('☢️ ' + user.name + ': zerou parcelamentos');
-    } else {
-      response = ErrorMessages.NO_DATA_FOUND('parcelamentos') + '\n\n🕐 ' + timestamp.formatted;
-    }
-  } else {
-    // Primeira vez OU expirou - PEDIR CONFIRMAÇÃO
-    this.pendingResets[user.id] = { type: 'installments', timestamp: now };
-    response = this.reports.generateResetWarning('installments');
-    
-    const self = this;
-    setTimeout(function() {
-      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'installments') {
-        delete self.pendingResets[user.id];
+        if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'installments') {
+          delete this.pendingResets[user.id];
+          const success = this.dao.resetInstallments(user.id);
+          
+          if (success) {
+            response = this.reports.generateResetConfirmation('installments');
+            console.log('☢️ ' + user.name + ': zerou parcelamentos');
+          } else {
+            response = ErrorMessages.NO_DATA_FOUND('parcelamentos') + '\n\n🕑 ' + timestamp.formatted;
+          }
+        } else {
+          this.pendingResets[user.id] = { type: 'installments', timestamp: Date.now() };
+          response = this.reports.generateResetWarning('installments');
+          
+          const self = this;
+          setTimeout(function() {
+            if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'installments') {
+              delete self.pendingResets[user.id];
+            }
+          }, 120000);
+        }
       }
-    }, 120000);
-  }
-}
       
-   else if (command.command === 'resetEverything') {
-  // ✅ CORREÇÃO: Verificar timestamp para evitar loop
-  const pending = this.pendingResets[user.id];
-  const now = Date.now();
-  
-  if (pending && pending.type === 'everything' && (now - pending.timestamp) < 120000) {
-    // Segunda vez DENTRO do prazo de 2 minutos - EXECUTAR
-    delete this.pendingResets[user.id];
-    const success = this.dao.resetEverything(user.id);
-    
-    if (success) {
-      response = this.reports.generateResetConfirmation('everything');
-      console.log('☢️☢️☢️ ' + user.name + ': ZEROU TODO O SISTEMA');
-    } else {
-      response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕐 ' + timestamp.formatted;
-    }
-  } else {
-    // Primeira vez OU expirou - PEDIR CONFIRMAÇÃO
-    this.pendingResets[user.id] = { type: 'everything', timestamp: now };
-    response = this.reports.generateResetWarning('everything');
-    
-    const self = this;
-    setTimeout(function() {
-      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'everything') {
-        delete self.pendingResets[user.id];
+      else if (command.command === 'resetEverything' || command.command === 'confirmReset') {
+        const textLower = this.whatsapp.getMessageText(message).toLowerCase().trim();
+        
+        if (textLower === 'confirmar zerar tudo' || command.command === 'confirmReset') {
+          if (this.pendingResets[user.id] && this.pendingResets[user.id].type === 'everything') {
+            delete this.pendingResets[user.id];
+            const success = this.dao.resetEverything(user.id);
+            
+            if (success) {
+              response = this.reports.generateResetConfirmation('everything');
+              console.log('☢️☢️☢️ ' + user.name + ': ZEROU TODO O SISTEMA');
+            } else {
+              response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕑 ' + timestamp.formatted;
+            }
+          } else {
+            response = '❌ *Nenhuma operação pendente*\n\n' +
+              'Use `/zerar tudo` primeiro para iniciar o processo.\n\n' +
+              '🕑 ' + timestamp.formatted;
+          }
+        } else {
+          this.pendingResets[user.id] = { type: 'everything', timestamp: Date.now() };
+          response = this.reports.generateResetWarning('everything');
+          
+          const self = this;
+          setTimeout(function() {
+            if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'everything') {
+              delete self.pendingResets[user.id];
+            }
+          }, 120000);
+        }
       }
-    }, 120000);
-  }
-}
+      
       else if (command.command === 'help') {
-        response = this.reports.generateHelpMessage();
+        // ⭐ ADICIONAR COMANDOS ADMIN NO /AJUDA
+        if (sender === ADMIN_NUMBER) {
+          response = this.reports.generateHelpMessage() + 
+                     '\n\n━━━━━━━━━━━━━━━━━━━\n\n' +
+                     '🔧 *COMANDOS ADMINISTRATIVOS*\n\n' +
+                     'Você tem acesso a comandos especiais:\n\n' +
+                     '*!status*\n' +
+                     '└ Ver status da memória do bot\n\n' +
+                     '*!limpar*\n' +
+                     '└ Limpar apenas sua memória\n\n' +
+                     '*!limpartudo*\n' +
+                     '└ Limpar TODA a memória do bot\n\n' +
+                     '*!ajuda*\n' +
+                     '└ Ver comandos administrativos\n\n' +
+                     '━━━━━━━━━━━━━━━━━━━\n\n' +
+                     '⚠️ Apenas você (admin) pode usar estes comandos.';
+        } else {
+          response = this.reports.generateHelpMessage();
+        }
       }
       
       else if (command.command === 'start') {
         response = this.reports.generateWelcomeMessage(user.name);
+        
+        // ⭐ SE FOR ADMIN, MOSTRAR INFO SOBRE COMANDOS ESPECIAIS
+        if (sender === ADMIN_NUMBER) {
+          response += '\n\n━━━━━━━━━━━━━━━━━━━\n\n' +
+                      '🔧 *PAINEL ADMINISTRATIVO ATIVO*\n\n' +
+                      'Você tem acesso a comandos especiais de gerenciamento.\n' +
+                      'Digite *!ajuda* para ver os comandos admin.\n\n' +
+                      '━━━━━━━━━━━━━━━━━━━';
+        }
       }
       
       else {
