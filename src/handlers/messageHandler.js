@@ -2,7 +2,7 @@ const NLPProcessor = require('../services/nlp');
 const ReportGenerator = require('../services/reports');
 const ErrorMessages = require('../utils/ErrorMessages');
 const Logger = require('../utils/logger'); // ⭐ NOVO
-const { TIMEOUTS, PAYMENT_METHODS } = require('../config/constants'); // ⭐ NOVO
+const { TIMEOUTS, PAYMENT_METHODS } = require('../config/constants'); // ⭐ NOVOO CONTANTS
 
 const { 
   ADMIN_NUMBER, 
@@ -27,20 +27,6 @@ class MessageHandler {
   this.pendingInvoicePayments = {};  // ⭐ ADICIONAR ESTE
   
   // ✅ BIND DAS FUNÇÕES PARA EVITAR PERDER CONTEXTO
-  this.cleanupPendingOperation = this.cleanupPendingOperation.bind(this);
-}
-constructor(dao, whatsappService) {
-  this.dao = dao;
-  this.whatsapp = whatsappService;
-  this.nlp = new NLPProcessor();
-  this.reports = new ReportGenerator(dao);
-  
-  this.recentlyProcessed = {};
-  this.pendingResets = {};
-  this.pendingPurchases = {};
-  this.pendingInstallments = {};
-  this.pendingInvoicePayments = {}; // ✅ JÁ TEM
-  
   this.cleanupPendingOperation = this.cleanupPendingOperation.bind(this);
 }
 cleanupPendingOperation(userId, operationType, timeout = 120000) {
