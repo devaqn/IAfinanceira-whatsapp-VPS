@@ -544,20 +544,27 @@ class ReportGenerator {
     const timestamp = this.getCurrentBrazilTimestamp();
     let msg = '✅ *OPERAÇÃO CONCLUÍDA*\n\n';
     
-    switch(type) {
-      case 'balance':
-        msg += '💰 *Saldo principal zerado*\n';
-        break;
-      case 'savings':
-        msg += '🏷 *Poupança zerada*\n';
-        break;
-      case 'emergency':
-        msg += '🚨 *Reserva de emergência zerada*\n';
-        break;
-      case 'installments':
-        msg += '📦 *Parcelamentos zerados*\n';
-        break;
-      case 'everything':
+  switch(type) {
+  case 'balance':
+    msg += '💰 *Saldo principal zerado*\n';
+    break;
+  case 'savings':
+    msg += '🏷 *Poupança zerada*\n';
+    break;
+  case 'emergency':
+    msg += '🚨 *Reserva de emergência zerada*\n';
+    break;
+  case 'card':  // ⭐ ADICIONAR ESTE CASO
+    msg += '💳 *Cartão de crédito zerado*\n';
+    msg += '\nTodos os dados do cartão foram removidos:\n';
+    msg += '• Saldo usado zerado\n';
+    msg += '• Fatura zerada\n';
+    msg += '• Histórico de compras removido\n\n';
+    break;
+  case 'installments':
+    msg += '📦 *Parcelamentos zerados*\n';
+    break;
+  case 'everything':
         msg += '☢️ *SISTEMA TOTALMENTE ZERADO*\n';
         msg += '\nTodos os dados foram removidos:\n';
         msg += '• Saldo principal\n';
@@ -598,6 +605,14 @@ class ReportGenerator {
         msg += 'Você está prestes a *zerar sua reserva de emergência*.\n\n';
         msg += 'Todo o valor reservado será removido.\n';
         break;
+         case 'card':  
+         msg += 'Você está prestes a *zerar seu cartão de crédito*.\n\n';
+         msg += 'Isso irá:\n';
+        msg += '• Zerar todo o saldo usado\n';
+        msg += '• Zerar a fatura atual\n';
+        msg += '• Remover histórico de compras\n';
+        msg += '• Manter o limite do cartão\n';
+    break;
       case 'installments':
         msg += 'Você está prestes a *zerar todos os parcelamentos*.\n\n';
         msg += 'Isso irá:\n';
