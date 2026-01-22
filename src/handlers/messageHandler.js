@@ -22,19 +22,35 @@ class MessageHandler {
   }
 
   async process(message) {
-    try {
-      if (this.whatsapp.isFromMe(message)) {
-        return;
-      }
+  try {
+    // ✅ VALIDAÇÕES EXTRAS
+    if (!message || !message.key) {
+      console.log('⚠️ Mensagem inválida recebida');
+      return;
+    }
 
-      const text = this.whatsapp.getMessageText(message);
-      if (!text || text.trim() === '') return;
+    // ✅ IGNORAR MENSAGENS ENVIADAS PELO BOT
+    if (message.key.fromMe) {
+      return;
+    }
 
-      const info = this.whatsapp.getSenderInfo(message);
-      const sender = info.sender;
-      const chatId = info.chatId;
-      const isGroup = info.isGroup;
-      const messageId = info.messageId;
+    const msg = message.message;
+    const text = msg.conversation ||
+      (msg.extendedTextMessage && msg.extendedTextMessage.text) ||
+      (msg.imageMessage && msg.imageMessage.caption) ||
+      (msg.videoMessage && msg.videoMessage.caption) ||
+      '';
+      
+    if (!text || text.trim() === '') return;
+
+    const isGroup = message.key.remoteJid.endsWith('@g.us');
+    const sender = isGroup ? message.key.participant : message.key.remoteJid;
+    const info = {
+      sender: sender,
+      chatId: message.key.remoteJid,
+      isGroup: isGroup,
+      messageId: message.key.id
+    };
 
       // ==================== ⭐ COMANDOS ADMINISTRATIVOS ⭐ ====================
       if (sender === ADMIN_NUMBER) {
