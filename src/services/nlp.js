@@ -24,6 +24,11 @@ class NLPProcessor {
       // Reserva de emergência
       getEmergency: /^\/emerg[eê]ncia\s*$/i,
       depositEmergency: /^\/reservar\s+(\d+(?:[.,]\d{1,2})?)/i,
+      // 💳 Cartão de crédito
+      getCard: /^\/cart[aã]o\s*$/i,
+      setCardLimit: /^\/cart[aã]o\s+limite\s+(\d+(?:[.,]\d{1,2})?)/i,
+      payInvoice: /^\/pagar\s+fatura\s*$/i,
+      resetCard: /^\/(?:zerar|resetar|limpar)\s+cart[aã]o\s*$/i,
       withdrawEmergency: /^\/usar\s+(\d+(?:[.,]\d{1,2})?)/i,
       
       // Parcelamentos

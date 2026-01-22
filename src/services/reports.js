@@ -723,7 +723,100 @@ class ReportGenerator {
     welcome += '🕑 ' + timestamp.formatted;
     
     return welcome;
+    
   }
+  generateCardReport(card) {
+  const timestamp = this.getCurrentBrazilTimestamp();
+  const percentUsed = card.card_limit > 0 
+    ? ((card.current_balance / card.card_limit) * 100).toFixed(1)
+    : 0;
+  
+  let emoji = '💳';
+  if (card.available_limit < 0) emoji = '🚨';
+  else if (card.available_limit < card.card_limit * 0.2) emoji = '⚠️';
+  
+  let report = '╔══════════════════════════════════════════════╗\n';
+  report += `${emoji} *CARTÃO DE CRÉDITO*\n`;
+  report += '╚══════════════════════════════════════════════╝\n\n';
+  
+  report += `📊 *Limite Total:* ${this.formatMoney(card.card_limit)}\n`;
+  report += `💰 *Usado:* ${this.formatMoney(card.current_balance)} (${percentUsed}%)\n`;
+  report += `✅ *Disponível:* ${this.formatMoney(card.available_limit)}\n\n`;
+  
+  report += `📅 *Fatura Atual:* ${this.formatMoney(card.invoice_amount)}\n`;
+  report += `🔔 *Vencimento:* Todo dia ${card.invoice_due_day}\n\n`;
+  
+  if (card.last_payment_date) {
+    report += `💵 *Último Pagamento:*\n`;
+    report += `   Valor: ${this.formatMoney(card.last_payment_amount)}\n`;
+    report += `   Data: ${this.formatDate(card.last_payment_date)}\n\n`;
+  }
+  
+  if (card.available_limit < 0) {
+    report += '🚨 *ATENÇÃO: Limite estourado!*\n';
+    report += `Você está ${this.formatMoney(Math.abs(card.available_limit))} acima do limite.\n\n`;
+  } else if (card.available_limit < card.card_limit * 0.2) {
+    report += '⚠️ *AVISO: Limite baixo!*\n';
+    report += 'Menos de 20% disponível.\n\n';
+  }
+  
+  report += '══════════════════════════════════════════════\n';
+  report += '💡 Use `/pagar fatura` para pagar\n';
+  report += '🕐 ' + timestamp.formatted;
+  
+  return report;
 }
+
+// 💳 CONFIRMAÇÃO DE COMPRA NO CARTÃO
+generateCardPurchaseConfirmation(expense, card, category) {
+  const timestamp = this.getCurrentBrazilTimestamp();
+  
+  let report = '✅ *COMPRA NO CARTÃO REGISTRADA*\n\n';
+  
+  report += `${category.emoji} *Categoria:* ${category.name}\n`;
+  report += `💵 *Valor:* ${this.formatMoney(expense.amount)}\n`;
+  report += `📝 *Descrição:* ${expense.description}\n`;
+  report += `🕐 *Registrado em:* ${timestamp.formatted}\n\n`;
+  
+  report += '💳 *CARTÃO DE CRÉDITO*\n';
+  report += `   Limite: ${this.formatMoney(card.card_limit)}\n`;
+  report += `   Usado: ${this.formatMoney(card.current_balance)}\n`;
+  report += `   Disponível: ${this.formatMoney(card.available_limit)}\n\n`;
+  
+  report += `📅 *Fatura próximo mês:* ${this.formatMoney(card.invoice_amount)}\n`;
+  report += `🔔 *Vencimento:* Dia ${card.invoice_due_day}\n\n`;
+  
+  report += '══════════════════════════════════════════════';
+  
+  return report;
+}
+
+// 💳 CONFIRMAÇÃO DE PARCELAMENTO NO CARTÃO
+generateCardInstallmentConfirmation(installment, card, category) {
+  const timestamp = this.getCurrentBrazilTimestamp();
+  
+  let report = '✅ *PARCELAMENTO NO CARTÃO REGISTRADO*\n\n';
+  
+  report += `${category.emoji} *Categoria:* ${category.name}\n`;
+  report += `📦 *Produto:* ${installment.description}\n`;
+  report += `💰 *Total:* ${this.formatMoney(installment.total_amount)}\n`;
+  report += `📊 *Parcelas:* ${installment.total_installments}x de ${this.formatMoney(installment.installment_amount)}\n`;
+  report += `📅 *Primeira parcela:* ${this.formatDate(installment.first_due_date)}\n`;
+  report += `🕐 *Registrado em:* ${timestamp.formatted}\n\n`;
+  
+  report += '💳 *SITUAÇÃO DO CARTÃO*\n';
+  report += `   Limite: ${this.formatMoney(card.card_limit)}\n`;
+  report += `   Usado: ${this.formatMoney(card.current_balance)}\n`;
+  report += `   Disponível: ${this.formatMoney(card.available_limit)}\n\n`;
+  
+  report += `📅 *Fatura atual:* ${this.formatMoney(card.invoice_amount)}\n\n`;
+  
+  report += '💡 As parcelas serão cobradas mensalmente\n';
+  report += '══════════════════════════════════════════════';
+  
+  return report;
+}
+}
+
 
 module.exports = ReportGenerator;

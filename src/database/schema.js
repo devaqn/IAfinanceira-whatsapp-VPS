@@ -22,6 +22,7 @@ class DatabaseSchema {
   }
 
   initialize() {
+    
     console.log('🗄️ Inicializando banco de dados...');
 
     // Tabelas existentes (mantidas)
@@ -122,7 +123,50 @@ class DatabaseSchema {
     
     this.save();
     console.log('✅ Banco de dados pronto!\n');
+    // ============ 💳 TABELA DE CARTÃO DE CRÉDITO ============
+// Armazena as configurações do cartão do usuário
+this.db.run(`
+  CREATE TABLE IF NOT EXISTS credit_cards (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    card_limit REAL DEFAULT 0.0,           -- Limite total do cartão
+    current_balance REAL DEFAULT 0.0,      -- Quanto já foi usado
+    available_limit REAL DEFAULT 0.0,      -- Quanto ainda tem disponível
+    invoice_amount REAL DEFAULT 0.0,       -- Valor da fatura atual
+    invoice_due_day INTEGER DEFAULT 10,    -- Dia de vencimento da fatura
+    last_payment_date DATETIME,            -- Data do último pagamento
+    last_payment_amount REAL DEFAULT 0.0,  -- Valor do último pagamento
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+  )
+`);
+
+// ============ 💳 TABELA DE TRANSAÇÕES DO CARTÃO ============
+// Registra cada compra feita no cartão
+this.db.run(`
+  CREATE TABLE IF NOT EXISTS card_transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    card_id INTEGER NOT NULL,
+    amount REAL NOT NULL,                  -- Valor da compra
+    description TEXT NOT NULL,             -- Descrição da compra
+    category_id INTEGER NOT NULL,          -- Categoria
+    transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_installment INTEGER DEFAULT 0,      -- Se é parcelamento (1) ou à vista (0)
+    installment_id INTEGER,                -- ID do parcelamento (se aplicável)
+    chat_id TEXT NOT NULL,
+    message_id TEXT,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (card_id) REFERENCES credit_cards (id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories (id),
+    FOREIGN KEY (installment_id) REFERENCES installments (id) ON DELETE SET NULL
+  )
+`);
+
+console.log('✅ Tabelas de cartão criadas!');
   }
+  
 
   migrateDatabase() {
     try {
