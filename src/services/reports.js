@@ -631,69 +631,77 @@ class ReportGenerator {
   }
 
   generateHelpMessage() {
-    const timestamp = this.getCurrentBrazilTimestamp();
-    
-    let help = '╔═══════════════════════════════════════╗\n';
-    help += '🤖 *BOT FINANCEIRO - AJUDA*\n';
-    help += '╚═══════════════════════════════════════╝\n\n';
-    
-    help += '💸 *REGISTRAR GASTO*\n';
-    help += 'Escreva naturalmente:\n';
-    help += '• "Gastei 50 no mercado"\n';
-    help += '• "Paguei 15 no uber"\n';
-    help += '• "Almocei por 25 reais"\n\n';
-    
-    help += '💰 *SALDO PRINCIPAL*\n';
-    help += '• `/saldo` - Ver saldo\n';
-    help += '• `/saldo 1000` - Definir inicial\n';
-    help += '• `/adicionar 500` - Adicionar saldo\n\n';
-    
-    help += '🏷 *POUPANÇA*\n';
-    help += '• `/poupanca` - Ver poupança\n';
-    help += '• `/guardar 100` - Guardar dinheiro\n';
-    help += '• `/retirar 50` - Retirar da poupança\n\n';
-    
-    help += '🚨 *RESERVA DE EMERGÊNCIA*\n';
-    help += '• `/emergencia` - Ver reserva\n';
-    help += '• `/reservar 200` - Adicionar à reserva\n';
-    help += '• `/usar 100` - Usar da reserva\n\n';
-    
-    help += '📦 *PARCELAMENTOS*\n';
-    help += '• "comprei celular por 1200 em 12x"\n';
-    help += '• `/parcelamentos` - Ver todas as compras parceladas\n';
-    help += '• `/pagar celular` - Pagar próxima parcela\n\n';
-    
-    help += '🔔 *LEMBRETES*\n';
-    help += '• `/lembretes` ou `/lembrar` - Ver lembretes\n';
-    help += '• `/vencidas` ou `/pendentes` - Ver parcelas atrasadas\n';
-    help += '_⚠️ Lembretes só funcionam com o bot ligado_\n\n';
-    
-    help += '📊 *RELATÓRIOS*\n';
-    help += '• `/relatorio semanal` ou `/semana` - 7 dias\n';
-    help += '• `/relatorio mensal` ou `/mes` - Mês atual\n\n';
-    
-    help += '☢️ *ZERAGEM (IRREVERSÍVEL)*\n';
-    help += '• `/zerar saldo` - Zerar saldo principal ⚠️\n';
-    help += '• `/zerar poupanca` - Zerar poupança ⚠️\n';
-    help += '• `/zerar reserva` - Zerar reserva emergência ⚠️\n';
-    help += '• `/zerar parcelas` - Zerar parcelamentos ⚠️\n';
-    help += '• `/zerar tudo` - Zerar TUDO ☢️\n';
-    help += '_⚠️ Todos os comandos de zeragem exigem confirmação_\n\n';
-    
-    help += '🏷️ *CATEGORIAS AUTOMÁTICAS*\n';
-    help += '🍔 Alimentação • 🚗 Transporte\n';
-    help += '🛒 Mercado • 🎮 Lazer\n';
-    help += '💳 Contas • 💊 Saúde\n';
-    help += '📚 Educação • 👕 Vestuário\n\n';
-    
-    help += '═══════════════════════════════════════\n';
-    help += '💡 O bot identifica categorias automaticamente!\n';
-    help += 'Use `/start` para começar.\n\n';
-    help += '✅ *TODOS os comandos retornam confirmação*\n';
-    help += '🕑 ' + timestamp.formatted;
-    
-    return help;
-  }
+  const timestamp = this.getCurrentBrazilTimestamp();
+  
+  let help = '╔═══════════════════════════════════════╗\n';
+  help += '🤖 *BOT FINANCEIRO - AJUDA COMPLETA*\n';
+  help += '╚═══════════════════════════════════════╝\n\n';
+  
+  help += '💸 *REGISTRAR GASTOS*\n';
+  help += 'Escreva naturalmente:\n';
+  help += '• "Gastei 50 no mercado"\n';
+  help += '• "Paguei 15 no uber"\n';
+  help += '• "Almocei por 25 reais"\n\n';
+  
+  help += '💰 *SALDO PRINCIPAL*\n';
+  help += '• `/saldo` - Ver saldo\n';
+  help += '• `/saldo 1000` - Definir inicial\n';
+  help += '• `/adicionar 500` - Adicionar saldo\n';
+  help += '• `/zerar saldo` - Zerar saldo ⚠️\n\n';
+  
+  help += '🏷 *POUPANÇA*\n';
+  help += '• `/poupanca` - Ver poupança\n';
+  help += '• `/guardar 100` - Guardar dinheiro\n';
+  help += '• `/retirar 50` - Retirar da poupança\n';
+  help += '• `/zerar poupanca` - Zerar poupança ⚠️\n\n';
+  
+  help += '🚨 *RESERVA DE EMERGÊNCIA*\n';
+  help += '• `/emergencia` - Ver reserva\n';
+  help += '• `/reservar 200` - Adicionar à reserva\n';
+  help += '• `/usar 100` - Usar da reserva\n';
+  help += '• `/zerar reserva` - Zerar reserva ⚠️\n\n';
+  
+  help += '💳 *CARTÃO DE CRÉDITO*\n';
+  help += '• `/cartao` - Ver informações do cartão\n';
+  help += '• `/cartao limite 5000` - Definir limite\n';
+  help += '• `/pagar fatura` - Pagar fatura do cartão\n';
+  help += '• `/zerar cartao` - Zerar cartão ⚠️\n';
+  help += '_💡 Gastos perguntam se foram no cartão_\n\n';
+  
+  help += '📦 *PARCELAMENTOS*\n';
+  help += '• "comprei celular por 1200 em 12x"\n';
+  help += '• `/parcelamentos` - Ver todas parcelas\n';
+  help += '• `/pagar celular` - Pagar próxima parcela\n';
+  help += '• `/zerar parcelas` - Zerar parcelamentos ⚠️\n\n';
+  
+  help += '🔔 *LEMBRETES*\n';
+  help += '• `/lembretes` - Ver lembretes\n';
+  help += '• `/vencidas` - Ver parcelas atrasadas\n';
+  help += '_⚠️ Lembretes só funcionam com bot ligado_\n\n';
+  
+  help += '📊 *RELATÓRIOS*\n';
+  help += '• `/relatorio semanal` ou `/semana`\n';
+  help += '• `/relatorio mensal` ou `/mes`\n\n';
+  
+  help += '☢️ *ZERAGEM COMPLETA*\n';
+  help += '• `/zerar tudo` - Zerar TUDO ☢️\n';
+  help += '_⚠️ Remove saldo, poupança, reserva, parcelas e histórico_\n';
+  help += '_⚠️ Todos os comandos de zeragem exigem confirmação_\n\n';
+  
+  help += '🏷️ *CATEGORIAS AUTOMÁTICAS*\n';
+  help += '🍔 Alimentação • 🚗 Transporte\n';
+  help += '🛒 Mercado • 🎮 Lazer\n';
+  help += '💳 Contas • 💊 Saúde\n';
+  help += '📚 Educação • 👕 Vestuário\n\n';
+  
+  help += '═══════════════════════════════════════\n';
+  help += '💡 O bot identifica categorias automaticamente!\n';
+  help += '✅ TODOS os comandos retornam confirmação\n\n';
+  help += 'Desenvolvido por : github.com/devaqn\n\n';
+  help += '🕐 ' + timestamp.formatted;
+  
+  return help;
+}
 
   generateWelcomeMessage(userName) {
     const timestamp = this.getCurrentBrazilTimestamp();

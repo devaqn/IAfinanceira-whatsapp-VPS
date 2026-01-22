@@ -752,26 +752,26 @@ else if (command.command === 'resetCard') {
 }
       
       else if (command.command === 'help') {
-        // ⭐ ADICIONAR COMANDOS ADMIN NO /AJUDA
-        if (sender === ADMIN_NUMBER) {
-          response = this.reports.generateHelpMessage() + 
-                     '\n\n━━━━━━━━━━━━━━━━━━━\n\n' +
-                     '🔧 *COMANDOS ADMINISTRATIVOS*\n\n' +
-                     'Você tem acesso a comandos especiais:\n\n' +
-                     '*!status*\n' +
-                     '└ Ver status da memória do bot\n\n' +
-                     '*!limpar*\n' +
-                     '└ Limpar apenas sua memória\n\n' +
-                     '*!limpartudo*\n' +
-                     '└ Limpar TODA a memória do bot\n\n' +
-                     '*!ajuda*\n' +
-                     '└ Ver comandos administrativos\n\n' +
-                     '━━━━━━━━━━━━━━━━━━━\n\n' +
-                     '⚠️ Apenas você (admin) pode usar estes comandos.';
-        } else {
-          response = this.reports.generateHelpMessage();
-        }
-      }
+  // ⭐ ADICIONAR COMANDOS ADMIN NO /AJUDA
+  if (sender === ADMIN_NUMBER) {
+    response = this.reports.generateHelpMessage() + 
+               '\n\n═══════════════════════════════════════\n\n' +
+               '🔧 *COMANDOS ADMINISTRATIVOS*\n\n' +
+               'Você tem acesso a comandos especiais:\n\n' +
+               '*!status*\n' +
+               '└ Ver status da memória do bot\n\n' +
+               '*!limpar*\n' +
+               '└ Limpar apenas sua memória\n\n' +
+               '*!limpartudo*\n' +
+               '└ Limpar TODA a memória do bot\n\n' +
+               '*!ajuda*\n' +
+               '└ Ver comandos administrativos\n\n' +
+               '═══════════════════════════════════════\n\n' +
+               '⚠️ Apenas você (admin) pode usar estes comandos.';
+  } else {
+    response = this.reports.generateHelpMessage();
+  }
+}
       
       else if (command.command === 'start') {
         response = this.reports.generateWelcomeMessage(user.name);
