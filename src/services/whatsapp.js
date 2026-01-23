@@ -17,6 +17,8 @@ class WhatsAppService {
     this.qrAttempts = 0;
     this.maxQRAttempts = 3;
     this.isConnected = false;
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 5;
 
     if (!fs.existsSync(this.authPath)) {
       fs.mkdirSync(this.authPath, { recursive: true });
@@ -43,7 +45,11 @@ class WhatsAppService {
           printQRInTerminal: false,
           browser: ['Finance Bot', 'Chrome', '1.0.0'],
           connectTimeoutMs: 60000,
-          keepAliveIntervalMs: 30000
+          keepAliveIntervalMs: 30000,
+          // 🔥 CONFIGURAÇÕES ANTI-CONFLITO
+          markOnlineOnConnect: false,
+          syncFullHistory: false,
+          shouldIgnoreJid: jid => jid === 'status@broadcast'
         });
 
         this.sock.ev.on('creds.update', saveCreds);
@@ -56,18 +62,54 @@ class WhatsAppService {
 
             if (this.qrAttempts >= this.maxQRAttempts) {
               this.qrAttempts = 0;
-              console.log('⚠️ Muitas tentativas de QR\n');
+              console.log('⚠️ Muitas tentativas de QR. Aguarde 1 minuto...\n');
+              setTimeout(() => this.connect(messageHandler), 60000);
+              return;
             }
           }
 
           if (connection === 'close') {
             this.isConnected = false;
             const reason = lastDisconnect?.error?.output?.statusCode;
+            const errorMsg = lastDisconnect?.error?.message || 'Desconhecido';
             
             console.log('🔌 Conexão fechada');
-            console.log('📊 Motivo:', reason);
-            console.log('📊 Descrição:', lastDisconnect?.error?.message);
+            console.log('📊 Código:', reason);
+            console.log('📊 Mensagem:', errorMsg);
 
+            // 🔥 TRATAMENTO ESPECIAL PARA ERRO 440 (CONFLITO)
+            if (reason === 440 || errorMsg.includes('conflict')) {
+              this.reconnectAttempts++;
+              console.log('\n⚠️ ========================================');
+              console.log('🚨 CONFLITO DETECTADO! (Erro 440)');
+              console.log('⚠️ ========================================');
+              console.log('');
+              console.log('📌 Possíveis causas:');
+              console.log('   1. Outro bot rodando com este número');
+              console.log('   2. WhatsApp Web aberto no navegador');
+              console.log('   3. Múltiplas instâncias no PM2');
+              console.log('');
+              console.log('🔧 Para corrigir:');
+              console.log('   • pm2 delete all');
+              console.log('   • pkill -9 node');
+              console.log('   • pm2 start index.js --instances 1');
+              console.log('');
+              
+              if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+                console.log('❌ Máximo de tentativas atingido.');
+                console.log('🗑️ Limpando sessão para forçar novo login...\n');
+                fs.rmSync(this.authPath, { recursive: true, force: true });
+                fs.mkdirSync(this.authPath, { recursive: true });
+                this.reconnectAttempts = 0;
+              }
+              
+              const waitTime = Math.min(this.reconnectAttempts * 15000, 60000);
+              console.log(`⏸️ Aguardando ${waitTime/1000}s antes de reconectar...\n`);
+              setTimeout(() => this.connect(messageHandler), waitTime);
+              return;
+            }
+
+            // OUTROS ERROS
             if (reason === DisconnectReason.loggedOut) {
               console.log('❌ Sessão inválida. Limpando auth...\n');
               fs.rmSync(this.authPath, { recursive: true, force: true });
@@ -80,12 +122,6 @@ class WhatsAppService {
                        reason === DisconnectReason.connectionLost) {
               console.log('⚠️ Conexão perdida, reconectando...\n');
               setTimeout(() => this.connect(messageHandler), 5000);
-            } else if (reason === 440) {
-              console.log('⚠️ CONFLITO DETECTADO!');
-              console.log('🚨 Outra instância está conectada neste número.');
-              console.log('📌 Feche outros bots/apps usando este WhatsApp.\n');
-              console.log('⏸️ Aguardando 30s antes de reconectar...\n');
-              setTimeout(() => this.connect(messageHandler), 30000);
             } else if (reason === 515) {
               console.log('⚠️ ERRO 515 - Sessão perdida/inválida');
               console.log('🔄 Limpando credenciais e reconectando...\n');
@@ -101,11 +137,13 @@ class WhatsAppService {
           if (connection === 'open') {
             this.isConnected = true;
             this.qrAttempts = 0;
+            this.reconnectAttempts = 0; // 🔥 RESETAR CONTADOR
 
             const me = this.sock.user;
-            console.log('✅ Conectado!');
+            console.log('\n✅ Conectado!');
             console.log(`📱 Conta: ${me.name || 'Sem nome'}`);
             console.log(`📞 Número: ${me.id.split(':')[0]}`);
+            console.log('');
 
             resolve(this.sock);
           }
@@ -133,7 +171,9 @@ class WhatsAppService {
   }
 
   async sendMessage(jid, text) {
-    if (!this.sock) throw new Error('Socket não conectado');
+    if (!this.sock || !this.isConnected) {
+      throw new Error('WhatsApp não conectado');
+    }
     await this.sock.sendMessage(jid, { text });
   }
 
