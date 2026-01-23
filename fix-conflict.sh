@@ -1,58 +1,74 @@
 #!/bin/bash
 
-echo "🔧 CORRIGINDO CONFLITO DO WHATSAPP"
-echo "=================================="
+echo "╔═══════════════════════════════════════════════════════════╗"
+echo "║        🔥 FORÇAR NOVA SESSÃO DO WHATSAPP 🔥               ║"
+echo "╚═══════════════════════════════════════════════════════════╝"
 echo ""
 
-# 1. PARAR TODAS AS INSTÂNCIAS DO PM2
-echo "1️⃣ Parando todas as instâncias do PM2..."
+# 1. Parar tudo
+echo "🛑 Parando todas as instâncias..."
 pm2 delete all 2>/dev/null
-pm2 kill
+pm2 kill 2>/dev/null
+pkill -9 node 2>/dev/null
+sleep 3
 
-# 2. MATAR PROCESSOS NODE RESIDUAIS
-echo ""
-echo "2️⃣ Matando processos Node.js residuais..."
-pkill -9 node
+# 2. Remover sessão antiga
+echo "🗑️ Removendo sessão antiga COMPLETAMENTE..."
+rm -rf auth_info
+rm -rf auth_info_multi
+rm -rf .wwebjs_auth
+rm -rf .wwebjs_cache
+rm -rf baileys_store*
 
-# 3. LIMPAR SESSÃO DO WHATSAPP
-echo ""
-echo "3️⃣ Você quer limpar a sessão do WhatsApp? (s/n)"
-read -r resposta
+# 3. Limpar node_modules do baileys (cache pode estar corrompido)
+echo "🧹 Limpando cache do Baileys..."
+rm -rf node_modules/@whiskeysockets/baileys/.cache 2>/dev/null
+rm -rf node_modules/.cache 2>/dev/null
 
-if [[ "$resposta" == "s" || "$resposta" == "S" ]]; then
-    echo "🗑️ Limpando sessão..."
-    rm -rf auth_info/
-    echo "✅ Sessão removida! Você precisará ler o QR Code novamente."
-else
-    echo "⏭️ Mantendo sessão atual..."
-fi
-
-# 4. VERIFICAR SE HÁ PROCESSOS NA PORTA (caso use)
-echo ""
-echo "4️⃣ Verificando portas em uso..."
-netstat -tlnp 2>/dev/null | grep -E ':(3000|8080|5000)' && {
-    echo "⚠️ Porta em uso encontrada. Liberando..."
-    fuser -k 3000/tcp 2>/dev/null
-    fuser -k 8080/tcp 2>/dev/null
-    fuser -k 5000/tcp 2>/dev/null
-} || echo "✅ Nenhuma porta em uso"
-
-# 5. INICIAR NOVAMENTE
-echo ""
-echo "5️⃣ Iniciando bot novamente..."
-pm2 start index.js --name "IAfinanc" --instances 1 --max-memory-restart 500M
+# 4. Criar pasta limpa
+echo "📁 Criando estrutura limpa..."
+mkdir -p auth_info
+chmod 755 auth_info
 
 echo ""
-echo "✅ PRONTO!"
+echo "╔═══════════════════════════════════════════════════════════╗"
+echo "║  📱 AGORA FAÇA NO CELULAR (IMPORTANTE!):                  ║"
+echo "║                                                           ║"
+echo "║  1. WhatsApp > ⋮ > Aparelhos conectados                   ║"
+echo "║  2. Se houver "Finance Bot", "Chrome" ou similar          ║"
+echo "║     → Desconectar esse dispositivo                        ║"
+echo "║  3. Volte aqui e pressione ENTER para continuar           ║"
+echo "╚═══════════════════════════════════════════════════════════╝"
 echo ""
-echo "📊 Status:"
-pm2 status
+read -p "Pressione ENTER após desconectar no celular... "
 
 echo ""
-echo "📋 Logs em tempo real:"
-echo "   pm2 logs IAfinanc"
+echo "⏳ Aguardando WhatsApp liberar a sessão antiga..."
+echo "   (Isso pode levar até 2 minutos)"
+
+for i in {120..1}; do
+    printf "\r   ⏱️  %3d segundos restantes... " $i
+    sleep 1
+done
+
 echo ""
-echo "⚠️ SE O ERRO PERSISTIR:"
-echo "   1. Feche o WhatsApp Web no navegador"
-echo "   2. Execute: ./fix-conflict.sh"
-echo "   3. Escolha 's' para limpar a sessão"
+echo ""
+echo "🚀 Iniciando bot com nova sessão..."
+
+pm2 start index.js \
+    --name "IAfinancias" \
+    --instances 1 \
+    --max-memory-restart 500M \
+    --time
+
+sleep 3
+
+echo ""
+echo "╔═══════════════════════════════════════════════════════════╗"
+echo "║                     ✅ PRONTO!                            ║"
+echo "╚═══════════════════════════════════════════════════════════╝"
+echo ""
+echo "📋 Acompanhe os logs:"
+echo ""
+
+pm2 logs IAfinancias --lines 50

@@ -43,13 +43,18 @@ class WhatsAppService {
           },
           logger: this.logger,
           printQRInTerminal: false,
-          browser: ['Finance Bot', 'Chrome', '1.0.0'],
+          browser: ['Finance Bot', 'Safari', '1.0.0'], // Mudei para Safari
           connectTimeoutMs: 60000,
           keepAliveIntervalMs: 30000,
-          // 🔥 CONFIGURAÇÕES ANTI-CONFLITO
+          // 🔥 CONFIGURAÇÕES ANTI-CONFLITO MAIS AGRESSIVAS
           markOnlineOnConnect: false,
           syncFullHistory: false,
-          shouldIgnoreJid: jid => jid === 'status@broadcast'
+          shouldIgnoreJid: jid => jid === 'status@broadcast',
+          getMessage: async () => undefined,
+          defaultQueryTimeoutMs: undefined,
+          emitOwnEvents: false,
+          fireInitQueries: false,
+          generateHighQualityLinkPreview: false
         });
 
         this.sock.ev.on('creds.update', saveCreds);
