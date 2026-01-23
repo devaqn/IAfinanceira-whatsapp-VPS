@@ -60,38 +60,44 @@ class WhatsAppService {
             }
           }
 
-         if (connection === 'close') {
-  this.isConnected = false;
-  const reason = lastDisconnect?.error?.output?.statusCode;
-  
-  console.log('🔌 Conexão fechada');
-  console.log('📊 Motivo:', reason);
-  console.log('📊 Descrição:', lastDisconnect?.error?.message);
+          if (connection === 'close') {
+            this.isConnected = false;
+            const reason = lastDisconnect?.error?.output?.statusCode;
+            
+            console.log('🔌 Conexão fechada');
+            console.log('📊 Motivo:', reason);
+            console.log('📊 Descrição:', lastDisconnect?.error?.message);
 
-  if (reason === DisconnectReason.loggedOut) {
-    console.log('❌ Sessão inválida. Limpando auth...\n');
-    fs.rmSync(this.authPath, { recursive: true, force: true });
-    fs.mkdirSync(this.authPath, { recursive: true });
-    setTimeout(() => this.connect(messageHandler), 5000);
-  } else if (reason === DisconnectReason.restartRequired) {
-    console.log('🔄 Restart necessário...\n');
-    setTimeout(() => this.connect(messageHandler), 3000);
-  } else if (reason === DisconnectReason.connectionClosed ||
-             reason === DisconnectReason.connectionLost) {
-    console.log('⚠️ Conexão perdida, reconectando...\n');
-    setTimeout(() => this.connect(messageHandler), 5000);
- } else if (reason === 440) {
-  // ✅ ERRO 440 = CONFLITO (múltiplas sessões)
-  console.log('⚠️ CONFLITO DETECTADO!');
-  console.log('🚨 Outra instância está conectada neste número.');
-  console.log('📌 Feche outros bots/apps usando este WhatsApp.\n');
-  console.log('⏸️ Aguardando 30s antes de reconectar...\n');
-  setTimeout(() => this.connect(messageHandler), 30000);
-} else {
-  console.log('⏸️ Aguardando 10s antes de reconectar...\n');
-  setTimeout(() => this.connect(messageHandler), 10000);
-}
-}
+            if (reason === DisconnectReason.loggedOut) {
+              console.log('❌ Sessão inválida. Limpando auth...\n');
+              fs.rmSync(this.authPath, { recursive: true, force: true });
+              fs.mkdirSync(this.authPath, { recursive: true });
+              setTimeout(() => this.connect(messageHandler), 5000);
+            } else if (reason === DisconnectReason.restartRequired) {
+              console.log('🔄 Restart necessário...\n');
+              setTimeout(() => this.connect(messageHandler), 3000);
+            } else if (reason === DisconnectReason.connectionClosed ||
+                       reason === DisconnectReason.connectionLost) {
+              console.log('⚠️ Conexão perdida, reconectando...\n');
+              setTimeout(() => this.connect(messageHandler), 5000);
+            } else if (reason === 440) {
+              console.log('⚠️ CONFLITO DETECTADO!');
+              console.log('🚨 Outra instância está conectada neste número.');
+              console.log('📌 Feche outros bots/apps usando este WhatsApp.\n');
+              console.log('⏸️ Aguardando 30s antes de reconectar...\n');
+              setTimeout(() => this.connect(messageHandler), 30000);
+            } else if (reason === 515) {
+              console.log('⚠️ ERRO 515 - Sessão perdida/inválida');
+              console.log('🔄 Limpando credenciais e reconectando...\n');
+              fs.rmSync(this.authPath, { recursive: true, force: true });
+              fs.mkdirSync(this.authPath, { recursive: true });
+              setTimeout(() => this.connect(messageHandler), 5000);
+            } else {
+              console.log('⏸️ Aguardando 10s antes de reconectar...\n');
+              setTimeout(() => this.connect(messageHandler), 10000);
+            }
+          }
+
           if (connection === 'open') {
             this.isConnected = true;
             this.qrAttempts = 0;
@@ -152,7 +158,7 @@ class WhatsAppService {
     );
   }
   
-    async markAsRead(jid, messageId) {
+  async markAsRead(jid, messageId) {
     if (!this.sock || !this.isConnected) return;
     
     try {

@@ -550,43 +550,46 @@ class DAO {
   }
 
   payInstallment(paymentId, userId) {
-    const payment = this.db.exec('SELECT * FROM installment_payments WHERE id = ?', [paymentId]);
-    if (!payment[0]) return false;
+  const payment = this.db.exec('SELECT * FROM installment_payments WHERE id = ?', [paymentId]);
+  if (!payment[0]) return false;
+  
+  const paymentData = this.rowToObject(payment[0]);
+  const user = this.getUserById(userId);
+  
+  if (!user || user.current_balance < paymentData.amount) return false;
+  
+  // Marcar como paga
+  this.db.run(
+    'UPDATE installment_payments SET status = ?, paid_at = CURRENT_TIMESTAMP WHERE id = ?',
+    ['paid', paymentId]
+  );
+  
+  // Descontar do saldo
+  const newBalance = parseFloat((user.current_balance - paymentData.amount).toFixed(2));
+  this.updateBalance(userId, newBalance);
+  
+  // 🆕 SE FOR COMPRA NO CARTÃO, LIBERAR LIMITE
+  this.releaseCardLimitOnPayment(userId, paymentData.installment_id, paymentData.amount);
+  
+  // Registrar como despesa
+  const installment = this.db.exec('SELECT * FROM installments WHERE id = ?', [paymentData.installment_id]);
+  if (installment[0]) {
+    const inst = this.rowToObject(installment[0]);
+    const description = inst.description + ' (parcela ' + paymentData.installment_number + '/' + inst.total_installments + ')';
     
-    const paymentData = this.rowToObject(payment[0]);
-    const user = this.getUserById(userId);
-    
-    if (!user || user.current_balance < paymentData.amount) return false;
-    
-    // Marcar como paga
-    this.db.run(
-      'UPDATE installment_payments SET status = ?, paid_at = CURRENT_TIMESTAMP WHERE id = ?',
-      ['paid', paymentId]
-    );
-    
-    // Descontar do saldo
-    const newBalance = parseFloat((user.current_balance - paymentData.amount).toFixed(2));
-    this.updateBalance(userId, newBalance);
-    
-    // Registrar como despesa
-    const installment = this.db.exec('SELECT * FROM installments WHERE id = ?', [paymentData.installment_id]);
-    if (installment[0]) {
-      const inst = this.rowToObject(installment[0]);
-      const description = inst.description + ' (parcela ' + paymentData.installment_number + '/' + inst.total_installments + ')';
-      
-      this.createExpense({
-        userId: userId,
-        amount: paymentData.amount,
-        description: description,
-        categoryId: inst.category_id,
-        chatId: inst.chat_id,
-        messageId: null
-      });
-    }
-    
-    this.save();
-    return true;
+    this.createExpense({
+      userId: userId,
+      amount: paymentData.amount,
+      description: description,
+      categoryId: inst.category_id,
+      chatId: inst.chat_id,
+      messageId: null
+    });
   }
+  
+  this.save();
+  return true;
+}
 
   findInstallmentByDescription(userId, partialDescription) {
     const installments = this.getInstallmentsByUser(userId);
@@ -999,18 +1002,23 @@ resetCreditCard(userId) {
   const card = this.getCreditCardByUserId(userId);
   if (!card) return false;
   
+  // Zerar saldo do cartão
   this.db.run(
     'UPDATE credit_cards SET current_balance = 0, available_limit = card_limit, invoice_amount = 0, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?',
     [userId]
   );
   this.save();
   
+  // Deletar transações do cartão
   this.db.run('DELETE FROM card_transactions WHERE user_id = ?', [userId]);
+  this.save();
+  
+  // 🆕 RESETAR FLAG DE PARCELAMENTOS QUE ERAM DO CARTÃO
+  this.db.run('UPDATE installments SET is_card_purchase = 0 WHERE user_id = ? AND is_card_purchase = 1', [userId]);
   this.save();
   
   return true;
 }
-
 close() {
   if (this.db) {
     this.save();

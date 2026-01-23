@@ -29,23 +29,7 @@ class MessageHandler {
   // ✅ BIND DAS FUNÇÕES PARA EVITAR PERDER CONTEXTO
   this.cleanupPendingOperation = this.cleanupPendingOperation.bind(this);
 }
-cleanupPendingOperation(userId, operationType, timeout = 120000) {
-  const self = this;
-  setTimeout(function() {
-    const pendingMap = {
-      'purchase': self.pendingPurchases,
-      'installment': self.pendingInstallments,
-      'invoice': self.pendingInvoicePayments,
-      'reset': self.pendingResets
-    };
-    
-    const targetMap = pendingMap[operationType];
-    if (targetMap && targetMap[userId]) {
-      delete targetMap[userId];
-      console.log(`⏰ Timeout: ${operationType} expirado para usuário ${userId}`);
-    }
-  }, timeout);
-}
+
 isCardPayment(text) {
   const textLower = text.toLowerCase().trim();
   return PAYMENT_METHODS.CARD.includes(textLower);
@@ -153,6 +137,7 @@ const self = this;
 setTimeout(function() {
   delete self.recentlyProcessed[messageKey];
 }, 30000);
+
 
 await this.whatsapp.markAsRead(info.chatId, info.messageId); // ✅ CORRETO
 await this.whatsapp.sendPresence(info.chatId, 'composing');
@@ -850,13 +835,7 @@ else if (command.command === 'resetCard') {
       );
       
       // Limpar após 2 minutos
-      const self = this;
-      setTimeout(function() {
-        if (self.pendingPurchases && self.pendingPurchases[user.id]) {
-          delete self.pendingPurchases[user.id];
-        }
-      }, 120000);
-      
+    this.cleanupPendingOperation(user.id, 'purchase', TIMEOUTS.PENDING_PURCHASE);
       return;
     }
     
@@ -994,13 +973,8 @@ async registerExpenseInBalance(expense, user, message, info, chatId, timestamp) 
         '🕐 ' + timestamp.formatted
       );
       
-      const self = this;
-      setTimeout(function() {
-        if (self.pendingInstallments && self.pendingInstallments[user.id]) {
-          delete self.pendingInstallments[user.id];
-        }
-      }, 120000);
-      
+      // Limpar após 2 minutos usando a função centralizada
+this.cleanupPendingOperation(user.id, 'installment', TIMEOUTS.PENDING_INSTALLMENT);
       return;
     }
     
