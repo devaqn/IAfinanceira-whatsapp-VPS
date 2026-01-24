@@ -855,55 +855,108 @@ resetEverything(userId) {
   
   return true;
 }
-// ============ 💳 GESTÃO DE CARTÃO DE CRÉDITO ============
+// ============ 💳 GESTÃO DE CARTÕES DE CRÉDITO (MÚLTIPLOS CARTÕES) ============
 
-// Cria o cartão do usuário (primeira vez)
-createCreditCard(userId, cardLimit) {
+// Criar novo cartão (com nome e vencimento)
+createCreditCard(userId, cardName, cardLimit, invoiceDueDay) {
   const user = this.getUserById(userId);
   if (!user) return false;
   
-  // Verificar se já tem cartão
-  const existing = this.db.exec('SELECT * FROM credit_cards WHERE user_id = ?', [userId]);
+  // Validar nome
+  if (!cardName || cardName.trim() === '') return false;
+  
+  // Validar limite
+  if (cardLimit < 100 || cardLimit > 1000000) return false;
+  
+  // Validar dia de vencimento (1-31)
+  const dueDay = invoiceDueDay || 10;
+  if (dueDay < 1 || dueDay > 31) return false;
+  
+  // Verificar se já existe cartão com este nome
+  const existing = this.db.exec(
+    'SELECT * FROM user_cards WHERE user_id = ? AND LOWER(card_name) = LOWER(?)',
+    [userId, cardName.trim()]
+  );
+  
   if (existing[0]) {
-    return false; // Já tem cartão
+    return false; // Já tem cartão com este nome
   }
   
   this.db.run(
-    'INSERT INTO credit_cards (user_id, card_limit, current_balance, available_limit) VALUES (?, ?, ?, ?)',
-    [userId, cardLimit, 0, cardLimit]
+    'INSERT INTO user_cards (user_id, card_name, card_limit, current_balance, available_limit, invoice_due_day) VALUES (?, ?, ?, ?, ?, ?)',
+    [userId, cardName.trim(), cardLimit, 0, cardLimit, dueDay]
   );
   this.save();
   
   return true;
 }
 
-// Busca o cartão do usuário
-getCreditCardByUserId(userId) {
-  const result = this.db.exec('SELECT * FROM credit_cards WHERE user_id = ?', [userId]);
+// Listar todos os cartões do usuário
+getAllCardsByUserId(userId) {
+  const result = this.db.exec('SELECT * FROM user_cards WHERE user_id = ? ORDER BY created_at DESC', [userId]);
+  return result[0] ? this.rowsToObjects(result[0]) : [];
+}
+
+// Buscar cartão por ID
+getCardById(cardId) {
+  const result = this.db.exec('SELECT * FROM user_cards WHERE id = ?', [cardId]);
   return result[0] ? this.rowToObject(result[0]) : null;
 }
 
-// Atualiza o limite do cartão
-updateCardLimit(userId, newLimit) {
-  const card = this.getCreditCardByUserId(userId);
+// Buscar cartão por nome
+getCardByName(userId, cardName) {
+  const result = this.db.exec(
+    'SELECT * FROM user_cards WHERE user_id = ? AND LOWER(card_name) = LOWER(?)', 
+    [userId, cardName.trim()]
+  );
+  return result[0] ? this.rowToObject(result[0]) : null;
+}
+
+// Buscar cartão por nome parcial (para quando usuário digita parte do nome)
+findCardByPartialName(userId, partialName) {
+  const cards = this.getAllCardsByUserId(userId);
+  const searchLower = partialName.toLowerCase().trim();
+  
+  // Busca exata primeiro
+  for (const card of cards) {
+    if (card.card_name.toLowerCase() === searchLower) {
+      return card;
+    }
+  }
+  
+  // Busca parcial
+  for (const card of cards) {
+    if (card.card_name.toLowerCase().includes(searchLower)) {
+      return card;
+    }
+  }
+  
+  return null;
+}
+
+// Atualizar limite do cartão
+updateCardLimit(cardId, newLimit) {
+  const card = this.getCardById(cardId);
   if (!card) return false;
+  
+  if (newLimit < 100 || newLimit > 1000000) return false;
   
   const usedAmount = card.current_balance;
   const newAvailable = newLimit - usedAmount;
   
   this.db.run(
-    'UPDATE credit_cards SET card_limit = ?, available_limit = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?',
-    [newLimit, newAvailable, userId]
+    'UPDATE user_cards SET card_limit = ?, available_limit = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+    [newLimit, newAvailable, cardId]
   );
   this.save();
   
   return true;
 }
 
-// Registra compra à vista no cartão
-addCardPurchase(userId, amount, description, categoryId, chatId, messageId) {
-  const card = this.getCreditCardByUserId(userId);
-  if (!card) return false;
+// Adicionar compra à vista no cartão
+addCardPurchase(userId, cardId, amount, description, categoryId, chatId, messageId) {
+  const card = this.getCardById(cardId);
+  if (!card || card.user_id !== userId) return false;
   
   const newBalance = parseFloat((card.current_balance + amount).toFixed(2));
   const newAvailable = parseFloat((card.available_limit - amount).toFixed(2));
@@ -911,25 +964,25 @@ addCardPurchase(userId, amount, description, categoryId, chatId, messageId) {
   
   // Atualizar cartão
   this.db.run(
-    'UPDATE credit_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [newBalance, newAvailable, newInvoice, card.id]
+    'UPDATE user_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+    [newBalance, newAvailable, newInvoice, cardId]
   );
   this.save();
   
   // Registrar transação
   this.db.run(
     'INSERT INTO card_transactions (user_id, card_id, amount, description, category_id, is_installment, chat_id, message_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-    [userId, card.id, amount, description, categoryId, 0, chatId, messageId]
+    [userId, cardId, amount, description, categoryId, 0, chatId, messageId]
   );
   this.save();
   
   return true;
 }
 
-// Registra parcelamento no cartão
-addCardInstallment(userId, installmentId, totalAmount) {
-  const card = this.getCreditCardByUserId(userId);
-  if (!card) return false;
+// Adicionar parcelamento ao cartão
+addCardInstallment(userId, cardId, installmentId, totalAmount) {
+  const card = this.getCardById(cardId);
+  if (!card || card.user_id !== userId) return false;
   
   const newBalance = parseFloat((card.current_balance + totalAmount).toFixed(2));
   const newAvailable = parseFloat((card.available_limit - totalAmount).toFixed(2));
@@ -937,15 +990,15 @@ addCardInstallment(userId, installmentId, totalAmount) {
   
   // Atualizar cartão
   this.db.run(
-    'UPDATE credit_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [newBalance, newAvailable, newInvoice, card.id]
+    'UPDATE user_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+    [newBalance, newAvailable, newInvoice, cardId]
   );
   this.save();
   
   // Marcar parcelamento como sendo do cartão
   this.db.run(
-    'UPDATE installments SET is_card_purchase = 1 WHERE id = ?',
-    [installmentId]
+    'UPDATE installments SET is_card_purchase = 1, card_id = ? WHERE id = ?',
+    [cardId, installmentId]
   );
   this.save();
   
@@ -953,11 +1006,11 @@ addCardInstallment(userId, installmentId, totalAmount) {
 }
 
 // Pagar fatura do cartão
-payCardInvoice(userId, paymentAmount) {
-  const card = this.getCreditCardByUserId(userId);
+payCardInvoice(userId, cardId, paymentAmount) {
+  const card = this.getCardById(cardId);
   const user = this.getUserById(userId);
   
-  if (!card || !user) return false;
+  if (!card || !user || card.user_id !== userId) return false;
   if (user.current_balance < paymentAmount) return false;
   
   // Descontar do saldo do usuário
@@ -970,60 +1023,137 @@ payCardInvoice(userId, paymentAmount) {
   const newInvoice = parseFloat((card.invoice_amount - paymentAmount).toFixed(2));
   
   this.db.run(
-    'UPDATE credit_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, last_payment_date = CURRENT_TIMESTAMP, last_payment_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [newCardBalance, newAvailable, newInvoice, paymentAmount, card.id]
+    'UPDATE user_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, last_payment_date = CURRENT_TIMESTAMP, last_payment_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+    [newCardBalance, newAvailable, newInvoice, paymentAmount, cardId]
   );
   this.save();
   
   return true;
 }
 
-// Quando paga parcela de compra no cartão, libera o limite
+// Quando paga parcela de compra no cartão, libera o limite proporcional
 releaseCardLimitOnPayment(userId, installmentId, amount) {
   const installment = this.getInstallmentById(installmentId);
   if (!installment || installment.is_card_purchase !== 1) return;
   
-  const card = this.getCreditCardByUserId(userId);
-  if (!card) return;
+  const cardId = installment.card_id;
+  if (!cardId) return;
+  
+  const card = this.getCardById(cardId);
+  if (!card || card.user_id !== userId) return;
   
   // Liberar o limite proporcional da parcela
   const newCardBalance = parseFloat((card.current_balance - amount).toFixed(2));
   const newAvailable = parseFloat((card.available_limit + amount).toFixed(2));
   
   this.db.run(
-    'UPDATE credit_cards SET current_balance = ?, available_limit = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [newCardBalance, newAvailable, card.id]
+    'UPDATE user_cards SET current_balance = ?, available_limit = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+    [newCardBalance, newAvailable, cardId]
   );
   this.save();
 }
 
-// Zerar cartão
-resetCreditCard(userId) {
-  const card = this.getCreditCardByUserId(userId);
-  if (!card) return false;
-  
-  // Zerar saldo do cartão
+// Registrar alerta de 30% de uso
+setCard30PercentAlert(cardId) {
   this.db.run(
-    'UPDATE credit_cards SET current_balance = 0, available_limit = card_limit, invoice_amount = 0, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?',
-    [userId]
+    'UPDATE user_cards SET last_alert_30_percent = CURRENT_TIMESTAMP WHERE id = ?',
+    [cardId]
   );
   this.save();
+}
+
+// Verificar se precisa alertar sobre 30% de uso
+shouldAlert30Percent(card) {
+  if (!card || card.card_limit === 0) return false;
+  
+  const percentUsed = (card.current_balance / card.card_limit) * 100;
+  if (percentUsed < 30) return false;
+  
+  // Se nunca alertou, alertar agora
+  if (!card.last_alert_30_percent) return true;
+  
+  // Se já alertou, só alertar novamente após 24 horas
+  const lastAlert = new Date(card.last_alert_30_percent);
+  const now = new Date();
+  const hoursSinceLastAlert = (now - lastAlert) / (1000 * 60 * 60);
+  
+  return hoursSinceLastAlert >= 24;
+}
+
+// Buscar cartões com vencimento próximo (próximos 5 dias)
+getCardsWithUpcomingDueDate(userId, daysAhead = 5) {
+  const cards = this.getAllCardsByUserId(userId);
+  const today = new Date();
+  const currentDay = today.getDate();
+  
+  const upcoming = [];
+  
+  for (const card of cards) {
+    if (card.invoice_amount === 0) continue;
+    
+    let daysUntil = card.invoice_due_day - currentDay;
+    if (daysUntil < 0) {
+      daysUntil += 30; // Próximo mês
+    }
+    
+    if (daysUntil <= daysAhead) {
+      upcoming.push({
+        ...card,
+        daysUntilDue: daysUntil
+      });
+    }
+  }
+  
+  return upcoming.sort((a, b) => a.daysUntilDue - b.daysUntilDue);
+}
+
+// Deletar cartão
+deleteCard(cardId, userId) {
+  const card = this.getCardById(cardId);
+  if (!card || card.user_id !== userId) return false;
   
   // Deletar transações do cartão
-  this.db.run('DELETE FROM card_transactions WHERE user_id = ?', [userId]);
+  this.db.run('DELETE FROM card_transactions WHERE card_id = ?', [cardId]);
   this.save();
   
-  // 🆕 RESETAR FLAG DE PARCELAMENTOS QUE ERAM DO CARTÃO
-  this.db.run('UPDATE installments SET is_card_purchase = 0 WHERE user_id = ? AND is_card_purchase = 1', [userId]);
+  // Resetar flag de parcelamentos que eram deste cartão
+  this.db.run('UPDATE installments SET is_card_purchase = 0, card_id = NULL WHERE card_id = ?', [cardId]);
+  this.save();
+  
+  // Deletar o cartão
+  this.db.run('DELETE FROM user_cards WHERE id = ?', [cardId]);
   this.save();
   
   return true;
 }
-close() {
-  if (this.db) {
-    this.save();
-    this.db.close();
-  }
+
+// Resetar cartão (zerar saldo mas manter cadastro)
+resetCard(cardId, userId) {
+  const card = this.getCardById(cardId);
+  if (!card || card.user_id !== userId) return false;
+  
+  // Zerar saldo do cartão
+  this.db.run(
+    'UPDATE user_cards SET current_balance = 0, available_limit = card_limit, invoice_amount = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+    [cardId]
+  );
+  this.save();
+  
+  // Deletar transações do cartão
+  this.db.run('DELETE FROM card_transactions WHERE card_id = ?', [cardId]);
+  this.save();
+  
+  // Resetar flag de parcelamentos que eram deste cartão
+  this.db.run('UPDATE installments SET is_card_purchase = 0, card_id = NULL WHERE card_id = ?', [cardId]);
+  this.save();
+  
+  return true;
+}
+
+// MANTER a função antiga para compatibilidade (busca o primeiro cartão ou retorna null)
+getCreditCardByUserId(userId) {
+  const cards = this.getAllCardsByUserId(userId);
+  return cards.length > 0 ? cards[0] : null;
 }
 }
 

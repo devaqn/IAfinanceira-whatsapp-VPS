@@ -103,18 +103,22 @@ class DatabaseSchema {
       )
     `);
 
-    // Índices
-    try {
-      this.db.run('CREATE INDEX IF NOT EXISTS idx_expenses_user_id ON expenses(user_id)');
-      this.db.run('CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date)');
-      this.db.run('CREATE INDEX IF NOT EXISTS idx_expenses_category_id ON expenses(category_id)');
-      this.db.run('CREATE INDEX IF NOT EXISTS idx_users_whatsapp_id ON users(whatsapp_id)');
-      this.db.run('CREATE INDEX IF NOT EXISTS idx_installments_user_id ON installments(user_id)');
-      this.db.run('CREATE INDEX IF NOT EXISTS idx_installment_payments_installment_id ON installment_payments(installment_id)');
-      this.db.run('CREATE INDEX IF NOT EXISTS idx_installment_payments_status ON installment_payments(status)');
-    } catch (e) {
-      // Índices já existem
-    }
+ // Índices
+try {
+  this.db.run('CREATE INDEX IF NOT EXISTS idx_expenses_user_id ON expenses(user_id)');
+  this.db.run('CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date)');
+  this.db.run('CREATE INDEX IF NOT EXISTS idx_expenses_category_id ON expenses(category_id)');
+  this.db.run('CREATE INDEX IF NOT EXISTS idx_users_whatsapp_id ON users(whatsapp_id)');
+  this.db.run('CREATE INDEX IF NOT EXISTS idx_installments_user_id ON installments(user_id)');
+  this.db.run('CREATE INDEX IF NOT EXISTS idx_installment_payments_installment_id ON installment_payments(installment_id)');
+  this.db.run('CREATE INDEX IF NOT EXISTS idx_installment_payments_status ON installment_payments(status)');
+  
+  // 💳 NOVOS ÍNDICES PARA CARTÕES
+  this.db.run('CREATE INDEX IF NOT EXISTS idx_user_cards_user_id ON user_cards(user_id)');
+  this.db.run('CREATE INDEX IF NOT EXISTS idx_card_transactions_card_id ON card_transactions(card_id)');
+  this.db.run('CREATE INDEX IF NOT EXISTS idx_card_transactions_user_id ON card_transactions(user_id)');
+} catch (e) {
+}
 
     console.log('✅ Estrutura básica criada!');
     
@@ -125,16 +129,18 @@ class DatabaseSchema {
     console.log('✅ Banco de dados pronto!\n');
     
 
-   // ============ 💳 TABELAS DE CARTÃO DE CRÉDITO ============
+    // ============ 💳 NOVA TABELA DE CARTÕES (MÚLTIPLOS CARTÕES) ============
     this.db.run(`
-      CREATE TABLE IF NOT EXISTS credit_cards (
+      CREATE TABLE IF NOT EXISTS user_cards (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
+        card_name TEXT NOT NULL,
         card_limit REAL DEFAULT 0.0,
         current_balance REAL DEFAULT 0.0,
         available_limit REAL DEFAULT 0.0,
         invoice_amount REAL DEFAULT 0.0,
-        invoice_due_day INTEGER DEFAULT 10,
+        invoice_due_day INTEGER NOT NULL,
+        last_alert_30_percent DATETIME,
         last_payment_date DATETIME,
         last_payment_amount REAL DEFAULT 0.0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -143,6 +149,7 @@ class DatabaseSchema {
       )
     `);
 
+    // ============ 💳 TABELA DE TRANSAÇÕES DOS CARTÕES ============
     this.db.run(`
       CREATE TABLE IF NOT EXISTS card_transactions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -157,7 +164,7 @@ class DatabaseSchema {
         chat_id TEXT NOT NULL,
         message_id TEXT,
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-        FOREIGN KEY (card_id) REFERENCES credit_cards (id) ON DELETE CASCADE,
+        FOREIGN KEY (card_id) REFERENCES user_cards (id) ON DELETE CASCADE,
         FOREIGN KEY (category_id) REFERENCES categories (id),
         FOREIGN KEY (installment_id) REFERENCES installments (id) ON DELETE SET NULL
       )
@@ -175,6 +182,7 @@ console.log('✅ Tabelas de cartão criadas!');
   migrateDatabase() {
     try {
       console.log('🔄 Verificando migração...');
+      
       
       // MIGRAÇÃO: USERS
       const userColumns = this.db.exec("PRAGMA table_info(users)");
@@ -241,8 +249,25 @@ console.log('✅ Tabelas de cartão criadas!');
         if (!columnNames.includes('is_card_purchase')) {
           console.log('   → Adicionando is_card_purchase');
           this.db.run('ALTER TABLE installments ADD COLUMN is_card_purchase INTEGER DEFAULT 0');
+
+          // 💳 MIGRAÇÃO: INSTALLMENTS (campo para identificar se é compra no cartão)
+const installmentColumns = this.db.exec("PRAGMA table_info(installments)");
+if (installmentColumns[0]) {
+  const columnNames = installmentColumns[0].values.map(row => row[1]);
+  
+  if (!columnNames.includes('is_card_purchase')) {
+    console.log('   ↳ Adicionando is_card_purchase');
+    this.db.run('ALTER TABLE installments ADD COLUMN is_card_purchase INTEGER DEFAULT 0');
+  }
+  
+  if (!columnNames.includes('card_id')) {
+    console.log('   ↳ Adicionando card_id (qual cartão foi usado)');
+    this.db.run('ALTER TABLE installments ADD COLUMN card_id INTEGER');
+  }
+}
         }
       }
+      
 
       console.log('✅ Migração concluída!');
       this.save();

@@ -11,57 +11,60 @@ class NLPProcessor {
     this.installmentPattern = /(\d+(?:[.,]\d{1,2})?)\s*(?:em|por|parcelado em|parcelada em|parcelado|parcelada)\s*(\d+)x?/i;
 
     this.commandPatterns = {
-      // Saldo principal
-      setBalance: /^\/saldo\s+(\d+(?:[.,]\d{1,2})?)/i,
-      getBalance: /^\/saldo\s*$/i,
-      addBalance: /^\/adicionar\s+(\d+(?:[.,]\d{1,2})?)/i,
-      
-      // Poupança
-      getSavings: /^\/poupan[cç]a\s*$/i,
-      depositSavings: /^\/guardar\s+(\d+(?:[.,]\d{1,2})?)/i,
-      withdrawSavings: /^\/retirar\s+(\d+(?:[.,]\d{1,2})?)/i,
-      
-      // Reserva de emergência
-      getEmergency: /^\/emerg[eê]ncia\s*$/i,
-      depositEmergency: /^\/reservar\s+(\d+(?:[.,]\d{1,2})?)/i,
-      // 💳 Cartão de crédito
-      getCard: /^\/cart[aã]o\s*$/i,
-      setCardLimit: /^\/cart[aã]o\s+limite\s+(\d+(?:[.,]\d{1,2})?)/i,
-      payInvoice: /^\/pagar\s+fatura\s*$/i,
-      resetCard: /^\/(?:zerar|resetar|limpar)\s+cart[aã]o\s*$/i,
-      withdrawEmergency: /^\/usar\s+(\d+(?:[.,]\d{1,2})?)/i,
-      
-      // Parcelamentos
-      getInstallments: /^\/parcelamentos?\s*$/i,
-      payInstallment: /^\/pagar\s+(?:parcela\s+)?(.+)/i,
-      
-      // Lembretes
-      getReminders: /^\/(?:lembretes?|lembrar|avisos?)/i,
-      getDuePayments: /^\/(?:vencidas?|atrasadas?|pendentes?)/i,
-      
-      // Zeragem
-      resetBalance: /^\/(?:zerar|resetar|limpar)\s+saldo\s*$/i,
-      resetSavings: /^\/(?:zerar|resetar|limpar)\s+poupan[cç]a\s*$/i,
-      resetEmergency: /^\/(?:zerar|resetar|limpar)\s+(?:reserva|reserva\s+emerg[eê]ncia|reserva\s+emergencia)\s*$/i,
-      resetInstallments: /^\/(?:zerar|resetar|limpar|apagar)\s+(?:parcelas?|parcelamentos?)\s*$/i,
-      resetEverything: /^\/(?:zerar|resetar|limpar)\s+(?:tudo|sistema)\s*$/i,
-      
-      // Confirmação de zeragem
-      confirmReset: /^SIM,?\s*ZERAR\s+TUDO\s*$/i,
-      
-      // 🔧 CORREÇÃO: REMOVIDO RELATÓRIO DIÁRIO
-      // Apenas relatórios semanal e mensal
-      reportWeekly: /^\/relat[oó]rio\s+(?:semana|semanal|week|weekly)/i,
-      reportMonthly: /^\/relat[oó]rio\s+(?:m[eê]s|mes|mensal|month|monthly)/i,
-      
-      // Comandos diretos
-      reportWeeklyShort: /^\/(?:semana|semanal)\s*$/i,
-      reportMonthlyShort: /^\/(?:m[eê]s|mes|mensal)\s*$/i,
-      
-      // Outros
-      help: /^\/(?:ajuda|help|comandos)/i,
-      start: /^\/(?:start|come[çc]ar|comecar)/i
-    };
+  // Saldo principal
+  setBalance: /^\/saldo\s+(\d+(?:[.,]\d{1,2})?)/i,
+  getBalance: /^\/saldo\s*$/i,
+  addBalance: /^\/adicionar\s+(\d+(?:[.,]\d{1,2})?)/i,
+  
+  // Poupança
+  getSavings: /^\/poupan[cç]a\s*$/i,
+  depositSavings: /^\/guardar\s+(\d+(?:[.,]\d{1,2})?)/i,
+  withdrawSavings: /^\/retirar\s+(\d+(?:[.,]\d{1,2})?)/i,
+  
+  // Reserva de emergência
+  getEmergency: /^\/emerg[eê]ncia\s*$/i,
+  depositEmergency: /^\/reservar\s+(\d+(?:[.,]\d{1,2})?)/i,
+  withdrawEmergency: /^\/usar\s+(\d+(?:[.,]\d{1,2})?)/i,
+  
+  // 💳 Cartões de crédito (NOVOS COMANDOS)
+  createCard: /^\/cart[aã]o\s+criar\s*$/i,
+  listCards: /^\/cart[oõ]es\s*$/i,
+  getCardByName: /^\/cart[aã]o\s+(.+)/i,
+  payInvoiceCard: /^\/pagar\s+fatura\s+(.+)/i,
+  deleteCard: /^\/deletar\s+cart[aã]o\s+(.+)/i,
+  resetCard: /^\/zerar\s+cart[aã]o\s+(.+)/i,
+  vencimentos: /^\/vencimentos?\s*$/i,
+  
+  // Parcelamentos
+  getInstallments: /^\/parcelamentos?\s*$/i,
+  payInstallment: /^\/pagar\s+(?:parcela\s+)?(.+)/i,
+  
+  // Lembretes
+  getReminders: /^\/(?:lembretes?|lembrar|avisos?)/i,
+  getDuePayments: /^\/(?:vencidas?|atrasadas?|pendentes?)/i,
+  
+  // Zeragem
+  resetBalance: /^\/(?:zerar|resetar|limpar)\s+saldo\s*$/i,
+  resetSavings: /^\/(?:zerar|resetar|limpar)\s+poupan[cç]a\s*$/i,
+  resetEmergency: /^\/(?:zerar|resetar|limpar)\s+(?:reserva|reserva\s+emerg[eê]ncia|reserva\s+emergencia)\s*$/i,
+  resetInstallments: /^\/(?:zerar|resetar|limpar|apagar)\s+(?:parcelas?|parcelamentos?)\s*$/i,
+  resetEverything: /^\/(?:zerar|resetar|limpar)\s+(?:tudo|sistema)\s*$/i,
+  
+  // Confirmação de zeragem
+  confirmReset: /^SIM,?\s*ZERAR\s+TUDO\s*$/i,
+  
+  // Relatórios
+  reportWeekly: /^\/relat[oó]rio\s+(?:semana|semanal|week|weekly)/i,
+  reportMonthly: /^\/relat[oó]rio\s+(?:m[eê]s|mes|mensal|month|monthly)/i,
+  
+  // Comandos diretos
+  reportWeeklyShort: /^\/(?:semana|semanal)\s*$/i,
+  reportMonthlyShort: /^\/(?:m[eê]s|mes|mensal)\s*$/i,
+  
+  // Outros
+  help: /^\/(?:ajuda|help|comandos)/i,
+  start: /^\/(?:start|come[çc]ar|comecar)/i
+};
   }
 
   extractAmount(text) {

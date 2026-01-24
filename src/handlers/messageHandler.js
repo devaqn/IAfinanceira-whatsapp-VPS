@@ -13,7 +13,7 @@ const {
 } = require('../utils/memoryManager');
 
 class MessageHandler {
- constructor(dao, whatsappService) {
+constructor(dao, whatsappService) {
   this.dao = dao;
   this.whatsapp = whatsappService;
   this.nlp = new NLPProcessor();
@@ -24,7 +24,8 @@ class MessageHandler {
   this.pendingResets = {};
   this.pendingPurchases = {};
   this.pendingInstallments = {};
-  this.pendingInvoicePayments = {};  // ⭐ ADICIONAR ESTE
+  this.pendingInvoicePayments = {};
+  this.pendingCardCreation = {};  // ⭐ NOVO: Para fluxo de criação de cartão
   
   // ✅ BIND DAS FUNÇÕES PARA EVITAR PERDER CONTEXTO
   this.cleanupPendingOperation = this.cleanupPendingOperation.bind(this);
@@ -158,21 +159,11 @@ if (info.isGroup) { // ✅ CORRIGIDO
 }
 // 💳 VERIFICAR SE É RESPOSTA A PERGUNTA DE PAGAMENTO
 if (this.pendingPurchases && this.pendingPurchases[user.id]) {
+  const pending = this.pendingPurchases[user.id];
   const textLower = text.toLowerCase().trim();
   
-  if (this.isCardPayment(text)) {
-    // PAGAR NO CARTÃO
-    const pending = this.pendingPurchases[user.id];
-    delete this.pendingPurchases[user.id];
-    
-    await this.registerExpenseInCard(pending.expense, user, message, pending.messageInfo, info.chatId);
-    await this.whatsapp.sendPresence(info.chatId, 'available');
-    return;
-  }
-  
-  if (textLower === 'saldo' || textLower === 'dinheiro' || textLower === 'conta') {
-    // PAGAR NO SALDO
-    const pending = this.pendingPurchases[user.id];
+  // Verificar se digitou "saldo" ou "dinheiro"
+  if (this.isBalancePayment(text)) {
     delete this.pendingPurchases[user.id];
     
     const timestamp = this.reports.getCurrentBrazilTimestamp();
@@ -180,22 +171,38 @@ if (this.pendingPurchases && this.pendingPurchases[user.id]) {
     await this.whatsapp.sendPresence(info.chatId, 'available');
     return;
   }
+  
+  // Caso contrário, tentar encontrar cartão pelo nome digitado
+  const card = this.dao.findCardByPartialName(user.id, text);
+  
+  if (card) {
+    delete this.pendingPurchases[user.id];
+    
+    await this.registerExpenseInCard(pending.expense, user, message, pending.messageInfo, info.chatId, card);
+    await this.whatsapp.sendPresence(info.chatId, 'available');
+    return;
+  } else {
+    // Não encontrou cartão nem é saldo
+    const timestamp = this.reports.getCurrentBrazilTimestamp();
+    await this.whatsapp.replyMessage(message,
+      '❌ *Cartão não encontrado!*\n\n' +
+      `Você digitou: "${text}"\n\n` +
+      '💡 *Opções válidas:*\n' +
+      '• Digite o nome de um dos seus cartões\n' +
+      '• Ou digite "saldo" para pagar no saldo\n\n' +
+      'Use `/cartoes` para ver seus cartões\n\n' +
+      '🕐 ' + timestamp.formatted
+    );
+    return;
+  }
 }
 // 💳 VERIFICAR SE É RESPOSTA A PERGUNTA DE PARCELAMENTO
 if (this.pendingInstallments && this.pendingInstallments[user.id]) {
+  const pending = this.pendingInstallments[user.id];
   const textLower = text.toLowerCase().trim();
   
-  if (this.isCardPayment(text)) {
-    const pending = this.pendingInstallments[user.id];
-    delete this.pendingInstallments[user.id];
-    
-    await this.registerInstallmentInCard(pending.installment, user, message, pending.messageInfo, info.chatId);
-    await this.whatsapp.sendPresence(info.chatId, 'available');
-    return;
-  }
-  
-  if (textLower === 'saldo' || textLower === 'dinheiro') {
-    const pending = this.pendingInstallments[user.id];
+  // Verificar se digitou "saldo"
+  if (this.isBalancePayment(text)) {
     delete this.pendingInstallments[user.id];
     
     const timestamp = this.reports.getCurrentBrazilTimestamp();
@@ -203,24 +210,49 @@ if (this.pendingInstallments && this.pendingInstallments[user.id]) {
     await this.whatsapp.sendPresence(info.chatId, 'available');
     return;
   }
+  
+  // Tentar encontrar cartão
+  const card = this.dao.findCardByPartialName(user.id, text);
+  
+  if (card) {
+    delete this.pendingInstallments[user.id];
+    
+    await this.registerInstallmentInCard(pending.installment, user, message, pending.messageInfo, info.chatId, card);
+    await this.whatsapp.sendPresence(info.chatId, 'available');
+    return;
+  } else {
+    const timestamp = this.reports.getCurrentBrazilTimestamp();
+    await this.whatsapp.replyMessage(message,
+      '❌ *Cartão não encontrado!*\n\n' +
+      `Você digitou: "${text}"\n\n` +
+      '💡 *Opções válidas:*\n' +
+      '• Digite o nome de um dos seus cartões\n' +
+      '• Ou digite "saldo" para parcelar manualmente\n\n' +
+      'Use `/cartoes` para ver seus cartões\n\n' +
+      '🕐 ' + timestamp.formatted
+    );
+    return;
+  }
 }
 // 💳 VERIFICAR SE É VALOR PARA PAGAMENTO DE FATURA
 if (this.pendingInvoicePayments && this.pendingInvoicePayments[user.id]) {
+  const pending = this.pendingInvoicePayments[user.id];
   const amount = this.nlp.extractAmount(text);
   
   if (amount && amount > 0) {
     delete this.pendingInvoicePayments[user.id];
     
     const timestamp = this.reports.getCurrentBrazilTimestamp();
-    const success = this.dao.payCardInvoice(user.id, amount);
+    const success = this.dao.payCardInvoice(user.id, pending.cardId, amount);
     
     if (success) {
-      const updatedCard = this.dao.getCreditCardByUserId(user.id);
+      const updatedCard = this.dao.getCardById(pending.cardId);
       const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);
       
       let resp = '✅ *FATURA PAGA!*\n\n' +
+        `💳 Cartão: *${updatedCard.card_name}*\n` +
         `💰 Valor pago: ${this.reports.formatMoney(amount)}\n` +
-        `💳 Limite liberado: ${this.reports.formatMoney(amount)}\n\n` +
+        `🔓 Limite liberado: ${this.reports.formatMoney(amount)}\n\n` +
         '📊 *SITUAÇÃO ATUAL DO CARTÃO*\n' +
         `   Limite total: ${this.reports.formatMoney(updatedCard.card_limit)}\n` +
         `   Usado: ${this.reports.formatMoney(updatedCard.current_balance)}\n` +
@@ -232,12 +264,12 @@ if (this.pendingInvoicePayments && this.pendingInvoicePayments[user.id]) {
         resp += '✅ *Fatura totalmente quitada!*\n\n';
       }
       
-      resp += `💰 *Seu saldo:* ${this.reports.formatMoney(updatedUser.current_balance)}\n\n`;
+      resp += `💰 *Seu saldo atual:* ${this.reports.formatMoney(updatedUser.current_balance)}\n\n`;
       resp += '🕐 ' + timestamp.formatted;
       
       await this.whatsapp.replyMessage(message, resp);
       await this.whatsapp.sendPresence(info.chatId, 'available');
-      Logger.invoice(user, 'pagou fatura', amount);
+      Logger.invoice(user, 'pagou fatura', updatedCard.card_name);
       return;
     } else {
       await this.whatsapp.replyMessage(message, 
@@ -247,7 +279,156 @@ if (this.pendingInvoicePayments && this.pendingInvoicePayments[user.id]) {
       return;
     }
   }
+}    
+// 💳 VERIFICAR SE ESTÁ NO FLUXO DE CRIAÇÃO DE CARTÃO (3 ETAPAS)
+if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
+  const pending = this.pendingCardCreation[user.id];
+  const timestamp = this.reports.getCurrentBrazilTimestamp();
+  
+  // ETAPA 1: Aguardando nome do cartão
+  if (pending.step === 'waiting_name') {
+    const cardName = text.trim();
+    
+    // Validar tamanho do nome
+    if (cardName.length < 2 || cardName.length > 50) {
+      await this.whatsapp.replyMessage(message,
+        '❌ *Nome inválido!*\n\n' +
+        'O nome deve ter entre 2 e 50 caracteres.\n\n' +
+        '💡 Exemplo: "Nubank" ou "Cartão Principal"\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+    
+    // Verificar se já existe cartão com este nome
+    const existing = this.dao.getCardByName(user.id, cardName);
+    if (existing) {
+      await this.whatsapp.replyMessage(message,
+        '⚠️ *Você já tem um cartão com este nome!*\n\n' +
+        `💳 Nome duplicado: *${cardName}*\n\n` +
+        '💡 Escolha outro nome ou use `/cartoes` para ver seus cartões\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+    
+    // Avançar para próxima etapa
+    this.pendingCardCreation[user.id] = {
+      step: 'waiting_limit',
+      cardName: cardName,
+      timestamp: Date.now()
+    };
+    
+    await this.whatsapp.replyMessage(message,
+      '💳 *CADASTRO DE CARTÃO*\n\n' +
+      `✅ Nome: *${cardName}*\n\n` +
+      '📊 *Agora digite o limite do cartão:*\n' +
+      'Valor mínimo: R$ 100,00\n' +
+      'Exemplo: 5000\n\n' +
+      '⏱️ Você tem 3 minutos para responder\n\n' +
+      '🕐 ' + timestamp.formatted
+    );
+    
+    this.cleanupPendingOperation(user.id, 'card_creation', TIMEOUTS.PENDING_CARD_CREATION);
+    await this.whatsapp.sendPresence(info.chatId, 'available');
+    return;
+  }
+  
+  // ETAPA 2: Aguardando limite do cartão
+  if (pending.step === 'waiting_limit') {
+    const limit = this.nlp.extractAmount(text);
+    
+    if (!limit || limit < 100) {
+      await this.whatsapp.replyMessage(message,
+        '❌ *Limite inválido!*\n\n' +
+        'O limite mínimo é R$ 100,00\n\n' +
+        '💡 Digite apenas o valor (exemplo: 5000)\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+    
+    if (limit > 1000000) {
+      await this.whatsapp.replyMessage(message,
+        '❌ *Limite muito alto!*\n\n' +
+        'O limite máximo é R$ 1.000.000,00\n\n' +
+        '💡 Digite um valor menor\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+    
+    // Avançar para vencimento
+    this.pendingCardCreation[user.id] = {
+      step: 'waiting_due_day',
+      cardName: pending.cardName,
+      cardLimit: limit,
+      timestamp: Date.now()
+    };
+    
+    await this.whatsapp.replyMessage(message,
+      '💳 *CADASTRO DE CARTÃO*\n\n' +
+      `✅ Nome: *${pending.cardName}*\n` +
+      `✅ Limite: *${this.reports.formatMoney(limit)}*\n\n` +
+      '📅 *Por último, digite o dia do vencimento da fatura:*\n' +
+      'Número de 1 a 31\n' +
+      'Exemplo: 10 (para todo dia 10)\n\n' +
+      '⏱️ Você tem 3 minutos para responder\n\n' +
+      '🕐 ' + timestamp.formatted
+    );
+    
+    this.cleanupPendingOperation(user.id, 'card_creation', TIMEOUTS.PENDING_CARD_CREATION);
+    await this.whatsapp.sendPresence(info.chatId, 'available');
+    return;
+  }
+  
+  // ETAPA 3: Aguardando dia do vencimento
+  if (pending.step === 'waiting_due_day') {
+    const dueDay = parseInt(text.trim());
+    
+    if (isNaN(dueDay) || dueDay < 1 || dueDay > 31) {
+      await this.whatsapp.replyMessage(message,
+        '❌ *Dia inválido!*\n\n' +
+        'Digite um número de 1 a 31\n\n' +
+        '💡 Exemplo: 10 (para vencimento todo dia 10)\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+    
+    // Criar o cartão
+    const success = this.dao.createCreditCard(user.id, pending.cardName, pending.cardLimit, dueDay);
+    delete this.pendingCardCreation[user.id];
+    
+    if (success) {
+      await this.whatsapp.replyMessage(message,
+        '✅ *CARTÃO CADASTRADO COM SUCESSO!*\n\n' +
+        `💳 Nome: *${pending.cardName}*\n` +
+        `📊 Limite: ${this.reports.formatMoney(pending.cardLimit)}\n` +
+        `📅 Vencimento: Todo dia ${dueDay}\n\n` +
+        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+        '💡 *Como usar:*\n\n' +
+        'Quando você registrar uma compra, o bot vai perguntar:\n' +
+        '• Digite o nome do cartão para pagar nele\n' +
+        '• Ou digite "saldo" para pagar no saldo\n\n' +
+        '📌 Use `/cartoes` para ver todos os seus cartões\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+      
+      Logger.card(user, 'criou cartão', pending.cardName);
+    } else {
+      await this.whatsapp.replyMessage(message, 
+        '❌ *Erro ao criar cartão*\n\n' +
+        'Tente novamente mais tarde.\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+    }
+    
+    await this.whatsapp.sendPresence(info.chatId, 'available');
+    return;
+  }
 }
+
 
       const processed = this.nlp.processMessage(text);
 
