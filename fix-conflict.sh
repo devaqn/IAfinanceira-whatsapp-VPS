@@ -71,4 +71,8 @@ echo ""
 echo "📋 Acompanhe os logs:"
 echo ""
 
+<<<<<<< HEAD
 pm2 logs IAfinancias --lines 50
+=======
+pm2 logs IAfinancias --lines 500
+>>>>>>> 9f34b68 ( commitando alteraçoes dentro da vps)
