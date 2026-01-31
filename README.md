@@ -348,7 +348,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 Desenvolvido com ❤️ por **[devaqn]**
 
-- GitHub: [@seu-usuario](https://github.com/devaqn)
+- GitHub: (https://github.com/devaqn)
 - Email: pedromiguelaqn@gmail.com
 
 ---
