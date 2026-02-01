@@ -18,19 +18,17 @@ console.log('╚═════════════════════�
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'database', 'finance.db');
 const AUTH_PATH = process.env.AUTH_PATH || path.join(__dirname, 'auth_info');
 const LOCK_FILE = path.join(__dirname, '.bot.lock');
-const MAX_RECONNECT_ATTEMPTS = 5;
 
 // ==================== 🔒 SISTEMA DE LOCK ====================
 function checkLock() {
   if (fs.existsSync(LOCK_FILE)) {
     const pid = fs.readFileSync(LOCK_FILE, 'utf8').trim();
     try {
-      process.kill(pid, 0); // Verifica se o PID ainda existe
+      process.kill(pid, 0);
       console.error('❌ Bot já está rodando! (PID:', pid, ')');
       console.error('💡 Execute: pkill -f "node index.js" && node index.js');
       process.exit(1);
     } catch (e) {
-      // PID não existe mais — lock antigo, pode remover
       console.log('🧹 Removendo lock antigo (PID:', pid, ')');
       fs.unlinkSync(LOCK_FILE);
     }
@@ -45,9 +43,7 @@ function removeLock() {
       fs.unlinkSync(LOCK_FILE);
       console.log('🔓 Lock removido');
     }
-  } catch (e) {
-    // ignorar erros ao remover lock
-  }
+  } catch (e) {}
 }
 
 // ==================== 📊 DATABASE ====================
@@ -71,7 +67,6 @@ async function initializeDatabase() {
 function startReminders(dao, whatsapp, messageHandler) {
   async function checkReminders() {
     try {
-      // Pagamentos vencendo hoje
       const dueToday = dao.getDueTodayPayments();
       for (const payment of dueToday) {
         const message = messageHandler.reports.generateReminderMessage(payment);
@@ -80,7 +75,6 @@ function startReminders(dao, whatsapp, messageHandler) {
         console.log('🔔 Lembrete enviado:', payment.description);
       }
 
-      // Pagamentos já vencidos
       const overdue = dao.getOverduePayments();
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -99,79 +93,9 @@ function startReminders(dao, whatsapp, messageHandler) {
     }
   }
 
-  // Primeira verificação após 60s, depois a cada hora
   setTimeout(checkReminders, 60 * 1000);
   setInterval(checkReminders, 60 * 60 * 1000);
   console.log('🔔 Sistema de lembretes ativo');
-}
-
-// ==================== 🔄 RECONEXÃO ====================
-function setupReconnection(whatsapp) {
-  let reconnectAttempts = 0;
-  let reconnectTimeout = null;
-
-  whatsapp.sock.ev.on('connection.update', (update) => {
-    const { connection, lastDisconnect, qr } = update;
-
-    if (qr) {
-      console.log('\n📱 QR Code gerado! Escaneie para conectar.\n');
-    }
-
-    if (connection === 'close') {
-      const statusCode = lastDisconnect?.error?.output?.statusCode;
-      console.log('\n🔌 Conexão fechada | Código:', statusCode, '| Mensagem:', lastDisconnect?.error?.message);
-
-      // Limpar timeout anterior se existir
-      if (reconnectTimeout) {
-        clearTimeout(reconnectTimeout);
-        reconnectTimeout = null;
-      }
-
-      // --- 440: Conflito (outro dispositivo conectou) ---
-      if (statusCode === 440) {
-        console.log('\n⚠️  CONFLITO DETECTADO (Erro 440)');
-        console.log('📌 Causas comuns:');
-        console.log('   • Outro bot rodando com este número');
-        console.log('   • WhatsApp Web aberto no navegador');
-        console.log('   • Múltiplas instâncias no PM2');
-        console.log('🔧 Solução: pkill -f "node index.js" && node index.js\n');
-        // NÃO reconecta — aguarda ação manual
-        return;
-      }
-
-      // --- 401: Não autorizado (logout) ---
-      if (statusCode === 401) {
-        console.log('❌ Desconectado por logout. Remova a pasta auth_info e reinicie.');
-        removeLock();
-        process.exit(1);
-      }
-
-      // --- 515: Stream error ou outros erros reconectáveis ---
-      reconnectAttempts++;
-
-      if (reconnectAttempts > MAX_RECONNECT_ATTEMPTS) {
-        console.log('❌ Muitas tentativas de reconexão. Encerrando...');
-        removeLock();
-        process.exit(1);
-      }
-
-      const delay = Math.min(reconnectAttempts * 5000, 30000);
-      console.log(`🔄 Reconectando em ${delay / 1000}s... (tentativa ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
-
-      reconnectTimeout = setTimeout(() => {
-        main().catch((err) => {
-          console.error('❌ Erro na reconexão:', err);
-          removeLock();
-          process.exit(1);
-        });
-      }, delay);
-    }
-
-    if (connection === 'open') {
-      reconnectAttempts = 0;
-      console.log('\n✅ Bot conectado com sucesso!\n');
-    }
-  });
 }
 
 // ==================== 🚀 MAIN ====================
@@ -196,12 +120,10 @@ async function main() {
     // Lembretes
     startReminders(dao, whatsapp, messageHandler);
 
-    // Reconexão inteligente
-    setupReconnection(whatsapp);
-
+    // Conectar ao WhatsApp
+    // A reconexão é gerenciada internamente pelo WhatsAppService
     console.log('📱 Passo 3/3: Conectando ao WhatsApp\n');
 
-    // Conectar ao WhatsApp e processar mensagens
     await whatsapp.connect(async (message) => {
       await messageHandler.process(message);
     });
@@ -214,8 +136,6 @@ async function main() {
 }
 
 // ==================== 🛡️ HANDLERS DE SINAL ====================
-// Faz cleanup do lock ao encerrar, mas NÃO force-exits no SIGINT/SIGTERM
-// para evitar deslogar do WhatsApp no PM2.
 let exiting = false;
 
 function gracefulShutdown(signal) {
