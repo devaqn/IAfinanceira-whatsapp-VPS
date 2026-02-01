@@ -336,16 +336,24 @@ if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
   
 // 💳 AGUARDANDO LIMITE DO CARTÃO
 if (pending.step === 'awaiting_limit') {
+  console.log('🔍 DEBUG: Entrou no bloco awaiting_limit'); // ⭐ LOG 1
+  console.log('🔍 DEBUG: Texto recebido:', text); // ⭐ LOG 2
+  
   const timestamp = this.reports.getCurrentBrazilTimestamp();
   
   const cleanValue = text
     .replace(/[R$\s]/g, '')          
     .replace(/\./g, '')               
-    .replace(',', '.');                
+    .replace(',', '.');
+  
+  console.log('🔍 DEBUG: Valor limpo:', cleanValue); // ⭐ LOG 3
   
   const limitValue = parseFloat(cleanValue);
   
+  console.log('🔍 DEBUG: Valor parseado:', limitValue); // ⭐ LOG 4
+  
   if (isNaN(limitValue) || limitValue < 100) {
+    console.log('❌ DEBUG: Valor inválido'); // ⭐ LOG 5
     await this.whatsapp.replyMessage(message,
       '❌ *Limite inválido!*\n' +
       'O limite mínimo é R$ 100,00\n\n' +
@@ -361,6 +369,7 @@ if (pending.step === 'awaiting_limit') {
   }
     
   if (limitValue > 1000000) {
+    console.log('❌ DEBUG: Valor muito alto'); // ⭐ LOG 6
     await this.whatsapp.replyMessage(message,
       '❌ *Limite muito alto!*\n\n' +
       'O limite máximo é R$ 1.000.000,00\n\n' +
@@ -370,6 +379,8 @@ if (pending.step === 'awaiting_limit') {
     return;
   }
   
+  console.log('✅ DEBUG: Valor válido, avançando para próximo step'); // ⭐ LOG 7
+  
   // Avançar para vencimento
   this.pendingCardCreation[user.id] = {
     step: 'waiting_due_day',
@@ -377,6 +388,10 @@ if (pending.step === 'awaiting_limit') {
     cardLimit: limitValue,  
     timestamp: Date.now()
   };
+  
+  console.log('✅ DEBUG: Estado atualizado:', this.pendingCardCreation[user.id]); // ⭐ LOG 8
+  
+  console.log('📤 DEBUG: Enviando mensagem de confirmação...'); // ⭐ LOG 9
   
   await this.whatsapp.replyMessage(message,
     '💳 *CADASTRO DE CARTÃO*\n\n' +
@@ -389,8 +404,12 @@ if (pending.step === 'awaiting_limit') {
     '🕐 ' + timestamp.formatted
   );
   
+  console.log('✅ DEBUG: Mensagem enviada!'); // ⭐ LOG 10
+  
   this.cleanupPendingOperation(user.id, 'card_creation', TIMEOUTS.PENDING_CARD_CREATION);
   await this.whatsapp.sendPresence(info.chatId, 'available');
+  
+  console.log('✅ DEBUG: Finalizando bloco awaiting_limit'); // ⭐ LOG 11
   return;
 }
   
