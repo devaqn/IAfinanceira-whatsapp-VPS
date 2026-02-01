@@ -336,15 +336,16 @@ if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
   
 // 💳 AGUARDANDO LIMITE DO CARTÃO
 if (pending.step === 'awaiting_limit') {
+  const timestamp = this.reports.getCurrentBrazilTimestamp();
+  
   const cleanValue = text
-    .replace(/[R$\s]/g, '')           // Remove R$, espaços
-    .replace(/\./g, '')                // Remove pontos de milhares (5.000 → 5000)
-    .replace(',', '.');                // Troca vírgula por ponto decimal (5000,50 → 5000.50)
+    .replace(/[R$\s]/g, '')          
+    .replace(/\./g, '')               
+    .replace(',', '.');                
   
   const limitValue = parseFloat(cleanValue);
   
   if (isNaN(limitValue) || limitValue < 100) {
-    const timestamp = this.reports.getCurrentBrazilTimestamp();
     await this.whatsapp.replyMessage(message,
       '❌ *Limite inválido!*\n' +
       'O limite mínimo é R$ 100,00\n\n' +
@@ -359,41 +360,39 @@ if (pending.step === 'awaiting_limit') {
     return;
   }
     
-    if (limitValue > 1000000) {  // ✅ CORRIGIDO!
-      const timestamp = this.reports.getCurrentBrazilTimestamp();
-      await this.whatsapp.replyMessage(message,
-        '❌ *Limite muito alto!*\n\n' +
-        'O limite máximo é R$ 1.000.000,00\n\n' +
-        '💡 Digite um valor menor\n\n' +
-        '🕐 ' + timestamp.formatted
-      );
-      return;
-    }
-    
-    // Avançar para vencimento
-    this.pendingCardCreation[user.id] = {
-      step: 'waiting_due_day',
-      cardName: pending.cardName,
-      cardLimit: limitValue,  // ✅ CORRIGIDO!
-      timestamp: Date.now()
-    };
-    
-    const timestamp = this.reports.getCurrentBrazilTimestamp();
+  if (limitValue > 1000000) {
     await this.whatsapp.replyMessage(message,
-      '💳 *CADASTRO DE CARTÃO*\n\n' +
-      `✅ Nome: *${pending.cardName}*\n` +
-      `✅ Limite: *${this.reports.formatMoney(limitValue)}*\n\n` +  // ✅ CORRIGIDO!
-      '📅 *Por último, digite o dia do vencimento da fatura:*\n' +
-      'Número de 1 a 31\n' +
-      'Exemplo: 10 (para todo dia 10)\n\n' +
-      '⏱️ Você tem 3 minutos para responder\n\n' +
+      '❌ *Limite muito alto!*\n\n' +
+      'O limite máximo é R$ 1.000.000,00\n\n' +
+      '💡 Digite um valor menor\n\n' +
       '🕐 ' + timestamp.formatted
     );
-    
-    this.cleanupPendingOperation(user.id, 'card_creation', TIMEOUTS.PENDING_CARD_CREATION);
-    await this.whatsapp.sendPresence(info.chatId, 'available');
     return;
   }
+  
+  // Avançar para vencimento
+  this.pendingCardCreation[user.id] = {
+    step: 'waiting_due_day',
+    cardName: pending.cardName,
+    cardLimit: limitValue,  
+    timestamp: Date.now()
+  };
+  
+  await this.whatsapp.replyMessage(message,
+    '💳 *CADASTRO DE CARTÃO*\n\n' +
+    `✅ Nome: *${pending.cardName}*\n` +
+    `✅ Limite: *${this.reports.formatMoney(limitValue)}*\n\n` +  
+    '📅 *Por último, digite o dia do vencimento da fatura:*\n' +
+    'Número de 1 a 31\n' +
+    'Exemplo: 10 (para todo dia 10)\n\n' +
+    '⏱️ Você tem 3 minutos para responder\n\n' +
+    '🕐 ' + timestamp.formatted
+  );
+  
+  this.cleanupPendingOperation(user.id, 'card_creation', TIMEOUTS.PENDING_CARD_CREATION);
+  await this.whatsapp.sendPresence(info.chatId, 'available');
+  return;  
+}
   
   // ETAPA 3: Aguardando dia do vencimento
   if (pending.step === 'waiting_due_day') {
