@@ -427,34 +427,34 @@ if (pending.step === 'waiting_limit') {
       return;
     }
     
-    // Criar o cartão
-    const result = this.dao.createCard(user.id, pending.cardName, pending.cardLimit, dueDay);
-    delete this.pendingCardCreation[user.id];
-    
-    if (result.success) {
-      await this.whatsapp.replyMessage(message,
-        '✅ *CARTÃO CADASTRADO COM SUCESSO!*\n\n' +
-        `💳 Nome: *${result.cardName}*\n` +
-        `📊 Limite: ${this.reports.formatMoney(result.limit)}\n` +
-        `📅 Vencimento: Todo dia ${result.dueDay}\n\n` +
-        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-        '💡 *Como usar:*\n\n' +
-        'Quando você registrar uma compra, o bot vai perguntar:\n' +
-        '• Digite o nome do cartão para pagar nele\n' +
-        '• Ou digitou "saldo" para pagar no saldo\n\n' +
-        '📌 Use `/cartoes` para ver todos os seus cartões\n\n' +
-        '🕐 ' + timestamp.formatted
-      );
-      
-      Logger.card(user, 'criou cartão', pending.cardName);
-    } else {
-      await this.whatsapp.replyMessage(message, 
-        (result.message || '❌ *Erro ao criar cartão*') + '\n\n🕐 ' + timestamp.formatted
-      );
-    }
-    
-    await this.whatsapp.sendPresence(info.chatId, 'available');
-    return;
+   // Criar o cartão
+const result = this.dao.createCard(user.id, pending.cardName, pending.cardLimit, dueDay);
+delete this.pendingCardCreation[user.id];
+
+if (result.success) {
+  await this.whatsapp.replyMessage(message,
+    '✅ *CARTÃO CADASTRADO COM SUCESSO!*\n\n' +
+    `💳 Nome: *${result.cardName}*\n` +
+    `📊 Limite: ${this.reports.formatMoney(result.limit)}\n` +
+    `📅 Vencimento: Todo dia ${result.dueDay}\n\n` +
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+    '💡 *Como usar:*\n\n' +
+    'Quando você registrar uma compra, o bot vai perguntar:\n' +
+    '• Digite o nome do cartão para pagar nele\n' +
+    '• Ou digitou "saldo" para pagar no saldo\n\n' +
+    '📌 Use `/cartoes` para ver todos os seus cartões\n\n' +
+    '🕐 ' + timestamp.formatted
+  );
+  
+  Logger.card(user, 'criou cartão', result.cardName || pending.cardName);  // ✅ Só um ;
+} else {
+  await this.whatsapp.replyMessage(message, 
+    (result.message || '❌ *Erro ao criar cartão*') + '\n\n🕐 ' + timestamp.formatted
+  );
+}
+
+await this.whatsapp.sendPresence(info.chatId, 'available');
+return;
   }
 }
 

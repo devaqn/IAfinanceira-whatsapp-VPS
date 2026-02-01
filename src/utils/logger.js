@@ -3,9 +3,9 @@ class Logger {
     console.log(`💸 [EXPENSE] ${user.name}: R$ ${amount.toFixed(2)} - ${description} (${category})`);
   }
   
-  static card(user, action, amount) {
-    console.log(`💳 [CARD] ${user.name}: ${action} - R$ ${amount.toFixed(2)}`);
-  }
+static card(user, action, cardName) {
+  console.log(`💳 [CARD] ${user.name}: ${action} - ${cardName}`);
+}
   
   static installment(user, amount, installments, description) {
     console.log(`📦 [INSTALLMENT] ${user.name}: R$ ${amount.toFixed(2)} em ${installments}x - ${description}`);
