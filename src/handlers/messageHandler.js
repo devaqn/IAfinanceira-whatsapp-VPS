@@ -335,7 +335,7 @@ if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
   }
   
 // 💳 AGUARDANDO LIMITE DO CARTÃO
-if (pending.step === 'awaiting_limit') {
+if (pending.step === 'waiting_limit') {
   console.log('🔍 DEBUG: Entrou no bloco awaiting_limit'); // ⭐ LOG 1
   console.log('🔍 DEBUG: Texto recebido:', text); // ⭐ LOG 2
   
