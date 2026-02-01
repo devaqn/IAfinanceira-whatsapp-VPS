@@ -334,19 +334,31 @@ if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
     return;
   }
   
-  // ETAPA 2: Aguardando limite do cartão
-  if (pending.step === 'waiting_limit') {
-    const limit = this.nlp.extractAmount(text);
-    
-    if (!limit || limit < 100) {
-      await this.whatsapp.replyMessage(message,
-        '❌ *Limite inválido!*\n\n' +
-        'O limite mínimo é R$ 100,00\n\n' +
-        '💡 Digite apenas o valor (exemplo: 5000)\n\n' +
-        '🕐 ' + timestamp.formatted
-      );
-      return;
-    }
+// 💳 AGUARDANDO LIMITE DO CARTÃO
+if (pending.step === 'awaiting_limit') {
+  // 🔧 LIMPEZA COMPLETA: Remove R$, espaços, pontos (milhares) e converte vírgula decimal
+  const cleanValue = text
+    .replace(/[R$\s]/g, '')           // Remove R$, espaços
+    .replace(/\./g, '')                // Remove pontos de milhares (5.000 → 5000)
+    .replace(',', '.');                // Troca vírgula por ponto decimal (5000,50 → 5000.50)
+  
+  const limitValue = parseFloat(cleanValue);
+  
+  if (isNaN(limitValue) || limitValue < 100) {
+    const timestamp = this.reports.getCurrentBrazilTimestamp();
+    await this.whatsapp.replyMessage(message,
+      '❌ *Limite inválido!*\n' +
+      'O limite mínimo é R$ 100,00\n\n' +
+      '💡 *Formatos aceitos:*\n' +
+      '   • 5000\n' +
+      '   • R$ 5000\n' +
+      '   • 5.000\n' +
+      '   • 5.000,00\n' +
+      '   • R$ 5.000,00\n\n' +
+      '🕐 ' + timestamp.formatted
+    );
+    return;
+  }
     
     if (limit > 1000000) {
       await this.whatsapp.replyMessage(message,
