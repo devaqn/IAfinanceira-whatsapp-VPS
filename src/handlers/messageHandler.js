@@ -391,7 +391,7 @@ if (pending.step === 'awaiting_limit') {
   
   this.cleanupPendingOperation(user.id, 'card_creation', TIMEOUTS.PENDING_CARD_CREATION);
   await this.whatsapp.sendPresence(info.chatId, 'available');
-  return;  
+  return;
 }
   
   // ETAPA 3: Aguardando dia do vencimento
