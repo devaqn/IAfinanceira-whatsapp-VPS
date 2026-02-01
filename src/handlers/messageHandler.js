@@ -234,6 +234,102 @@ if (this.pendingInstallments && this.pendingInstallments[user.id]) {
     return;
   }
 }
+// 💳 FLUXO DE CRIAÇÃO DE CARTÃO (3 ETAPAS)
+if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
+  const pending = this.pendingCardCreation[user.id];
+  const timestamp = this.reports.getCurrentBrazilTimestamp();
+  
+  // ETAPA 1: Capturar nome
+  if (pending.step === 'name') {
+    const cardName = text.trim();
+    
+    if (cardName.length < 2 || cardName.length > 30) {
+      await this.whatsapp.replyMessage(message, 
+        '❌ Nome deve ter entre 2 e 30 caracteres!\n\n' +
+        'Digite novamente:\n\n🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+    
+    // Verificar se já existe
+    const existing = this.dao.getCardByName(user.id, cardName);
+    if (existing) {
+      await this.whatsapp.replyMessage(message, 
+        `❌ Você já tem um cartão chamado "${cardName}"!\n\n` +
+        'Digite outro nome:\n\n🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+    
+    pending.step = 'limit';
+    pending.cardName = cardName;
+    
+    await this.whatsapp.replyMessage(message, 
+      `💳 Cartão: *${cardName}*\n\n` +
+      '📝 Passo 2/3: Digite o limite do cartão\n\n' +
+      'Exemplo: 5000\n\n🕐 ' + timestamp.formatted
+    );
+    return;
+  }
+  
+  // ETAPA 2: Capturar limite
+  if (pending.step === 'limit') {
+    const limitAmount = this.nlp.extractAmount(text);
+    
+    if (!limitAmount || limitAmount <= 0) {
+      await this.whatsapp.replyMessage(message, 
+        '❌ Limite inválido!\n\n' +
+        'Digite um valor válido (ex: 5000):\n\n🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+    
+    pending.step = 'dueDay';
+    pending.cardLimit = limitAmount;
+    
+    await this.whatsapp.replyMessage(message, 
+      `💳 Cartão: *${pending.cardName}*\n` +
+      `💰 Limite: ${this.reports.formatMoney(limitAmount)}\n\n` +
+      '📝 Passo 3/3: Digite o dia de vencimento (1-31)\n\n' +
+      'Exemplo: 15\n\n🕐 ' + timestamp.formatted
+    );
+    return;
+  }
+  
+  // ETAPA 3: Capturar vencimento e criar
+  if (pending.step === 'dueDay') {
+    const dueDay = parseInt(text.trim());
+    
+    if (isNaN(dueDay) || dueDay < 1 || dueDay > 31) {
+      await this.whatsapp.replyMessage(message, 
+        '❌ Dia inválido!\n\n' +
+        'Digite um número entre 1 e 31:\n\n🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+    
+    // Criar o cartão
+    const result = this.dao.createCard(user.id, pending.cardName, pending.cardLimit, dueDay);
+    delete this.pendingCardCreation[user.id];
+    
+    if (result.success) {
+      const resp = '✅ *CARTÃO CRIADO COM SUCESSO!*\n\n' +
+        `💳 Nome: *${result.cardName}*\n` +
+        `💰 Limite: ${this.reports.formatMoney(result.limit)}\n` +
+        `📅 Vencimento: Dia ${result.dueDay}\n` +
+        `✨ Limite disponível: ${this.reports.formatMoney(result.limit)}\n\n` +
+        '💡 Use `/cartoes` para ver todos os seus cartões\n\n' +
+        '🕐 ' + timestamp.formatted;
+      
+      await this.whatsapp.replyMessage(message, resp);
+    } else {
+      await this.whatsapp.replyMessage(message, 
+        result.message + '\n\n🕐 ' + timestamp.formatted
+      );
+    }
+    return;
+  }
+}
 // 💳 VERIFICAR SE É VALOR PARA PAGAMENTO DE FATURA
 if (this.pendingInvoicePayments && this.pendingInvoicePayments[user.id]) {
   const pending = this.pendingInvoicePayments[user.id];
@@ -613,28 +709,210 @@ if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
         return;
       }
       
-      else if (command.command === 'withdrawEmergency') {
-        if (command.amount && command.amount > 0) {
-          const success = this.dao.withdrawFromEmergencyFund(user.id, command.amount);
-          
-          if (success) {
-            const updatedUser = this.dao.getUserById(user.id);
-            if (updatedUser) {
-              response = this.reports.generateEmergencyConfirmation('withdraw', command.amount, updatedUser);
-              console.log('🚨 ' + user.name + ': usou reserva ' + command.amount);
-            } else {
-              response = '❌ *Erro ao buscar dados atualizados*\n\n🕑 ' + timestamp.formatted;
-            }
-          } else {
-            response = ErrorMessages.INSUFFICIENT_BALANCE('Reserva') + '\n\n🕑 ' + timestamp.formatted;
-          }
-        } else {
-          response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;
-        }
-        
-        await this.whatsapp.replyMessage(message, response);
-        return;
+      // ============ 💳 CRIAR NOVO CARTÃO (INICIAR FLUXO) ============
+else if (command.command === 'createCard') {
+  if (!this.pendingCardCreation) this.pendingCardCreation = {};
+  
+  this.pendingCardCreation[user.id] = {
+    step: 'waiting_name',
+    timestamp: Date.now()
+  };
+  
+  response = '💳 *CRIAR NOVO CARTÃO*\n\n' +
+    '📝 *Passo 1/3: Nome do cartão*\n\n' +
+    'Digite um nome para identificar seu cartão:\n\n' +
+    '💡 Exemplos:\n' +
+    '• Nubank\n' +
+    '• Inter\n' +
+    '• C6 Bank\n' +
+    '• Cartão Principal\n\n' +
+    '⏱️ Você tem 3 minutos para responder\n\n' +
+    '🕐 ' + timestamp.formatted;
+  
+  this.cleanupPendingOperation(user.id, 'card_creation', TIMEOUTS.PENDING_CARD_CREATION);
+}
+
+// ============ 💳 LISTAR TODOS OS CARTÕES ============
+else if (command.command === 'listCards') {
+  const cards = this.dao.getAllCardsByUserId(user.id);
+  
+  if (!cards || cards.length === 0) {
+    response = '💳 *VOCÊ NÃO TEM CARTÕES CADASTRADOS*\n\n' +
+      'Use `/cartao criar` para cadastrar seu primeiro cartão!\n\n' +
+      '🕐 ' + timestamp.formatted;
+  } else {
+    response = '💳 *SEUS CARTÕES*\n\n';
+    
+    for (let i = 0; i < cards.length; i++) {
+      const card = cards[i];
+      const percentUsed = card.card_limit > 0 ? (card.current_balance / card.card_limit * 100).toFixed(1) : 0;
+      
+      response += `📇 *${card.card_name}*\n`;
+      response += `   Limite: ${this.reports.formatMoney(card.card_limit)}\n`;
+      response += `   Usado: ${this.reports.formatMoney(card.current_balance)} (${percentUsed}%)\n`;
+      response += `   Disponível: ${this.reports.formatMoney(card.available_limit)}\n`;
+      response += `   Fatura: ${this.reports.formatMoney(card.invoice_amount)}\n`;
+      response += `   Vencimento: Dia ${card.invoice_due_day}\n\n`;
+    }
+    
+    response += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    response += '💡 Use `/cartao [nome]` para ver detalhes\n';
+    response += '💡 Use `/pagar fatura [nome]` para pagar\n\n';
+    response += '🕐 ' + timestamp.formatted;
+  }
+}
+
+// ============ 💳 VER DETALHES DE UM CARTÃO ESPECÍFICO ============
+else if (command.command === 'getCardByName') {
+  if (!command.description) {
+    response = '❌ Digite o nome do cartão!\n\n💡 Exemplo: `/cartao nubank`\n\n🕐 ' + timestamp.formatted;
+  } else {
+    const card = this.dao.findCardByPartialName(user.id, command.description);
+    
+    if (!card) {
+      response = `❌ Cartão "${command.description}" não encontrado\n\n` +
+        'Use `/cartoes` para ver todos os seus cartões\n\n' +
+        '🕐 ' + timestamp.formatted;
+    } else {
+      const percentUsed = card.card_limit > 0 ? (card.current_balance / card.card_limit * 100).toFixed(1) : 0;
+      
+      response = `💳 *${card.card_name.toUpperCase()}*\n\n`;
+      response += '📊 *LIMITES*\n';
+      response += `   Total: ${this.reports.formatMoney(card.card_limit)}\n`;
+      response += `   Usado: ${this.reports.formatMoney(card.current_balance)} (${percentUsed}%)\n`;
+      response += `   Disponível: ${this.reports.formatMoney(card.available_limit)}\n\n`;
+      response += '💰 *FATURA*\n';
+      response += `   Valor atual: ${this.reports.formatMoney(card.invoice_amount)}\n`;
+      response += `   Vencimento: Todo dia ${card.invoice_due_day}\n\n`;
+      
+      if (card.last_payment_date) {
+        const lastPayment = new Date(card.last_payment_date);
+        response += '📅 *ÚLTIMO PAGAMENTO*\n';
+        response += `   Valor: ${this.reports.formatMoney(card.last_payment_amount)}\n`;
+        response += `   Data: ${lastPayment.toLocaleDateString('pt-BR')}\n\n`;
       }
+      
+      response += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+      response += `💡 Use \`/pagar fatura ${card.card_name}\` para pagar\n\n`;
+      response += '🕐 ' + timestamp.formatted;
+    }
+  }
+}
+
+// ============ 💳 PAGAR FATURA (MÚLTIPLOS CARTÕES) ============
+else if (command.command === 'payInvoiceCard') {
+  const cardName = command.description;
+  const card = this.dao.findCardByPartialName(user.id, cardName);
+  
+  if (!card) {
+    response = `❌ Cartão "${cardName}" não encontrado\n\nUse \`/cartoes\` para ver seus cartões\n\n🕐 ` + timestamp.formatted;
+  } else if (card.invoice_amount === 0) {
+    response = `✅ *FATURA ZERADA*\n\n💳 Cartão: *${card.card_name}*\n\nVocê não tem fatura para pagar!\n\n🕐 ` + timestamp.formatted;
+  } else {
+    if (!this.pendingInvoicePayments) this.pendingInvoicePayments = {};
+    
+    this.pendingInvoicePayments[user.id] = {
+      cardId: card.id,
+      cardName: card.card_name,
+      invoiceAmount: card.invoice_amount,
+      timestamp: Date.now()
+    };
+
+    response = '💳 *PAGAMENTO DE FATURA*\n\n' +
+      `📇 Cartão: *${card.card_name}*\n` +
+      `📊 Fatura atual: ${this.reports.formatMoney(card.invoice_amount)}\n` +
+      `💰 Seu saldo: ${this.reports.formatMoney(user.current_balance)}\n\n` +
+      '💡 *Digite o valor que você pagou:*\n' +
+      'Exemplo: 1300\n\n' +
+      '⏱️ Você tem 2 minutos para responder\n\n' +
+      '🕐 ' + timestamp.formatted;
+
+    this.cleanupPendingOperation(user.id, 'invoice', TIMEOUTS.PENDING_INVOICE);
+  }
+}
+
+// ============ 💳 DELETAR CARTÃO ============
+else if (command.command === 'deleteCard') {
+  if (!command.description) {
+    response = '❌ Digite o nome do cartão!\n\n💡 Exemplo: `/deletar cartao nubank`\n\n🕐 ' + timestamp.formatted;
+  } else {
+    const card = this.dao.findCardByPartialName(user.id, command.description);
+    
+    if (!card) {
+      response = `❌ Cartão "${command.description}" não encontrado\n\n` +
+        'Use `/cartoes` para ver todos os seus cartões\n\n' +
+        '🕐 ' + timestamp.formatted;
+    } else {
+      // ✅ ORDEM CORRETA: (cardId, userId)
+      const success = this.dao.deleteCard(card.id, user.id);
+      
+      if (success) {
+        response = '✅ *CARTÃO DELETADO*\n\n' +
+          `💳 ${card.card_name} foi removido com sucesso!\n\n` +
+          '🕐 ' + timestamp.formatted;
+        
+        Logger.card(user, 'deletou cartão', card.card_name);
+      } else {
+        response = '❌ Erro ao deletar cartão\n\n🕐 ' + timestamp.formatted;
+      }
+    }
+  }
+}
+
+
+else if (command.command === 'resetCard') {
+  if (!command.description) {
+    response = '❌ Digite o nome do cartão!\n\n💡 Exemplo: `/zerar cartao nubank`\n\n🕐 ' + timestamp.formatted;
+  } else {
+    const card = this.dao.findCardByPartialName(user.id, command.description);
+    
+    if (!card) {
+      response = `❌ Cartão "${command.description}" não encontrado\n\n` +
+        'Use `/cartoes` para ver todos os seus cartões\n\n' +
+        '🕐 ' + timestamp.formatted;
+    } else {
+      // ✅ ORDEM CORRETA: (cardId, userId)
+      const success = this.dao.resetCard(card.id, user.id);
+      
+      if (success) {
+        response = '✅ *CARTÃO ZERADO*\n\n' +
+          `💳 ${card.card_name}\n\n` +
+          '• Saldo usado: R$ 0,00\n' +
+          '• Fatura: R$ 0,00\n' +
+          `• Limite disponível: ${this.reports.formatMoney(card.card_limit)}\n\n` +
+          '🕐 ' + timestamp.formatted;
+        
+        Logger.card(user, 'zerou cartão', card.card_name);
+      } else {
+        response = '❌ Erro ao zerar cartão\n\n🕐 ' + timestamp.formatted;
+      }
+    }
+  }
+}
+
+// ============ 📅 VENCIMENTOS ============
+else if (command.command === 'vencimentos') {
+  const cards = this.dao.getAllCardsByUserId(user.id);
+  
+  if (!cards || cards.length === 0) {
+    response = '💳 Você não tem cartões cadastrados\n\n🕐 ' + timestamp.formatted;
+  } else {
+    response = '📅 *VENCIMENTOS DOS CARTÕES*\n\n';
+    
+    // Ordenar por dia de vencimento
+    cards.sort((a, b) => a.invoice_due_day - b.invoice_due_day);
+    
+    for (let i = 0; i < cards.length; i++) {
+      const card = cards[i];
+      response += `💳 *${card.card_name}*\n`;
+      response += `   Vencimento: Todo dia ${card.invoice_due_day}\n`;
+      response += `   Fatura atual: ${this.reports.formatMoney(card.invoice_amount)}\n\n`;
+    }
+    
+    response += '🕐 ' + timestamp.formatted;
+  }
+}
+      
       // 💳 CARTÃO DE CRÉDITO
 else if (command.command === 'setCardLimit') {
   if (command.amount && command.amount > 0) {
@@ -705,32 +983,7 @@ else if (command.command === 'payInvoice') {
     this.cleanupPendingOperation(user.id, 'invoice', TIMEOUTS.PENDING_INVOICE);
   }
 }
-
-else if (command.command === 'resetCard') {
-  const card = this.dao.getCreditCardByUserId(user.id);
-  if (!card) {
-    response = '❌ Você não tem cartão cadastrado\n\n🕐 ' + timestamp.formatted;
-  } else {
-    const pending = this.pendingResets[user.id];
-    const now = Date.now();
-    
-    if (pending && pending.type === 'card' && (now - pending.timestamp) < TIMEOUTS.PENDING_RESET) {
-      delete this.pendingResets[user.id];
-      const success = this.dao.resetCreditCard(user.id);
-      
-      if (success) {
-        response = this.reports.generateResetConfirmation('card');
-        Logger.admin('zerou cartão de ' + user.name);
-      } else {
-        response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕐 ' + timestamp.formatted;
-      }
-    } else {
-      this.pendingResets[user.id] = { type: 'card', timestamp: now };
-      response = this.reports.generateResetWarning('card');
-      this.cleanupPendingOperation(user.id, 'reset', TIMEOUTS.PENDING_RESET);
-    }
-  }
-}
+// ============ 💳 PAGAMENTO DE FATURA (MÚLTIPLOS CARTÕES) ============
       
       else if (command.command === 'reportWeekly') {
         response = this.reports.generateWeeklyReport(user.id);

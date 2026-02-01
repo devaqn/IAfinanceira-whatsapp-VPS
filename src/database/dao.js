@@ -858,37 +858,38 @@ resetEverything(userId) {
 // ============ 💳 GESTÃO DE CARTÕES DE CRÉDITO (MÚLTIPLOS CARTÕES) ============
 
 // Criar novo cartão (com nome e vencimento)
-createCreditCard(userId, cardName, cardLimit, invoiceDueDay) {
-  const user = this.getUserById(userId);
-  if (!user) return false;
-  
-  // Validar nome
-  if (!cardName || cardName.trim() === '') return false;
-  
-  // Validar limite
-  if (cardLimit < 100 || cardLimit > 1000000) return false;
-  
-  // Validar dia de vencimento (1-31)
-  const dueDay = invoiceDueDay || 10;
-  if (dueDay < 1 || dueDay > 31) return false;
-  
-  // Verificar se já existe cartão com este nome
-  const existing = this.db.exec(
-    'SELECT * FROM user_cards WHERE user_id = ? AND LOWER(card_name) = LOWER(?)',
-    [userId, cardName.trim()]
-  );
-  
-  if (existing[0]) {
-    return false; // Já tem cartão com este nome
+createCard(userId, cardName, cardLimit, dueDay = 10) {
+  try {
+    // Validar nome duplicado
+    const existing = this.getCardByName(userId, cardName);
+    if (existing) {
+      return { success: false, message: '❌ Já existe um cartão com esse nome!' };
+    }
+
+    // Validar dia de vencimento (1-31)
+    const dueDayNum = parseInt(dueDay) || 10;
+    if (dueDayNum < 1 || dueDayNum > 31) {
+      return { success: false, message: '❌ Dia de vencimento deve ser entre 1 e 31' };
+    }
+
+    this.db.run(
+      `INSERT INTO user_cards (user_id, card_name, card_limit, available_limit, invoice_due_day)
+       VALUES (?, ?, ?, ?, ?)`,
+      [userId, cardName, cardLimit, cardLimit, dueDayNum]
+    );
+    
+    this.save();
+
+    return {
+      success: true,
+      cardName: cardName,
+      limit: cardLimit,
+      dueDay: dueDayNum
+    };
+  } catch (error) {
+    console.error('Erro ao criar cartão:', error);
+    return { success: false, message: 'Erro: ' + error.message };
   }
-  
-  this.db.run(
-    'INSERT INTO user_cards (user_id, card_name, card_limit, current_balance, available_limit, invoice_due_day) VALUES (?, ?, ?, ?, ?, ?)',
-    [userId, cardName.trim(), cardLimit, 0, cardLimit, dueDay]
-  );
-  this.save();
-  
-  return true;
 }
 
 // Listar todos os cartões do usuário

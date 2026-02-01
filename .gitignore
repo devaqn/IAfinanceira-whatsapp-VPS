@@ -1,0 +1,208 @@
+# ===================================
+# 🤖 BOT FINANCEIRO WHATSAPP
+# .gitignore
+# ===================================
+
+# ==================== 🔐 ARQUIVOS SENSÍVEIS ====================
+# Informações de autenticação do WhatsApp
+auth_info/
+*.json
+!package.json
+!package-lock.json
+
+# Variáveis de ambiente e configurações sensíveis
+.env
+.env.local
+.env.*.local
+.env.example
+config.js
+credentials.json
+
+# ==================== 💾 BANCO DE DADOS ====================
+# Banco de dados SQLite
+database/*.db
+database/*.sqlite
+database/*.sqlite3
+finance.db
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Backups do banco
+*.db.backup
+*.db.bak
+database/backups/
+
+# ==================== 📝 LOGS E RELATÓRIOS ====================
+# Logs de execução
+logs/
+*.log
+error.log
+combined.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Relatórios de teste
+test-reports.js
+coverage/
+.nyc_output/
+
+# ==================== 📦 NODE_MODULES ====================
+# Dependências do Node.js
+node_modules/
+jspm_packages/
+
+# ==================== 🔧 ARQUIVOS DE BUILD E CACHE ====================
+# Diretórios de build
+dist/
+build/
+out/
+
+# Cache do npm
+.npm
+.eslintcache
+.node_repl_history
+
+# Yarn
+.yarn-integrity
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# ==================== 💻 ARQUIVOS DE SISTEMA ====================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ==================== 🛠️ IDEs E EDITORES ====================
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# WebStorm
+.idea/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+
+# ==================== 📱 WHATSAPP SESSION ====================
+# Sessão do WhatsApp (MUITO IMPORTANTE!)
+.wwebjs_auth/
+.wwebjs_cache/
+session/
+sessions/
+qr/
+qr-codes/
+
+# ==================== 🗂️ ARQUIVOS TEMPORÁRIOS ====================
+# Arquivos temporários
+tmp/
+temp/
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.orig
+
+# ==================== 📄 DOCUMENTAÇÃO PRIVADA ====================
+# Documentação com informações sensíveis
+PRIVATE.md
+TODO.md
+NOTES.md
+mudancas1228.md
+
+# ==================== 🚫 ARQUIVOS DE TESTE ====================
+# Arquivos de teste locais
+test.js
+teste.js
+debug.js
+scratch.js
+
+# ==================== 🔒 CERTIFICADOS E CHAVES ====================
+# Chaves privadas e certificados
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+
+# ==================== ⚙️ CONFIGURAÇÕES ESPECÍFICAS ====================
+# Arquivos de configuração local
+.env.production.local
+.env.development.local
+.env.test.local
+
+# ==================== 📊 DADOS DE PRODUÇÃO ====================
+# Backups e exports de dados
+exports/
+backups/
+data/backups/
+*.backup
+*.bkp
+
+# ==================== 🎨 ASSETS DESNECESSÁRIOS ====================
+# Assets temporários
+uploads/
+temp-images/
+cache/
+
+# ==================== 🔄 ARQUIVOS DE MERGE ====================
+# Arquivos de conflito do Git
+*.orig
+*.rej
+fix-conflict.sh
+
+# ==================== ✅ OPCIONAL: MANTER ESTRUTURA ====================
+# Manter pastas vazias importantes (descomente se necessário)
+# !database/.gitkeep
+# !logs/.gitkeep
+# !uploads/.gitkeep

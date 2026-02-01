@@ -561,9 +561,10 @@ class ReportGenerator {
     msg += '• Fatura zerada\n';
     msg += '• Histórico de compras removido\n\n';
     break;
-  case 'installments':
-    msg += '📦 *Parcelamentos zerados*\n';
-    break;
+ case 'installments':
+  msg += '📦 *Parcelamentos zerados*\n\n';
+  msg += 'Todas as compras parceladas foram removidas com sucesso!\n';
+  break;
   case 'everything':
         msg += '☢️ *SISTEMA TOTALMENTE ZERADO*\n';
         msg += '\nTodos os dados foram removidos:\n';
