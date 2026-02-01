@@ -234,102 +234,6 @@ if (this.pendingInstallments && this.pendingInstallments[user.id]) {
     return;
   }
 }
-// 💳 FLUXO DE CRIAÇÃO DE CARTÃO (3 ETAPAS)
-if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
-  const pending = this.pendingCardCreation[user.id];
-  const timestamp = this.reports.getCurrentBrazilTimestamp();
-  
-  // ETAPA 1: Capturar nome
-  if (pending.step === 'name') {
-    const cardName = text.trim();
-    
-    if (cardName.length < 2 || cardName.length > 30) {
-      await this.whatsapp.replyMessage(message, 
-        '❌ Nome deve ter entre 2 e 30 caracteres!\n\n' +
-        'Digite novamente:\n\n🕐 ' + timestamp.formatted
-      );
-      return;
-    }
-    
-    // Verificar se já existe
-    const existing = this.dao.getCardByName(user.id, cardName);
-    if (existing) {
-      await this.whatsapp.replyMessage(message, 
-        `❌ Você já tem um cartão chamado "${cardName}"!\n\n` +
-        'Digite outro nome:\n\n🕐 ' + timestamp.formatted
-      );
-      return;
-    }
-    
-    pending.step = 'limit';
-    pending.cardName = cardName;
-    
-    await this.whatsapp.replyMessage(message, 
-      `💳 Cartão: *${cardName}*\n\n` +
-      '📝 Passo 2/3: Digite o limite do cartão\n\n' +
-      'Exemplo: 5000\n\n🕐 ' + timestamp.formatted
-    );
-    return;
-  }
-  
-  // ETAPA 2: Capturar limite
-  if (pending.step === 'limit') {
-    const limitAmount = this.nlp.extractAmount(text);
-    
-    if (!limitAmount || limitAmount <= 0) {
-      await this.whatsapp.replyMessage(message, 
-        '❌ Limite inválido!\n\n' +
-        'Digite um valor válido (ex: 5000):\n\n🕐 ' + timestamp.formatted
-      );
-      return;
-    }
-    
-    pending.step = 'dueDay';
-    pending.cardLimit = limitAmount;
-    
-    await this.whatsapp.replyMessage(message, 
-      `💳 Cartão: *${pending.cardName}*\n` +
-      `💰 Limite: ${this.reports.formatMoney(limitAmount)}\n\n` +
-      '📝 Passo 3/3: Digite o dia de vencimento (1-31)\n\n' +
-      'Exemplo: 15\n\n🕐 ' + timestamp.formatted
-    );
-    return;
-  }
-  
-  // ETAPA 3: Capturar vencimento e criar
-  if (pending.step === 'dueDay') {
-    const dueDay = parseInt(text.trim());
-    
-    if (isNaN(dueDay) || dueDay < 1 || dueDay > 31) {
-      await this.whatsapp.replyMessage(message, 
-        '❌ Dia inválido!\n\n' +
-        'Digite um número entre 1 e 31:\n\n🕐 ' + timestamp.formatted
-      );
-      return;
-    }
-    
-    // Criar o cartão
-    const result = this.dao.createCard(user.id, pending.cardName, pending.cardLimit, dueDay);
-    delete this.pendingCardCreation[user.id];
-    
-    if (result.success) {
-      const resp = '✅ *CARTÃO CRIADO COM SUCESSO!*\n\n' +
-        `💳 Nome: *${result.cardName}*\n` +
-        `💰 Limite: ${this.reports.formatMoney(result.limit)}\n` +
-        `📅 Vencimento: Dia ${result.dueDay}\n` +
-        `✨ Limite disponível: ${this.reports.formatMoney(result.limit)}\n\n` +
-        '💡 Use `/cartoes` para ver todos os seus cartões\n\n' +
-        '🕐 ' + timestamp.formatted;
-      
-      await this.whatsapp.replyMessage(message, resp);
-    } else {
-      await this.whatsapp.replyMessage(message, 
-        result.message + '\n\n🕐 ' + timestamp.formatted
-      );
-    }
-    return;
-  }
-}
 // 💳 VERIFICAR SE É VALOR PARA PAGAMENTO DE FATURA
 if (this.pendingInvoicePayments && this.pendingInvoicePayments[user.id]) {
   const pending = this.pendingInvoicePayments[user.id];
@@ -493,20 +397,20 @@ if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
     }
     
     // Criar o cartão
-    const success = this.dao.createCreditCard(user.id, pending.cardName, pending.cardLimit, dueDay);
+    const result = this.dao.createCard(user.id, pending.cardName, pending.cardLimit, dueDay);
     delete this.pendingCardCreation[user.id];
     
-    if (success) {
+    if (result.success) {
       await this.whatsapp.replyMessage(message,
         '✅ *CARTÃO CADASTRADO COM SUCESSO!*\n\n' +
-        `💳 Nome: *${pending.cardName}*\n` +
-        `📊 Limite: ${this.reports.formatMoney(pending.cardLimit)}\n` +
-        `📅 Vencimento: Todo dia ${dueDay}\n\n` +
+        `💳 Nome: *${result.cardName}*\n` +
+        `📊 Limite: ${this.reports.formatMoney(result.limit)}\n` +
+        `📅 Vencimento: Todo dia ${result.dueDay}\n\n` +
         '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
         '💡 *Como usar:*\n\n' +
         'Quando você registrar uma compra, o bot vai perguntar:\n' +
         '• Digite o nome do cartão para pagar nele\n' +
-        '• Ou digite "saldo" para pagar no saldo\n\n' +
+        '• Ou digitou "saldo" para pagar no saldo\n\n' +
         '📌 Use `/cartoes` para ver todos os seus cartões\n\n' +
         '🕐 ' + timestamp.formatted
       );
@@ -514,9 +418,7 @@ if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
       Logger.card(user, 'criou cartão', pending.cardName);
     } else {
       await this.whatsapp.replyMessage(message, 
-        '❌ *Erro ao criar cartão*\n\n' +
-        'Tente novamente mais tarde.\n\n' +
-        '🕐 ' + timestamp.formatted
+        (result.message || '❌ *Erro ao criar cartão*') + '\n\n🕐 ' + timestamp.formatted
       );
     }
     
@@ -700,6 +602,29 @@ if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
             }
           } else {
             response = ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n🕑 ' + timestamp.formatted;
+          }
+        } else {
+          response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;
+        }
+        
+        await this.whatsapp.replyMessage(message, response);
+        return;
+      }
+      
+      else if (command.command === 'withdrawEmergency') {
+        if (command.amount && command.amount > 0) {
+          const success = this.dao.withdrawFromEmergencyFund(user.id, command.amount);
+          
+          if (success) {
+            const updatedUser = this.dao.getUserById(user.id);
+            if (updatedUser) {
+              response = this.reports.generateEmergencyConfirmation('withdraw', command.amount, updatedUser);
+              console.log('🚨 ' + user.name + ': usou reserva ' + command.amount);
+            } else {
+              response = '❌ *Erro ao buscar dados atualizados*\n\n🕑 ' + timestamp.formatted;
+            }
+          } else {
+            response = ErrorMessages.INSUFFICIENT_BALANCE('Reserva de emergência') + '\n\n🕑 ' + timestamp.formatted;
           }
         } else {
           response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;
@@ -913,33 +838,32 @@ else if (command.command === 'vencimentos') {
   }
 }
       
-      // 💳 CARTÃO DE CRÉDITO
+      // 💳 ATUALIZAR LIMITE DE CARTÃO
 else if (command.command === 'setCardLimit') {
   if (command.amount && command.amount > 0) {
-    let card = this.dao.getCreditCardByUserId(user.id);
-    
-    if (!card) {
-      const success = this.dao.createCreditCard(user.id, command.amount);
+    const cards = this.dao.getAllCardsByUserId(user.id);
+    if (!cards || cards.length === 0) {
+      response = '❌ *Você não tem cartões cadastrados*\n\n' +
+        'Use `/cartao criar` para cadastrar seu primeiro cartão!\n\n' +
+        '🕐 ' + timestamp.formatted;
+    } else if (cards.length === 1) {
+      const success = this.dao.updateCardLimit(cards[0].id, command.amount);
       if (success) {
-        card = this.dao.getCreditCardByUserId(user.id);
-        response = '✅ *CARTÃO CRIADO COM SUCESSO!*\n\n' +
-          `💳 Limite definido: ${this.reports.formatMoney(command.amount)}\n` +
-          `✅ Disponível: ${this.reports.formatMoney(card.available_limit)}\n\n` +
-          '💡 Agora suas compras vão perguntar se foram no cartão!\n\n' +
-          '🕐 ' + timestamp.formatted;
-        Logger.card(user, 'criou cartão com limite', command.amount);
-      }
-    } else {
-      const success = this.dao.updateCardLimit(user.id, command.amount);
-      if (success) {
-        card = this.dao.getCreditCardByUserId(user.id);
+        const updatedCard = this.dao.getCardById(cards[0].id);
         response = '✅ *LIMITE ATUALIZADO*\n\n' +
-          `💳 Novo limite: ${this.reports.formatMoney(command.amount)}\n` +
-          `💰 Usado: ${this.reports.formatMoney(card.current_balance)}\n` +
-          `✅ Disponível: ${this.reports.formatMoney(card.available_limit)}\n\n` +
+          `💳 Cartão: *${updatedCard.card_name}*\n` +
+          `💰 Novo limite: ${this.reports.formatMoney(command.amount)}\n` +
+          `💵 Usado: ${this.reports.formatMoney(updatedCard.current_balance)}\n` +
+          `✅ Disponível: ${this.reports.formatMoney(updatedCard.available_limit)}\n\n` +
           '🕐 ' + timestamp.formatted;
         Logger.card(user, 'atualizou limite para', command.amount);
+      } else {
+        response = '❌ Erro ao atualizar limite\n\n🕐 ' + timestamp.formatted;
       }
+    } else {
+      response = '💳 Você tem mais de um cartão.\n\n' +
+        'Use `/cartoes` para ver a lista e depois `/cartao [nome]` para ver detalhes.\n\n' +
+        '🕐 ' + timestamp.formatted;
     }
   } else {
     response = ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted;
@@ -947,43 +871,19 @@ else if (command.command === 'setCardLimit') {
 }
 
 else if (command.command === 'getCard') {
-  const card = this.dao.getCreditCardByUserId(user.id);
-  if (!card) {
-    response = '💳 *CARTÃO NÃO CADASTRADO*\n\n' +
-      'Você ainda não tem um cartão cadastrado.\n\n' +
-      '💡 Use: `/cartao limite 1400`\n\n' +
+  const cards = this.dao.getAllCardsByUserId(user.id);
+  if (!cards || cards.length === 0) {
+    response = '💳 *VOCÊ NÃO TEM CARTÕES CADASTRADOS*\n\n' +
+      'Use `/cartao criar` para cadastrar seu primeiro cartão!\n\n' +
       '🕐 ' + timestamp.formatted;
+  } else if (cards.length === 1) {
+    response = this.reports.generateCardReport(cards[0]);
   } else {
-    response = this.reports.generateCardReport(card);
+    response = '💳 Você tem mais de um cartão.\n\n' +
+      'Use `/cartoes` para ver todos ou `/cartao [nome]` para detalhes de um específico.\n\n' +
+      '🕐 ' + timestamp.formatted;
   }
 }
-
-else if (command.command === 'payInvoice') {
-  const card = this.dao.getCreditCardByUserId(user.id);
-  if (!card) {
-    response = '❌ Você não tem cartão cadastrado\n\n🕐 ' + timestamp.formatted;
-  } else if (card.invoice_amount === 0) {
-    response = '✅ *FATURA ZERADA*\n\nVocê não tem fatura para pagar!\n\n🕐 ' + timestamp.formatted;
-  } else {
-    if (!this.pendingInvoicePayments) this.pendingInvoicePayments = {};
-    
-    this.pendingInvoicePayments[user.id] = {
-      card: card,
-      timestamp: Date.now()
-    };
-
-    response = '💳 *PAGAMENTO DE FATURA*\n\n' +
-      `📊 Fatura atual: ${this.reports.formatMoney(card.invoice_amount)}\n` +
-      `💰 Seu saldo: ${this.reports.formatMoney(user.current_balance)}\n\n` +
-      '💡 *Digite o valor que você pagou:*\n' +
-      'Exemplo: 1300\n\n' +
-      '⏱️ Você tem 2 minutos para responder\n\n' +
-      '🕐 ' + timestamp.formatted;
-
-    this.cleanupPendingOperation(user.id, 'invoice', TIMEOUTS.PENDING_INVOICE);
-  }
-}
-// ============ 💳 PAGAMENTO DE FATURA (MÚLTIPLOS CARTÕES) ============
       
       else if (command.command === 'reportWeekly') {
         response = this.reports.generateWeeklyReport(user.id);
@@ -1288,25 +1188,24 @@ else if (command.command === 'payInvoice') {
 }
 
 // 💳 REGISTRAR GASTO NO CARTÃO (função auxiliar)
-async registerExpenseInCard(expense, user, message, info, chatId) {
+async registerExpenseInCard(expense, user, message, info, chatId, card) {
   const timestamp = this.reports.getCurrentBrazilTimestamp();
   const categoryId = this.dao.identifyCategory(expense.description);
   const category = this.dao.getCategoryById(categoryId);
-  const card = this.dao.getCreditCardByUserId(user.id);
 
   if (!card) {
     await this.whatsapp.replyMessage(message, '❌ Erro: Cartão não encontrado\n\n🕐 ' + timestamp.formatted);
     return;
   }
 
-  const success = this.dao.addCardPurchase(user.id, expense.amount, expense.description, categoryId, chatId, info.messageId);
+  const success = this.dao.addCardPurchase(user.id, card.id, expense.amount, expense.description, categoryId, chatId, info.messageId);
 
   if (success) {
-    const updatedCard = this.dao.getCreditCardByUserId(user.id);
+    const updatedCard = this.dao.getCardById(card.id);
     const confirmation = this.reports.generateCardPurchaseConfirmation(expense, updatedCard, category);
     await this.whatsapp.replyMessage(message, confirmation);
 
-    console.log('💳 ' + user.name + ': ' + this.reports.formatMoney(expense.amount) + ' no cartão - ' + expense.description);
+    console.log('💳 ' + user.name + ': ' + this.reports.formatMoney(expense.amount) + ' no cartão ' + card.card_name + ' - ' + expense.description);
 
     // Avisar se limite estourou
     if (updatedCard.available_limit < 0) {
@@ -1453,7 +1352,7 @@ async registerInstallmentNormal(installment, user, message, info, chatId, timest
 }
 
 // 💳 REGISTRAR PARCELAMENTO NO CARTÃO (função auxiliar)
-async registerInstallmentInCard(installment, user, message, info, chatId) {
+async registerInstallmentInCard(installment, user, message, info, chatId, card) {
   const timestamp = this.reports.getCurrentBrazilTimestamp();
   const categoryId = this.dao.identifyCategory(installment.description);
   const category = this.dao.getCategoryById(categoryId);
@@ -1474,14 +1373,14 @@ async registerInstallmentInCard(installment, user, message, info, chatId) {
   });
 
   // 💳 ADICIONAR AO CARTÃO
-  const success = this.dao.addCardInstallment(user.id, savedInstallment.id, installment.totalAmount);
+  const success = this.dao.addCardInstallment(user.id, card.id, savedInstallment.id, installment.totalAmount);
 
   if (success) {
-    const updatedCard = this.dao.getCreditCardByUserId(user.id);
+    const updatedCard = this.dao.getCardById(card.id);
     const confirmation = this.reports.generateCardInstallmentConfirmation(savedInstallment, updatedCard, category);
     await this.whatsapp.replyMessage(message, confirmation);
 
-    console.log('💳📦 ' + user.name + ': parcelou no cartão ' + this.reports.formatMoney(installment.totalAmount) + ' em ' + installment.installments + 'x');
+    console.log('💳📦 ' + user.name + ': parcelou no cartão ' + card.card_name + ' ' + this.reports.formatMoney(installment.totalAmount) + ' em ' + installment.installments + 'x');
 
     if (updatedCard.available_limit < 0) {
       await this.whatsapp.sendMessage(chatId,

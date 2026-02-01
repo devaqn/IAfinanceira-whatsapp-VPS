@@ -24,11 +24,13 @@ class NLPProcessor {
       // Reserva de emergência
       getEmergency: /^\/emerg[eê]ncia\s*$/i,
       depositEmergency: /^\/reservar\s+(\d+(?:[.,]\d{1,2})?)/i,
-      withdrawEmergency: /^\/usar\s+(\d+(?:[.,]\d{1,2})?)/i,
+      withdrawEmergency: /^\/usar\s+(?:reserva\s+)?(\d+(?:[.,]\d{1,2})?)/i,
       
       // 💳 Cartões de crédito (NOVOS COMANDOS - MÚLTIPLOS CARTÕES)
       createCard: /^\/cart[aã]o\s+criar\s*$/i,
       listCards: /^\/cart[oõ]es\s*$/i,
+      setCardLimit: /^\/cart[aã]o\s+limite\s+(\d+(?:[.,]\d{1,2})?)/i,
+      getCard: /^\/cart[aã]o\s*$/i,
       getCardByName: /^\/cart[aã]o\s+(.+)/i,
       payInvoiceCard: /^\/pagar\s+fatura\s+(.+)/i,
       deleteCard: /^\/deletar\s+cart[aã]o\s+(.+)/i,
