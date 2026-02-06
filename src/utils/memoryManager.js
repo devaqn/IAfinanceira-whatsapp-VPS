@@ -10,14 +10,15 @@ const ADMIN_NUMBER = '558187338645@s.whatsapp.net';
 function limparMemoriaGlobal() {
   const usuariosAntes = Object.keys(conversationMemory).length;
   const mensagensAntes = Object.keys(messageHistory).length;
-  
-  conversationMemory = {};
-  userStates = {};
-  messageHistory = {};
-  
+
+  // Limpar propriedades sem reatribuir a referencia do objeto
+  for (const key of Object.keys(conversationMemory)) delete conversationMemory[key];
+  for (const key of Object.keys(userStates)) delete userStates[key];
+  for (const key of Object.keys(messageHistory)) delete messageHistory[key];
+
   console.log('🧹 MEMÓRIA GLOBAL LIMPA!');
   console.log(`📊 Removidos: ${usuariosAntes} usuários, ${mensagensAntes} conversas`);
-  
+
   return `✅ *MEMÓRIA GLOBAL LIMPA!*\n\n` +
          `📊 Estatísticas removidas:\n` +
          `👥 Usuários: ${usuariosAntes}\n` +

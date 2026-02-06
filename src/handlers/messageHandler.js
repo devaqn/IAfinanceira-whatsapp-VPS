@@ -91,7 +91,12 @@ cleanupPendingOperation(userId, operationType, timeout = TIMEOUTS.PENDING_PURCHA
     };
 
       // ==================== ⭐ COMANDOS ADMINISTRATIVOS ⭐ ====================
-      if (sender === ADMIN_NUMBER) {
+      // Comparar numeros ignorando sufixo :XX do Baileys
+      const senderClean = sender.split(':')[0].split('@')[0];
+      const adminClean = ADMIN_NUMBER.split(':')[0].split('@')[0];
+      const isAdmin = senderClean === adminClean;
+
+      if (isAdmin) {
         const comando = text.toLowerCase().trim();
         
         if (comando === '!limpartudo') {
@@ -576,7 +581,7 @@ return;
       const processed = this.nlp.processMessage(text);
 
       if (processed.type === 'command') {
-        await this.handleCommand(processed, user, message);
+        await this.handleCommand(processed, user, message, isAdmin);
       } else if (processed.type === 'expense') {
         await this.handleExpense(processed, user, message);
       } else if (processed.type === 'installment') {
@@ -601,7 +606,7 @@ return;
     }
   }
 
-  async handleCommand(command, user, message) {
+  async handleCommand(command, user, message, isAdmin) {
     let response = '';
     const timestamp = this.reports.getCurrentBrazilTimestamp();
     const info = this.whatsapp.getSenderInfo(message);
@@ -1217,7 +1222,7 @@ else if (command.command === 'getCard') {
       
       else if (command.command === 'help') {
   // ⭐ ADICIONAR COMANDOS ADMIN NO /AJUDA
-  if (sender === ADMIN_NUMBER) {
+  if (isAdmin) {
     response = this.reports.generateHelpMessage() + 
                '\n\n═══════════════════════════════════════\n\n' +
                '🔧 *COMANDOS ADMINISTRATIVOS*\n\n' +
@@ -1241,7 +1246,7 @@ else if (command.command === 'getCard') {
         response = this.reports.generateWelcomeMessage(user.name);
         
         // ⭐ SE FOR ADMIN, MOSTRAR INFO SOBRE COMANDOS ESPECIAIS
-        if (sender === ADMIN_NUMBER) {
+        if (isAdmin) {
           response += '\n\n━━━━━━━━━━━━━━━━━━━\n\n' +
                       '🔧 *PAINEL ADMINISTRATIVO ATIVO*\n\n' +
                       'Você tem acesso a comandos especiais de gerenciamento.\n' +
