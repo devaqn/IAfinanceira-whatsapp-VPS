@@ -63,7 +63,7 @@ class WhatsAppService {
           if (qr) {
             this.qrAttempts++;
             console.log(`\n📱 QR CODE (${this.qrAttempts}/${this.maxQRAttempts})\n`);
-            qrcode.generate(qr, { small: false });
+            qrcode.generate(qr, { small: true });
 
             if (this.qrAttempts >= this.maxQRAttempts) {
               this.qrAttempts = 0;
