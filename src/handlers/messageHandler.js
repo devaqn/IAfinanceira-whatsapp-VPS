@@ -329,18 +329,27 @@ if (this.pendingInstallments && this.pendingInstallments[user.id]) {
 // 💳 VERIFICAR SE É VALOR PARA PAGAMENTO DE FATURA
 if (this.pendingInvoicePayments && this.pendingInvoicePayments[user.id]) {
   const pending = this.pendingInvoicePayments[user.id];
-  const amount = this.nlp.extractAmount(text);
-  
+
+  // Tentar extrair valor do texto - aceitar numero puro tambem
+  let amount = this.nlp.extractAmount(text);
+  if (!amount) {
+    const cleanVal = text.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
+    const parsed = parseFloat(cleanVal);
+    if (!isNaN(parsed) && parsed > 0) {
+      amount = parsed;
+    }
+  }
+
   if (amount && amount > 0) {
     delete this.pendingInvoicePayments[user.id];
-    
+
     const timestamp = this.reports.getCurrentBrazilTimestamp();
     const success = this.dao.payCardInvoice(user.id, pending.cardId, amount);
-    
+
     if (success) {
       const updatedCard = this.dao.getCardById(pending.cardId);
       const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);
-      
+
       let resp = '✅ *FATURA PAGA!*\n\n' +
         `💳 Cartão: *${updatedCard.card_name}*\n` +
         `💰 Valor pago: ${this.reports.formatMoney(amount)}\n` +
@@ -349,29 +358,42 @@ if (this.pendingInvoicePayments && this.pendingInvoicePayments[user.id]) {
         `   Limite total: ${this.reports.formatMoney(updatedCard.card_limit)}\n` +
         `   Usado: ${this.reports.formatMoney(updatedCard.current_balance)}\n` +
         `   Disponível: ${this.reports.formatMoney(updatedCard.available_limit)}\n\n`;
-      
+
       if (updatedCard.invoice_amount > 0) {
         resp += `📅 *Fatura próximo mês:* ${this.reports.formatMoney(updatedCard.invoice_amount)}\n\n`;
       } else {
         resp += '✅ *Fatura totalmente quitada!*\n\n';
       }
-      
+
       resp += `💰 *Seu saldo atual:* ${this.reports.formatMoney(updatedUser.current_balance)}\n\n`;
       resp += '🕐 ' + timestamp.formatted;
-      
+
       await this.whatsapp.replyMessage(message, resp);
       await this.whatsapp.sendPresence(info.chatId, 'available');
-      Logger.invoice(user, 'pagou fatura', updatedCard.card_name);
+      Logger.info(`${user.name}: pagou fatura ${updatedCard.card_name} - R$ ${amount.toFixed(2)}`);
       return;
     } else {
-      await this.whatsapp.replyMessage(message, 
+      const timestamp = this.reports.getCurrentBrazilTimestamp();
+      await this.whatsapp.replyMessage(message,
         ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n🕐 ' + timestamp.formatted
       );
       await this.whatsapp.sendPresence(info.chatId, 'available');
       return;
     }
+  } else {
+    // ⭐ Valor invalido - avisar o usuario (antes caia silenciosamente)
+    const timestamp = this.reports.getCurrentBrazilTimestamp();
+    await this.whatsapp.replyMessage(message,
+      '❌ *Valor inválido!*\n\n' +
+      'Digite apenas o valor numérico que você pagou.\n' +
+      'Exemplo: 1300 ou 1.300,00\n\n' +
+      `📊 Fatura atual: ${this.reports.formatMoney(pending.invoiceAmount)}\n\n` +
+      '🕐 ' + timestamp.formatted
+    );
+    await this.whatsapp.sendPresence(info.chatId, 'available');
+    return;
   }
-}    
+}
 // 💳 VERIFICAR SE ESTÁ NO FLUXO DE CRIAÇÃO DE CARTÃO (3 ETAPAS)
 if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
   const pending = this.pendingCardCreation[user.id];

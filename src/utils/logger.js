@@ -23,8 +23,12 @@ static card(user, action, cardName) {
     console.log(`💰 [PAYMENT] ${user.name}: ${type} - R$ ${amount.toFixed(2)}`);
   }
   
-  static invoice(user, action, amount) {
-    console.log(`💳📄 [INVOICE] ${user.name}: ${action} - R$ ${amount.toFixed(2)}`);
+  static invoice(user, action, cardNameOrAmount) {
+    if (typeof cardNameOrAmount === 'number') {
+      console.log(`💳📄 [INVOICE] ${user.name}: ${action} - R$ ${cardNameOrAmount.toFixed(2)}`);
+    } else {
+      console.log(`💳📄 [INVOICE] ${user.name}: ${action} - ${cardNameOrAmount}`);
+    }
   }
   
   static error(context, error) {
