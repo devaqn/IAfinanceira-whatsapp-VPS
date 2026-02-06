@@ -958,25 +958,37 @@ updateCardLimit(cardId, newLimit) {
 addCardPurchase(userId, cardId, amount, description, categoryId, chatId, messageId) {
   const card = this.getCardById(cardId);
   if (!card || card.user_id !== userId) return false;
-  
+
   const newBalance = parseFloat((card.current_balance + amount).toFixed(2));
   const newAvailable = parseFloat((card.available_limit - amount).toFixed(2));
   const newInvoice = parseFloat((card.invoice_amount + amount).toFixed(2));
-  
+
   // Atualizar cartão
   this.db.run(
     'UPDATE user_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
     [newBalance, newAvailable, newInvoice, cardId]
   );
   this.save();
-  
-  // Registrar transação
+
+  // Registrar transação no card_transactions
   this.db.run(
     'INSERT INTO card_transactions (user_id, card_id, amount, description, category_id, is_installment, chat_id, message_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
     [userId, cardId, amount, description, categoryId, 0, chatId, messageId]
   );
   this.save();
-  
+
+  // ⭐ Registrar tambem em expenses para aparecer nos relatorios semanal/mensal
+  const descWithCard = description + ' (cartão ' + card.card_name + ')';
+  this.createTransaction({
+    userId: userId,
+    amount: amount,
+    description: descWithCard,
+    categoryId: categoryId,
+    transactionType: 'expense',
+    chatId: chatId,
+    messageId: messageId
+  });
+
   return true;
 }
 
