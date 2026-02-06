@@ -161,35 +161,122 @@ if (info.isGroup) { // ✅ CORRIGIDO
 if (this.pendingPurchases && this.pendingPurchases[user.id]) {
   const pending = this.pendingPurchases[user.id];
   const textLower = text.toLowerCase().trim();
-  
+
+  // ⭐ SUB-FLUXO: Aguardando resposta sobre parcelamento no cartão
+  if (pending.awaitingInstallmentAnswer) {
+    const timestamp = this.reports.getCurrentBrazilTimestamp();
+    if (textLower === 'nao' || textLower === 'não' || textLower === 'n') {
+      // Compra à vista no cartão
+      delete this.pendingPurchases[user.id];
+      await this.registerExpenseInCard(pending.expense, user, message, pending.messageInfo, info.chatId, pending.selectedCard);
+      await this.whatsapp.sendPresence(info.chatId, 'available');
+      return;
+    } else if (textLower === 'sim' || textLower === 's') {
+      // Quer parcelar - perguntar em quantas vezes
+      this.pendingPurchases[user.id] = {
+        ...pending,
+        awaitingInstallmentAnswer: false,
+        awaitingInstallmentCount: true
+      };
+      await this.whatsapp.replyMessage(message,
+        '📊 *PARCELAMENTO*\n\n' +
+        `💰 Valor: ${this.reports.formatMoney(pending.expense.amount)}\n` +
+        `💳 Cartão: *${pending.selectedCard.card_name}*\n\n` +
+        'Em quantas vezes deseja parcelar?\n' +
+        '(Digite o número de parcelas, ex: 3, 6, 12)\n\n' +
+        '⏱️ Você tem 2 minutos para responder\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+      this.cleanupPendingOperation(user.id, 'purchase', TIMEOUTS.PENDING_PURCHASE);
+      await this.whatsapp.sendPresence(info.chatId, 'available');
+      return;
+    } else {
+      await this.whatsapp.replyMessage(message,
+        '❌ Responda com *sim* ou *não*\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+  }
+
+  // ⭐ SUB-FLUXO: Aguardando numero de parcelas
+  if (pending.awaitingInstallmentCount) {
+    const timestamp = this.reports.getCurrentBrazilTimestamp();
+    const numParcelas = parseInt(textLower);
+    if (isNaN(numParcelas) || numParcelas < 2 || numParcelas > 48) {
+      await this.whatsapp.replyMessage(message,
+        '❌ *Número inválido!*\n\n' +
+        'Digite um número de parcelas entre 2 e 48.\n' +
+        'Exemplo: 3, 6, 12\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+
+    delete this.pendingPurchases[user.id];
+
+    // Registrar como parcelamento no cartão
+    const installmentAmount = parseFloat((pending.expense.amount / numParcelas).toFixed(2));
+    const installmentData = {
+      description: pending.expense.description,
+      totalAmount: pending.expense.amount,
+      installments: numParcelas,
+      installmentAmount: installmentAmount
+    };
+    await this.registerInstallmentInCard(installmentData, user, message, pending.messageInfo, info.chatId, pending.selectedCard);
+    await this.whatsapp.sendPresence(info.chatId, 'available');
+    return;
+  }
+
   // Verificar se digitou "saldo" ou "dinheiro"
   if (this.isBalancePayment(text)) {
     delete this.pendingPurchases[user.id];
-    
+
     const timestamp = this.reports.getCurrentBrazilTimestamp();
     await this.registerExpenseInBalance(pending.expense, user, message, pending.messageInfo, info.chatId, timestamp);
     await this.whatsapp.sendPresence(info.chatId, 'available');
     return;
   }
-  
+
   // Caso contrário, tentar encontrar cartão pelo nome digitado
   const card = this.dao.findCardByPartialName(user.id, text);
-  
+
   if (card) {
-    delete this.pendingPurchases[user.id];
-    
-    await this.registerExpenseInCard(pending.expense, user, message, pending.messageInfo, info.chatId, card);
+    // ⭐ Cartão encontrado - perguntar se vai parcelar
+    const timestamp = this.reports.getCurrentBrazilTimestamp();
+    this.pendingPurchases[user.id] = {
+      ...pending,
+      selectedCard: card,
+      awaitingInstallmentAnswer: true
+    };
+
+    await this.whatsapp.replyMessage(message,
+      '💳 *COMPRA NO CARTÃO*\n\n' +
+      `💰 Valor: ${this.reports.formatMoney(pending.expense.amount)}\n` +
+      `📝 Descrição: ${pending.expense.description}\n` +
+      `💳 Cartão: *${card.card_name}*\n\n` +
+      'Deseja parcelar esta compra?\n' +
+      'Responda com *sim* ou *não*\n\n' +
+      '⏱️ Você tem 2 minutos para responder\n\n' +
+      '🕐 ' + timestamp.formatted
+    );
+    this.cleanupPendingOperation(user.id, 'purchase', TIMEOUTS.PENDING_PURCHASE);
     await this.whatsapp.sendPresence(info.chatId, 'available');
     return;
   } else {
     // Não encontrou cartão nem é saldo
     const timestamp = this.reports.getCurrentBrazilTimestamp();
+    const cards = this.dao.getAllCardsByUserId(user.id);
+    let cardList = '';
+    for (let i = 0; i < cards.length; i++) {
+      cardList += `• *${cards[i].card_name}*\n`;
+    }
     await this.whatsapp.replyMessage(message,
       '❌ *Cartão não encontrado!*\n\n' +
       `Você digitou: "${text}"\n\n` +
       '💡 *Opções válidas:*\n' +
-      '• Digite o nome de um dos seus cartões\n' +
-      '• Ou digite "saldo" para pagar no saldo\n\n' +
+      cardList +
+      '• Ou digite *saldo* para pagar no saldo\n\n' +
       'Use `/cartoes` para ver seus cartões\n\n' +
       '🕐 ' + timestamp.formatted
     );
@@ -200,34 +287,39 @@ if (this.pendingPurchases && this.pendingPurchases[user.id]) {
 if (this.pendingInstallments && this.pendingInstallments[user.id]) {
   const pending = this.pendingInstallments[user.id];
   const textLower = text.toLowerCase().trim();
-  
+
   // Verificar se digitou "saldo"
   if (this.isBalancePayment(text)) {
     delete this.pendingInstallments[user.id];
-    
+
     const timestamp = this.reports.getCurrentBrazilTimestamp();
     await this.registerInstallmentNormal(pending.installment, user, message, pending.messageInfo, info.chatId, timestamp);
     await this.whatsapp.sendPresence(info.chatId, 'available');
     return;
   }
-  
+
   // Tentar encontrar cartão
   const card = this.dao.findCardByPartialName(user.id, text);
-  
+
   if (card) {
     delete this.pendingInstallments[user.id];
-    
+
     await this.registerInstallmentInCard(pending.installment, user, message, pending.messageInfo, info.chatId, card);
     await this.whatsapp.sendPresence(info.chatId, 'available');
     return;
   } else {
     const timestamp = this.reports.getCurrentBrazilTimestamp();
+    const allCards = this.dao.getAllCardsByUserId(user.id);
+    let cardList = '';
+    for (let i = 0; i < allCards.length; i++) {
+      cardList += `• *${allCards[i].card_name}*\n`;
+    }
     await this.whatsapp.replyMessage(message,
       '❌ *Cartão não encontrado!*\n\n' +
       `Você digitou: "${text}"\n\n` +
       '💡 *Opções válidas:*\n' +
-      '• Digite o nome de um dos seus cartões\n' +
-      '• Ou digite "saldo" para parcelar manualmente\n\n' +
+      cardList +
+      '• Ou digite *saldo* para parcelar manualmente\n\n' +
       'Use `/cartoes` para ver seus cartões\n\n' +
       '🕐 ' + timestamp.formatted
     );
@@ -1176,31 +1268,37 @@ else if (command.command === 'getCard') {
     }
 
     // 💳 VERIFICAR SE USUÁRIO TEM CARTÃO CADASTRADO
-    const card = this.dao.getCreditCardByUserId(user.id);
-    
-    if (card) {
+    const cards = this.dao.getAllCardsByUserId(user.id);
+
+    if (cards && cards.length > 0) {
       // TEM CARTÃO - PERGUNTAR ONDE FOI A COMPRA
       if (!this.pendingPurchases) this.pendingPurchases = {};
-      
+
       this.pendingPurchases[user.id] = {
         expense: expense,
         timestamp: Date.now(),
         messageInfo: info
       };
-      
+
+      // Listar nomes dos cartoes disponiveis
+      let cardList = '';
+      for (let i = 0; i < cards.length; i++) {
+        cardList += `• *${cards[i].card_name}*\n`;
+      }
+
       await this.whatsapp.replyMessage(message,
         '💳 *FORMA DE PAGAMENTO*\n\n' +
         `💰 Valor: ${this.reports.formatMoney(expense.amount)}\n` +
         `📝 Descrição: ${expense.description}\n\n` +
-        'Responda com:\n' +
-        '• *cartao* ou *cartão* - Para pagar no cartão\n' +
-        '• *saldo* ou *dinheiro* - Para pagar no saldo\n\n' +
+        'Responda com o *nome do cartão* para pagar no cartão, ou *saldo* para pagar com o saldo.\n\n' +
+        '💳 *Seus cartões:*\n' +
+        cardList + '\n' +
         '⏱️ Você tem 2 minutos para responder\n\n' +
         '🕐 ' + timestamp.formatted
       );
-      
+
       // Limpar após 2 minutos
-    this.cleanupPendingOperation(user.id, 'purchase', TIMEOUTS.PENDING_PURCHASE);
+      this.cleanupPendingOperation(user.id, 'purchase', TIMEOUTS.PENDING_PURCHASE);
       return;
     }
     
@@ -1313,32 +1411,38 @@ async registerExpenseInBalance(expense, user, message, info, chatId, timestamp) 
     }
 
     // 💳 VERIFICAR SE TEM CARTÃO
-    const card = this.dao.getCreditCardByUserId(user.id);
-    
-    if (card) {
+    const cards = this.dao.getAllCardsByUserId(user.id);
+
+    if (cards && cards.length > 0) {
       // TEM CARTÃO - PERGUNTAR
       if (!this.pendingInstallments) this.pendingInstallments = {};
-      
+
       this.pendingInstallments[user.id] = {
         installment: installment,
         timestamp: Date.now(),
         messageInfo: info
       };
-      
+
+      // Listar nomes dos cartoes
+      let cardList = '';
+      for (let i = 0; i < cards.length; i++) {
+        cardList += `• *${cards[i].card_name}*\n`;
+      }
+
       await this.whatsapp.replyMessage(message,
         '💳 *PARCELAMENTO - FORMA DE PAGAMENTO*\n\n' +
         `📦 Produto: ${installment.description}\n` +
         `💰 Total: ${this.reports.formatMoney(installment.totalAmount)}\n` +
         `📊 Parcelas: ${installment.installments}x de ${this.reports.formatMoney(installment.installmentAmount)}\n\n` +
-        'Responda com:\n' +
-        '• *cartao* ou *cartão* - Parcelar no cartão\n' +
-        '• *saldo* - Parcelar no saldo (paga manualmente)\n\n' +
+        'Responda com o *nome do cartão* para parcelar no cartão, ou *saldo* para parcelar no saldo.\n\n' +
+        '💳 *Seus cartões:*\n' +
+        cardList + '\n' +
         '⏱️ Você tem 2 minutos para responder\n\n' +
         '🕐 ' + timestamp.formatted
       );
-      
+
       // Limpar após 2 minutos usando a função centralizada
-this.cleanupPendingOperation(user.id, 'installment', TIMEOUTS.PENDING_INSTALLMENT);
+      this.cleanupPendingOperation(user.id, 'installment', TIMEOUTS.PENDING_INSTALLMENT);
       return;
     }
     
