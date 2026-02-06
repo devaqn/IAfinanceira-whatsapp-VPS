@@ -4,7 +4,6 @@ class ReportGenerator {
   }
 
   getCurrentBrazilTimestamp() {
-    process.env.TZ = 'America/Sao_Paulo';
     const now = new Date();
     
     const formatter = new Intl.DateTimeFormat('pt-BR', {
@@ -32,9 +31,8 @@ class ReportGenerator {
   }
 
   getBrazilDate(date) {
-    process.env.TZ = 'America/Sao_Paulo';
     const d = date ? new Date(date) : new Date();
-    
+
     const formatter = new Intl.DateTimeFormat('pt-BR', {
       timeZone: 'America/Sao_Paulo',
       year: 'numeric',
@@ -45,7 +43,7 @@ class ReportGenerator {
       second: '2-digit',
       hour12: false
     });
-    
+
     const parts = formatter.formatToParts(d);
     const year = parseInt(parts.find(p => p.type === 'year').value);
     const month = parseInt(parts.find(p => p.type === 'month').value) - 1;
@@ -53,7 +51,7 @@ class ReportGenerator {
     const hour = parseInt(parts.find(p => p.type === 'hour').value);
     const minute = parseInt(parts.find(p => p.type === 'minute').value);
     const second = parseInt(parts.find(p => p.type === 'second').value);
-    
+
     return new Date(year, month, day, hour, minute, second);
   }
 

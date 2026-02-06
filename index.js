@@ -1,3 +1,6 @@
+// ⭐ DEFINIR TIMEZONE ANTES DE QUALQUER COISA
+process.env.TZ = 'America/Sao_Paulo';
+
 require('dotenv').config();
 const path = require('path');
 const fs = require('fs');
