@@ -46,13 +46,18 @@ class ReportGenerator {
 
     const parts = formatter.formatToParts(d);
     const year = parseInt(parts.find(p => p.type === 'year').value);
-    const month = parseInt(parts.find(p => p.type === 'month').value) - 1;
+    const month = parseInt(parts.find(p => p.type === 'month').value);
     const day = parseInt(parts.find(p => p.type === 'day').value);
     const hour = parseInt(parts.find(p => p.type === 'hour').value);
     const minute = parseInt(parts.find(p => p.type === 'minute').value);
     const second = parseInt(parts.find(p => p.type === 'second').value);
 
-    return new Date(year, month, day, hour, minute, second);
+        const paddedMonth = String(month).padStart(2, '0');
+    const paddedDay = String(day).padStart(2, '0');
+    const paddedHour = String(hour).padStart(2, '0');
+    const paddedMinute = String(minute).padStart(2, '0');
+    const paddedSecond = String(second).padStart(2, '0');
+    return new Date(`${year}-${paddedMonth}-${paddedDay}T${paddedHour}:${paddedMinute}:${paddedSecond}-03:00`);
   }
 
   formatMoney(value) {
@@ -708,6 +713,12 @@ class ReportGenerator {
   help += '💳 Contas • 💊 Saúde\n';
   help += '📚 Educação • 👕 Vestuário\n\n';
   
+  
+  help += '🔐 *COMANDOS ADMINISTRATIVOS*\n';
+  help += '• `/broadcast [mensagem]` - Enviar mensagem para todos\n';
+  help += '• `/stats` - Ver estatísticas do bot\n';
+  help += '_⚠️ Apenas para administradores_\n\n';
+  
   help += '═══════════════════════════════════════\n';
   help += '💡 O bot identifica categorias automaticamente!\n';
   help += '✅ TODOS os comandos retornam confirmação\n\n';
@@ -739,6 +750,12 @@ class ReportGenerator {
     
     welcome += '💡 *DICA*\n';
     welcome += 'Use `/ajuda` para ver todos os comandos!\n\n';
+    
+    
+    welcome += '🔐 *COMANDOS ADMINISTRATIVOS*\n';
+    welcome += '• `/broadcast [mensagem]` - Enviar mensagem para todos\n';
+    welcome += '• `/stats` - Ver estatísticas do bot\n';
+    welcome += '_⚠️ Apenas para administradores_\n\n';
     
     welcome += '═══════════════════════════════════════\n';
     welcome += 'Vamos começar a organizar suas finanças! 💪\n\n';
