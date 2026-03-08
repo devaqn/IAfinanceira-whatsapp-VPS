@@ -66,6 +66,12 @@ class DAO {
     return result[0] ? this.rowToObject(result[0]) : null;
   }
 
+  getAllUsers() {
+    const result = this.db.exec('SELECT * FROM users ORDER BY created_at DESC');
+    if (!result[0]) return [];
+    return this.rowsToObjects(result[0]);
+  }
+
   // ============ SALDO PRINCIPAL ============
   
   setInitialBalance(whatsappId, amount) {

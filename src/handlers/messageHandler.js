@@ -99,7 +99,83 @@ cleanupPendingOperation(userId, operationType, timeout = TIMEOUTS.PENDING_PURCHA
 
       if (isAdmin) {
         const comando = text.toLowerCase().trim();
-        
+
+        // !STATS - Estatísticas do bot
+        if (comando === '!stats') {
+          Logger.admin('!stats');
+          const allUsers = this.dao.getAllUsers();
+          const totalExpenses = this.dao.db.prepare('SELECT COUNT(*) as count FROM expenses').get().count;
+          const totalInstallments = this.dao.db.prepare('SELECT COUNT(*) as count FROM installments').get().count;
+          const totalCards = this.dao.db.prepare('SELECT COUNT(*) as count FROM credit_cards').get().count;
+
+          let totalBalance = 0;
+          let totalSavings = 0;
+          let totalEmergency = 0;
+          for (let i = 0; i < allUsers.length; i++) {
+            totalBalance += allUsers[i].current_balance;
+            totalSavings += allUsers[i].savings_balance;
+            totalEmergency += allUsers[i].emergency_fund;
+          }
+
+          const timestamp = this.reports.getCurrentBrazilTimestamp();
+          const resposta = `📊 *ESTATÍSTICAS DO BOT*\n\n` +
+            `👥 Total de usuários: *${allUsers.length}*\n` +
+            `💸 Total de gastos: *${totalExpenses}*\n` +
+            `📦 Parcelamentos ativos: *${totalInstallments}*\n` +
+            `💳 Cartões cadastrados: *${totalCards}*\n\n` +
+            `💰 *SALDOS TOTAIS:*\n` +
+            `   Principal: ${this.reports.formatMoney(totalBalance)}\n` +
+            `   Poupança: ${this.reports.formatMoney(totalSavings)}\n` +
+            `   Emergência: ${this.reports.formatMoney(totalEmergency)}\n` +
+            `   Total: ${this.reports.formatMoney(totalBalance + totalSavings + totalEmergency)}\n\n` +
+            `🕐 ${timestamp.formatted}`;
+
+          await this.whatsapp.replyMessage(message, resposta);
+          await this.whatsapp.sendPresence(info.chatId, 'available');
+          return;
+        }
+
+        // !BROADCAST - Enviar mensagem para todos
+        if (comando.startsWith('!broadcast ')) {
+          Logger.admin('!broadcast');
+          const mensagem = text.substring('!broadcast '.length).trim();
+
+          if (!mensagem) {
+            await this.whatsapp.replyMessage(message,
+              '❌ *Erro!*\n\nUso: !broadcast [mensagem]\n\nExemplo:\n!broadcast Manutenção agendada para hoje às 22h'
+            );
+            return;
+          }
+
+          const allUsers = this.dao.getAllUsers();
+          const timestamp = this.reports.getCurrentBrazilTimestamp();
+          let sucessos = 0;
+          let falhas = 0;
+
+          for (let i = 0; i < allUsers.length; i++) {
+            try {
+              const userJid = allUsers[i].whatsapp_id;
+              const broadcastMsg = `📢 *MENSAGEM DO ADMINISTRADOR*\n\n${mensagem}\n\n🕐 ${timestamp.formatted}`;
+              await this.whatsapp.sendMessage(userJid, broadcastMsg);
+              sucessos++;
+              await new Promise(resolve => setTimeout(resolve, 1000)); // Delay de 1s entre envios
+            } catch (err) {
+              falhas++;
+              console.error(`❌ Erro ao enviar para ${allUsers[i].name}:`, err.message);
+            }
+          }
+
+          const resposta = `✅ *BROADCAST CONCLUÍDO*\n\n` +
+            `📤 Enviados: ${sucessos}\n` +
+            `❌ Falhas: ${falhas}\n` +
+            `👥 Total: ${allUsers.length}\n\n` +
+            `🕐 ${timestamp.formatted}`;
+
+          await this.whatsapp.replyMessage(message, resposta);
+          await this.whatsapp.sendPresence(info.chatId, 'available');
+          return;
+        }
+
         if (comando === '!limpartudo') {
           Logger.admin('!limpartudo');
           const resposta = limparMemoriaGlobal();
@@ -107,7 +183,7 @@ cleanupPendingOperation(userId, operationType, timeout = TIMEOUTS.PENDING_PURCHA
           await this.whatsapp.sendPresence(info.chatId, 'available');
           return;
         }
-        
+
         if (comando === '!limpar') {
           console.log('🧹 Admin executou: !limpar');
           const resposta = limparMemoriaUsuario(sender);
@@ -115,7 +191,7 @@ cleanupPendingOperation(userId, operationType, timeout = TIMEOUTS.PENDING_PURCHA
           await this.whatsapp.sendPresence(info.chatId, 'available');
           return;
         }
-        
+
         if (comando === '!status') {
           console.log('📊 Admin executou: !status');
           const resposta = verStatusMemoria();
@@ -123,7 +199,7 @@ cleanupPendingOperation(userId, operationType, timeout = TIMEOUTS.PENDING_PURCHA
           await this.whatsapp.sendPresence(info.chatId, 'available');
           return;
         }
-        
+
         if (comando === '!ajuda' || comando === '!help') {
           console.log('❓ Admin executou: !ajuda');
           const resposta = mostrarAjuda();

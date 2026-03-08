@@ -44,15 +44,15 @@ function verStatusMemoria() {
   const totalUsuarios = Object.keys(conversationMemory).length;
   const totalMensagens = Object.keys(messageHistory).length;
   const totalEstados = Object.keys(userStates).length;
-  
+
   const memoriaUsada = JSON.stringify({
     conversationMemory,
     userStates,
     messageHistory
   }).length;
-  
+
   const memoriaKB = (memoriaUsada / 1024).toFixed(2);
-  
+
   return `📊 *STATUS DA MEMÓRIA DO BOT*\n\n` +
          `👥 Usuários em memória: *${totalUsuarios}*\n` +
          `💬 Histórico de conversas: *${totalMensagens}*\n` +
@@ -60,33 +60,41 @@ function verStatusMemoria() {
          `💾 Memória utilizada: *${memoriaKB} KB*\n\n` +
          `━━━━━━━━━━━━━━━━━━━\n\n` +
          `🧹 *COMANDOS DISPONÍVEIS:*\n\n` +
-         `*!limpar*\n` +
-         `└ Limpa apenas SUA memória\n\n` +
-         `*!limpartudo*\n` +
-         `└ Limpa TODA a memória do bot\n\n` +
-         `*!status*\n` +
-         `└ Mostra este status\n\n` +
-         `*!ajuda*\n` +
-         `└ Mostra ajuda dos comandos`;
+         `*!stats* - Estatísticas gerais do bot\n` +
+         `*!broadcast [msg]* - Enviar mensagem para todos\n` +
+         `*!limpar* - Limpa apenas SUA memória\n` +
+         `*!limpartudo* - Limpa TODA a memória do bot\n` +
+         `*!status* - Mostra este status\n` +
+         `*!ajuda* - Mostra ajuda dos comandos`;
 }
 
 function mostrarAjuda() {
   return `🤖 *COMANDOS ADMINISTRATIVOS*\n\n` +
          `━━━━━━━━━━━━━━━━━━━\n\n` +
-         `*Gerenciamento de Memória:*\n\n` +
+         `*📊 Estatísticas e Informações:*\n\n` +
+         `*!stats*\n` +
+         `└ Mostra estatísticas gerais do bot\n` +
+         `└ Total de usuários, gastos, saldos, etc\n\n` +
          `*!status*\n` +
          `└ Ver quantos usuários estão na memória\n` +
          `└ Ver uso de memória do bot\n\n` +
+         `*📢 Comunicação:*\n\n` +
+         `*!broadcast [mensagem]*\n` +
+         `└ Envia mensagem para TODOS os usuários\n` +
+         `└ Exemplo: !broadcast Sistema em manutenção\n` +
+         `└ ⚠️ Use com cuidado!\n\n` +
+         `*🧹 Gerenciamento de Memória:*\n\n` +
          `*!limpar*\n` +
          `└ Apaga SUA conversa da memória\n` +
          `└ Não afeta outros usuários\n\n` +
          `*!limpartudo*\n` +
          `└ Apaga TODA a memória (todos os usuários)\n` +
-         `└ ⚠️ Use com cuidado!\n\n` +
+         `└ ⚠️ Use com MUITO cuidado!\n\n` +
          `*!ajuda*\n` +
          `└ Mostra esta mensagem\n\n` +
          `━━━━━━━━━━━━━━━━━━━\n\n` +
-         `⚠️ Apenas você (admin) pode usar estes comandos.`;
+         `⚠️ Apenas você (admin) pode usar estes comandos.\n` +
+         `🔐 Comandos protegidos por número do admin.`;
 }
 
 // ⭐ MUDEI DE export PARA module.exports (CommonJS)

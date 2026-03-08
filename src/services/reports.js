@@ -5,24 +5,13 @@ class ReportGenerator {
 
   getCurrentBrazilTimestamp() {
     const now = new Date();
-    
-    const formatter = new Intl.DateTimeFormat('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-    
-    const parts = formatter.formatToParts(now);
-    const day = parts.find(p => p.type === 'day').value;
-    const month = parts.find(p => p.type === 'month').value;
-    const year = parts.find(p => p.type === 'year').value;
-    const hour = parts.find(p => p.type === 'hour').value;
-    const minute = parts.find(p => p.type === 'minute').value;
-    
+
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hour = String(now.getHours()).padStart(2, '0');
+    const minute = String(now.getMinutes()).padStart(2, '0');
+
     return {
       formatted: `${day}/${month}/${year} às ${hour}:${minute}`,
       iso: now.toISOString(),
@@ -31,33 +20,7 @@ class ReportGenerator {
   }
 
   getBrazilDate(date) {
-    const d = date ? new Date(date) : new Date();
-
-    const formatter = new Intl.DateTimeFormat('pt-BR', {
-      timeZone: 'America/Sao_Paulo',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
-
-    const parts = formatter.formatToParts(d);
-    const year = parseInt(parts.find(p => p.type === 'year').value);
-    const month = parseInt(parts.find(p => p.type === 'month').value);
-    const day = parseInt(parts.find(p => p.type === 'day').value);
-    const hour = parseInt(parts.find(p => p.type === 'hour').value);
-    const minute = parseInt(parts.find(p => p.type === 'minute').value);
-    const second = parseInt(parts.find(p => p.type === 'second').value);
-
-        const paddedMonth = String(month).padStart(2, '0');
-    const paddedDay = String(day).padStart(2, '0');
-    const paddedHour = String(hour).padStart(2, '0');
-    const paddedMinute = String(minute).padStart(2, '0');
-    const paddedSecond = String(second).padStart(2, '0');
-    return new Date(`${year}-${paddedMonth}-${paddedDay}T${paddedHour}:${paddedMinute}:${paddedSecond}-03:00`);
+    return date ? new Date(date) : new Date();
   }
 
   formatMoney(value) {
@@ -651,118 +614,106 @@ class ReportGenerator {
 
   generateHelpMessage() {
   const timestamp = this.getCurrentBrazilTimestamp();
-  
+
   let help = '╔═══════════════════════════════════════╗\n';
   help += '🤖 *BOT FINANCEIRO - AJUDA COMPLETA*\n';
   help += '╚═══════════════════════════════════════╝\n\n';
-  
+
   help += '💸 *REGISTRAR GASTOS*\n';
   help += 'Escreva naturalmente:\n';
   help += '• "Gastei 50 no mercado"\n';
   help += '• "Paguei 15 no uber"\n';
   help += '• "Almocei por 25 reais"\n\n';
-  
+
   help += '💰 *SALDO PRINCIPAL*\n';
   help += '• `/saldo` - Ver saldo\n';
   help += '• `/saldo 1000` - Definir inicial\n';
   help += '• `/adicionar 500` - Adicionar saldo\n';
   help += '• `/zerar saldo` - Zerar saldo ⚠️\n\n';
-  
+
   help += '🏷 *POUPANÇA*\n';
   help += '• `/poupanca` - Ver poupança\n';
   help += '• `/guardar 100` - Guardar dinheiro\n';
   help += '• `/retirar 50` - Retirar da poupança\n';
   help += '• `/zerar poupanca` - Zerar poupança ⚠️\n\n';
-  
+
   help += '🚨 *RESERVA DE EMERGÊNCIA*\n';
   help += '• `/emergencia` - Ver reserva\n';
   help += '• `/reservar 200` - Adicionar à reserva\n';
   help += '• `/usar 100` - Usar da reserva\n';
   help += '• `/zerar reserva` - Zerar reserva ⚠️\n\n';
-  
+
   help += '💳 *CARTÃO DE CRÉDITO*\n';
   help += '• `/cartao` - Ver informações do cartão\n';
   help += '• `/cartao limite 5000` - Definir limite\n';
   help += '• `/pagar fatura` - Pagar fatura do cartão\n';
   help += '• `/zerar cartao` - Zerar cartão ⚠️\n';
   help += '_💡 Gastos perguntam se foram no cartão_\n\n';
-  
+
   help += '📦 *PARCELAMENTOS*\n';
   help += '• "comprei celular por 1200 em 12x"\n';
   help += '• `/parcelamentos` - Ver todas parcelas\n';
   help += '• `/pagar celular` - Pagar próxima parcela\n';
   help += '• `/zerar parcelas` - Zerar parcelamentos ⚠️\n\n';
-  
+
   help += '🔔 *LEMBRETES*\n';
   help += '• `/lembretes` - Ver lembretes\n';
   help += '• `/vencidas` - Ver parcelas atrasadas\n';
   help += '_⚠️ Lembretes só funcionam com bot ligado_\n\n';
-  
+
   help += '📊 *RELATÓRIOS*\n';
   help += '• `/relatorio semanal` ou `/semana`\n';
   help += '• `/relatorio mensal` ou `/mes`\n\n';
-  
+
   help += '☢️ *ZERAGEM COMPLETA*\n';
   help += '• `/zerar tudo` - Zerar TUDO ☢️\n';
   help += '_⚠️ Remove saldo, poupança, reserva, parcelas e histórico_\n';
   help += '_⚠️ Todos os comandos de zeragem exigem confirmação_\n\n';
-  
+
   help += '🏷️ *CATEGORIAS AUTOMÁTICAS*\n';
   help += '🍔 Alimentação • 🚗 Transporte\n';
   help += '🛒 Mercado • 🎮 Lazer\n';
   help += '💳 Contas • 💊 Saúde\n';
   help += '📚 Educação • 👕 Vestuário\n\n';
-  
-  
-  help += '🔐 *COMANDOS ADMINISTRATIVOS*\n';
-  help += '• `/broadcast [mensagem]` - Enviar mensagem para todos\n';
-  help += '• `/stats` - Ver estatísticas do bot\n';
-  help += '_⚠️ Apenas para administradores_\n\n';
-  
+
   help += '═══════════════════════════════════════\n';
   help += '💡 O bot identifica categorias automaticamente!\n';
   help += '✅ TODOS os comandos retornam confirmação\n\n';
   help += 'Desenvolvido por : github.com/devaqn\n\n';
   help += '🕐 ' + timestamp.formatted;
-  
+
   return help;
 }
 
   generateWelcomeMessage(userName) {
     const timestamp = this.getCurrentBrazilTimestamp();
-    
+
     let welcome = '╔═══════════════════════════════════════╗\n';
     welcome += '👋 *BEM-VINDO!*\n';
     welcome += '╚═══════════════════════════════════════╝\n\n';
-    
+
     welcome += `Olá, *${userName}!* 😊\n\n`;
     welcome += 'Sou seu assistente financeiro pessoal! 🤖💰\n\n';
-    
+
     welcome += '🚀 *PRIMEIROS PASSOS*\n\n';
     welcome += '1️⃣ Defina seu saldo inicial:\n';
     welcome += '   `/saldo 1000`\n\n';
-    
+
     welcome += '2️⃣ Registre seus gastos naturalmente:\n';
     welcome += '   "Gastei 50 no mercado"\n\n';
-    
+
     welcome += '3️⃣ Consulte relatórios:\n';
     welcome += '   `/relatorio mensal`\n\n';
-    
+
     welcome += '💡 *DICA*\n';
     welcome += 'Use `/ajuda` para ver todos os comandos!\n\n';
-    
-    
-    welcome += '🔐 *COMANDOS ADMINISTRATIVOS*\n';
-    welcome += '• `/broadcast [mensagem]` - Enviar mensagem para todos\n';
-    welcome += '• `/stats` - Ver estatísticas do bot\n';
-    welcome += '_⚠️ Apenas para administradores_\n\n';
-    
+
     welcome += '═══════════════════════════════════════\n';
     welcome += 'Vamos começar a organizar suas finanças! 💪\n\n';
-    welcome += '🕑 ' + timestamp.formatted;
-    
+    welcome += '🕐 ' + timestamp.formatted;
+
     return welcome;
-    
+
   }
   generateCardReport(card) {
   const timestamp = this.getCurrentBrazilTimestamp();
