@@ -72,6 +72,39 @@ class DAO {
     return this.rowsToObjects(result[0]);
   }
 
+  getTableCount(tableName) {
+    const allowedTables = ['users', 'expenses', 'installments', 'user_cards'];
+    if (!allowedTables.includes(tableName)) {
+      throw new Error('Tabela não permitida para contagem: ' + tableName);
+    }
+
+    const result = this.db.exec(`SELECT COUNT(*) as count FROM ${tableName}`);
+    return result[0] ? result[0].values[0][0] : 0;
+  }
+
+  getSystemStats() {
+    const allUsers = this.getAllUsers();
+    let totalBalance = 0;
+    let totalSavings = 0;
+    let totalEmergency = 0;
+
+    for (let i = 0; i < allUsers.length; i++) {
+      totalBalance += allUsers[i].current_balance || 0;
+      totalSavings += allUsers[i].savings_balance || 0;
+      totalEmergency += allUsers[i].emergency_fund || 0;
+    }
+
+    return {
+      totalUsers: allUsers.length,
+      totalExpenses: this.getTableCount('expenses'),
+      totalInstallments: this.getTableCount('installments'),
+      totalCards: this.getTableCount('user_cards'),
+      totalBalance: totalBalance,
+      totalSavings: totalSavings,
+      totalEmergency: totalEmergency
+    };
+  }
+
   // ============ SALDO PRINCIPAL ============
   
   setInitialBalance(whatsappId, amount) {
@@ -583,11 +616,12 @@ class DAO {
     const inst = this.rowToObject(installment[0]);
     const description = inst.description + ' (parcela ' + paymentData.installment_number + '/' + inst.total_installments + ')';
     
-    this.createExpense({
+    this.createTransaction({
       userId: userId,
       amount: paymentData.amount,
       description: description,
       categoryId: inst.category_id,
+      transactionType: 'expense',
       chatId: inst.chat_id,
       messageId: null
     });
@@ -1030,6 +1064,8 @@ payCardInvoice(userId, cardId, paymentAmount) {
   const user = this.getUserById(userId);
   
   if (!card || !user || card.user_id !== userId) return false;
+  if (!paymentAmount || paymentAmount <= 0) return false;
+  if (paymentAmount > card.invoice_amount) return false;
   if (user.current_balance < paymentAmount) return false;
   
   // Descontar do saldo do usuário
@@ -1037,9 +1073,9 @@ payCardInvoice(userId, cardId, paymentAmount) {
   this.updateBalance(userId, newUserBalance);
   
   // Liberar limite do cartão
-  const newCardBalance = parseFloat((card.current_balance - paymentAmount).toFixed(2));
+  const newCardBalance = parseFloat(Math.max(0, card.current_balance - paymentAmount).toFixed(2));
   const newAvailable = parseFloat((card.available_limit + paymentAmount).toFixed(2));
-  const newInvoice = parseFloat((card.invoice_amount - paymentAmount).toFixed(2));
+  const newInvoice = parseFloat(Math.max(0, card.invoice_amount - paymentAmount).toFixed(2));
   
   this.db.run(
     'UPDATE user_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, last_payment_date = CURRENT_TIMESTAMP, last_payment_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
@@ -1062,12 +1098,13 @@ releaseCardLimitOnPayment(userId, installmentId, amount) {
   if (!card || card.user_id !== userId) return;
   
   // Liberar o limite proporcional da parcela
-  const newCardBalance = parseFloat((card.current_balance - amount).toFixed(2));
+  const newCardBalance = parseFloat(Math.max(0, card.current_balance - amount).toFixed(2));
   const newAvailable = parseFloat((card.available_limit + amount).toFixed(2));
+  const newInvoice = parseFloat(Math.max(0, card.invoice_amount - amount).toFixed(2));
   
   this.db.run(
-    'UPDATE user_cards SET current_balance = ?, available_limit = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [newCardBalance, newAvailable, cardId]
+    'UPDATE user_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+    [newCardBalance, newAvailable, newInvoice, cardId]
   );
   this.save();
 }
