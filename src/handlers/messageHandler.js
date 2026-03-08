@@ -1,8 +1,11 @@
 const NLPProcessor = require('../services/nlp');
 const ReportGenerator = require('../services/reports');
+const ExportService = require('../services/exportService');
+const ForecastService = require('../services/forecastService');
 const ErrorMessages = require('../utils/ErrorMessages');
 const Logger = require('../utils/logger'); // ⭐ NOVO
 const { TIMEOUTS, PAYMENT_METHODS } = require('../config/constants'); // ⭐ NOVOO CONTANTS
+const path = require('path');
 
 const { 
   ADMIN_NUMBER, 
@@ -18,6 +21,8 @@ constructor(dao, whatsappService) {
   this.whatsapp = whatsappService;
   this.nlp = new NLPProcessor();
   this.reports = new ReportGenerator(dao);
+  this.exportService = new ExportService(dao, this.reports, path.join(__dirname, '../../exports'));
+  this.forecastService = new ForecastService(dao, this.reports);
   
   // ✅ INICIALIZAR TODOS OS OBJETOS PENDENTES
   this.recentlyProcessed = {};
@@ -58,6 +63,96 @@ cleanupPendingOperation(userId, operationType, timeout = TIMEOUTS.PENDING_PURCHA
       Logger.info(`Timeout: ${operationType} expirado para usuário ${userId}`);
     }
   }, timeout);
+}
+
+parseGoalCreateInput(rawText) {
+  const raw = String(rawText || '').trim();
+  if (!raw) return null;
+
+  const amountMatch = raw.match(/(?:r\$|\brs\b)?\s*(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{1,2})?|\d+(?:[.,]\d{1,2})?)/i);
+  if (!amountMatch) return null;
+
+  const amount = this.nlp.parseAmountString(amountMatch[1]);
+  if (!amount || amount <= 0) return null;
+
+  let name = raw.replace(amountMatch[0], '').trim();
+  name = name.replace(/^(?:para|de|da|do)\s+/i, '').trim();
+  if (!name) name = 'Meta de economia';
+
+  return { amount, name };
+}
+
+generateGoalsMessage(userId) {
+  const timestamp = this.reports.getCurrentBrazilTimestamp();
+  const goals = this.dao.getSavingsGoalsByUser(userId);
+
+  if (!goals.length) {
+    return '🎯 *METAS DE ECONOMIA*\n\n' +
+      'Você ainda não tem metas cadastradas.\n\n' +
+      'Use:\n' +
+      '`/meta criar 5000 viagem`\n\n' +
+      '🕑 ' + timestamp.formatted;
+  }
+
+  let msg = '🎯 *METAS DE ECONOMIA*\n\n';
+  for (let i = 0; i < goals.length; i++) {
+    const goal = goals[i];
+    const bar = this.reports.buildProgressBar(goal.progress_percent || 0, 12);
+    msg += `#${goal.id} *${goal.name}*\n`;
+    msg += `   Alvo: ${this.reports.formatMoney(Number(goal.target_amount || 0))}\n`;
+    msg += `   Progresso: ${this.reports.formatMoney(Number(goal.current_progress || 0))} (${goal.progress_percent || 0}%)\n`;
+    msg += `   ${bar}\n`;
+    msg += `   Falta: ${this.reports.formatMoney(Number(goal.remaining_amount || 0))}\n`;
+    msg += `   Status: ${goal.status === 'completed' ? 'concluída' : 'ativa'}\n`;
+    if (goal.target_date) {
+      msg += `   Prazo: ${this.reports.formatDateShort(goal.target_date)}\n`;
+    }
+    msg += '\n';
+  }
+
+  msg += '💡 Comandos:\n';
+  msg += '• `/meta criar 5000 viagem`\n';
+  msg += '• `/meta remover [id]`\n';
+  msg += '• `/meta concluir [id]`\n\n';
+  msg += '🕑 ' + timestamp.formatted;
+  return msg;
+}
+
+generateVisualChartMessage(userId, period) {
+  const timestamp = this.reports.getCurrentBrazilTimestamp();
+  const now = new Date();
+  const start = new Date(now);
+  const title = period === 'week' ? 'SEMANA' : 'MÊS';
+
+  if (period === 'week') {
+    start.setDate(start.getDate() - 7);
+  } else {
+    start.setDate(1);
+  }
+
+  const byCategory = this.dao.getExpensesByCategory(userId, start.toISOString(), now.toISOString());
+  if (!byCategory.length) {
+    return `📊 *GRÁFICO ${title}*\n\nSem gastos no período.\n\n🕑 ${timestamp.formatted}`;
+  }
+
+  const total = byCategory.reduce((sum, c) => sum + Number(c.total || 0), 0);
+  let msg = `📊 *GRÁFICO ${title} (CATEGORIAS)*\n\n`;
+  for (let i = 0; i < Math.min(byCategory.length, 8); i++) {
+    const c = byCategory[i];
+    const pct = total > 0 ? (Number(c.total || 0) / total) * 100 : 0;
+    const bar = this.reports.buildProgressBar(pct, 14);
+    msg += `${c.emoji || '•'} ${c.category}\n`;
+    msg += `${bar} ${pct.toFixed(0)}% (${this.reports.formatMoney(Number(c.total || 0))})\n\n`;
+  }
+  msg += '🕑 ' + timestamp.formatted;
+  return msg;
+}
+
+getDashboardUrl() {
+  const base = process.env.DASHBOARD_BASE_URL;
+  const port = process.env.DASHBOARD_PORT || '3030';
+  const fallback = `http://localhost:${port}/dashboard`;
+  return (base ? `${base.replace(/\/$/, '')}/dashboard` : fallback);
 }
 
   async process(message) {
@@ -103,31 +198,20 @@ cleanupPendingOperation(userId, operationType, timeout = TIMEOUTS.PENDING_PURCHA
         // !STATS - Estatísticas do bot
         if (comando === '!stats') {
           Logger.admin('!stats');
-          const allUsers = this.dao.getAllUsers();
-          const totalExpenses = this.dao.db.prepare('SELECT COUNT(*) as count FROM expenses').get().count;
-          const totalInstallments = this.dao.db.prepare('SELECT COUNT(*) as count FROM installments').get().count;
-          const totalCards = this.dao.db.prepare('SELECT COUNT(*) as count FROM credit_cards').get().count;
-
-          let totalBalance = 0;
-          let totalSavings = 0;
-          let totalEmergency = 0;
-          for (let i = 0; i < allUsers.length; i++) {
-            totalBalance += allUsers[i].current_balance;
-            totalSavings += allUsers[i].savings_balance;
-            totalEmergency += allUsers[i].emergency_fund;
-          }
+          const stats = this.dao.getSystemStats();
 
           const timestamp = this.reports.getCurrentBrazilTimestamp();
           const resposta = `📊 *ESTATÍSTICAS DO BOT*\n\n` +
-            `👥 Total de usuários: *${allUsers.length}*\n` +
-            `💸 Total de gastos: *${totalExpenses}*\n` +
-            `📦 Parcelamentos ativos: *${totalInstallments}*\n` +
-            `💳 Cartões cadastrados: *${totalCards}*\n\n` +
+            `👥 Total de usuários: *${stats.totalUsers}*\n` +
+            `💸 Total de gastos: *${stats.totalExpenses}*\n` +
+            `📦 Parcelamentos ativos: *${stats.totalInstallments}*\n` +
+            `💳 Cartões cadastrados: *${stats.totalCards}*\n` +
+            `🎯 Metas ativas: *${stats.totalGoals || 0}*\n\n` +
             `💰 *SALDOS TOTAIS:*\n` +
-            `   Principal: ${this.reports.formatMoney(totalBalance)}\n` +
-            `   Poupança: ${this.reports.formatMoney(totalSavings)}\n` +
-            `   Emergência: ${this.reports.formatMoney(totalEmergency)}\n` +
-            `   Total: ${this.reports.formatMoney(totalBalance + totalSavings + totalEmergency)}\n\n` +
+            `   Principal: ${this.reports.formatMoney(stats.totalBalance)}\n` +
+            `   Poupança: ${this.reports.formatMoney(stats.totalSavings)}\n` +
+            `   Emergência: ${this.reports.formatMoney(stats.totalEmergency)}\n` +
+            `   Total: ${this.reports.formatMoney(stats.totalBalance + stats.totalSavings + stats.totalEmergency)}\n\n` +
             `🕐 ${timestamp.formatted}`;
 
           await this.whatsapp.replyMessage(message, resposta);
@@ -423,9 +507,33 @@ if (this.pendingInvoicePayments && this.pendingInvoicePayments[user.id]) {
   }
 
   if (amount && amount > 0) {
-    delete this.pendingInvoicePayments[user.id];
-
     const timestamp = this.reports.getCurrentBrazilTimestamp();
+    const cardBeforePayment = this.dao.getCardById(pending.cardId);
+
+    if (!cardBeforePayment) {
+      delete this.pendingInvoicePayments[user.id];
+      await this.whatsapp.replyMessage(message,
+        '❌ *Cartão não encontrado!*\n\n' +
+        'Use `/cartoes` para conferir seus cartões.\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+      await this.whatsapp.sendPresence(info.chatId, 'available');
+      return;
+    }
+
+    if (amount > cardBeforePayment.invoice_amount) {
+      await this.whatsapp.replyMessage(message,
+        '❌ *Valor maior que a fatura atual!*\n\n' +
+        `💳 Cartão: *${cardBeforePayment.card_name}*\n` +
+        `📊 Fatura atual: ${this.reports.formatMoney(cardBeforePayment.invoice_amount)}\n` +
+        `💰 Valor informado: ${this.reports.formatMoney(amount)}\n\n` +
+        'Digite um valor menor ou igual à fatura.\n\n' +
+        '🕐 ' + timestamp.formatted
+      );
+      return;
+    }
+
+    delete this.pendingInvoicePayments[user.id];
     const success = this.dao.payCardInvoice(user.id, pending.cardId, amount);
 
     if (success) {
@@ -644,6 +752,12 @@ return;
         await this.handleExpense(processed, user, message);
       } else if (processed.type === 'installment') {
         await this.handleInstallment(processed, user, message);
+      } else if (processed.type === 'unknown' && text.trim().startsWith('/')) {
+        const timestamp = this.reports.getCurrentBrazilTimestamp();
+        await this.whatsapp.replyMessage(
+          message,
+          ErrorMessages.COMMAND_NOT_FOUND() + '\n\n🕑 ' + timestamp.formatted
+        );
       }
 
       await this.whatsapp.sendPresence(info.chatId, 'available');
@@ -934,33 +1048,57 @@ else if (command.command === 'getCardByName') {
 
 // ============ 💳 PAGAR FATURA (MÚLTIPLOS CARTÕES) ============
 else if (command.command === 'payInvoiceCard') {
-  const cardName = command.description;
-  const card = this.dao.findCardByPartialName(user.id, cardName);
-  
-  if (!card) {
-    response = `❌ Cartão "${cardName}" não encontrado\n\nUse \`/cartoes\` para ver seus cartões\n\n🕐 ` + timestamp.formatted;
-  } else if (card.invoice_amount === 0) {
-    response = `✅ *FATURA ZERADA*\n\n💳 Cartão: *${card.card_name}*\n\nVocê não tem fatura para pagar!\n\n🕐 ` + timestamp.formatted;
-  } else {
-    if (!this.pendingInvoicePayments) this.pendingInvoicePayments = {};
-    
-    this.pendingInvoicePayments[user.id] = {
-      cardId: card.id,
-      cardName: card.card_name,
-      invoiceAmount: card.invoice_amount,
-      timestamp: Date.now()
-    };
+  const cardName = (command.description || '').trim();
+  const cards = this.dao.getAllCardsByUserId(user.id);
 
-    response = '💳 *PAGAMENTO DE FATURA*\n\n' +
-      `📇 Cartão: *${card.card_name}*\n` +
-      `📊 Fatura atual: ${this.reports.formatMoney(card.invoice_amount)}\n` +
-      `💰 Seu saldo: ${this.reports.formatMoney(user.current_balance)}\n\n` +
-      '💡 *Digite o valor que você pagou:*\n' +
-      'Exemplo: 1300\n\n' +
-      '⏱️ Você tem 2 minutos para responder\n\n' +
+  if (!cards || cards.length === 0) {
+    response = '[ERRO] *Voce nao tem cartoes cadastrados*\n\n' +
+      'Use `/cartao criar` para cadastrar seu primeiro cartao!\n\n' +
       '🕐 ' + timestamp.formatted;
+  } else {
+    let card = null;
 
-    this.cleanupPendingOperation(user.id, 'invoice', TIMEOUTS.PENDING_INVOICE);
+    if (cardName) {
+      card = this.dao.findCardByPartialName(user.id, cardName);
+    } else if (cards.length === 1) {
+      card = cards[0];
+    } else {
+      let cardList = '';
+      for (let i = 0; i < cards.length; i++) {
+        cardList += '• *' + cards[i].card_name + '*\n';
+      }
+      response = '[INFO] Voce tem mais de um cartao.\n\n' +
+        'Use `/pagar fatura [nome do cartao]`.\n\n' +
+        '[INFO] *Seus cartoes:*\n' +
+        cardList + '\n' +
+        '🕐 ' + timestamp.formatted;
+    }
+
+    if (!response && !card) {
+      response = '[ERRO] Cartao ' + cardName + ' nao encontrado\n\nUse `/cartoes` para ver seus cartoes\n\n🕐 ' + timestamp.formatted;
+    } else if (!response && card.invoice_amount === 0) {
+      response = '[OK] *FATURA ZERADA*\n\n[INFO] Cartao: *' + card.card_name + '*\n\nVoce nao tem fatura para pagar!\n\n🕐 ' + timestamp.formatted;
+    } else if (!response) {
+      if (!this.pendingInvoicePayments) this.pendingInvoicePayments = {};
+      
+      this.pendingInvoicePayments[user.id] = {
+        cardId: card.id,
+        cardName: card.card_name,
+        invoiceAmount: card.invoice_amount,
+        timestamp: Date.now()
+      };
+
+      response = '[CARTAO] *PAGAMENTO DE FATURA*\n\n' +
+        '[INFO] Cartao: *' + card.card_name + '*\n' +
+        '[INFO] Fatura atual: ' + this.reports.formatMoney(card.invoice_amount) + '\n' +
+        '[INFO] Seu saldo: ' + this.reports.formatMoney(user.current_balance) + '\n\n' +
+        '[INFO] *Digite o valor que voce pagou:*\n' +
+        'Exemplo: 1300\n\n' +
+        '[INFO] Voce tem 2 minutos para responder\n\n' +
+        '🕐 ' + timestamp.formatted;
+
+      this.cleanupPendingOperation(user.id, 'invoice', TIMEOUTS.PENDING_INVOICE);
+    }
   }
 }
 
@@ -1099,6 +1237,145 @@ else if (command.command === 'getCard') {
       
       else if (command.command === 'reportMonthly') {
         response = this.reports.generateMonthlyReport(user.id);
+      }
+
+      else if (command.command === 'reportChart') {
+        const period = command.description === 'week' ? 'week' : 'month';
+        response = this.generateVisualChartMessage(user.id, period);
+      }
+
+      else if (command.command === 'goalsList') {
+        response = this.generateGoalsMessage(user.id);
+      }
+
+      else if (command.command === 'goalsCreate') {
+        const parsed = this.parseGoalCreateInput(command.description);
+        if (!parsed) {
+          response = '❌ *Formato inválido*\n\n' +
+            'Use: `/meta criar 5000 viagem`\n\n' +
+            '🕑 ' + timestamp.formatted;
+        } else {
+          const created = this.dao.createSavingsGoal(user.id, parsed.name, parsed.amount);
+          if (!created.success) {
+            response = '❌ *Erro ao criar meta*\n\n' +
+              `📌 ${created.error}\n\n` +
+              '🕑 ' + timestamp.formatted;
+          } else {
+            response = '✅ *META CRIADA*\n\n' +
+              `🎯 ${parsed.name}\n` +
+              `💰 Alvo: ${this.reports.formatMoney(parsed.amount)}\n\n` +
+              'Use `/meta` para acompanhar o progresso.\n\n' +
+              '🕑 ' + timestamp.formatted;
+          }
+        }
+      }
+
+      else if (command.command === 'goalsDelete') {
+        const goalId = parseInt(command.amount, 10);
+        if (!goalId) {
+          response = '❌ *ID inválido*\n\nUse `/meta remover [id]`\n\n🕑 ' + timestamp.formatted;
+        } else {
+          const removed = this.dao.deleteSavingsGoal(user.id, goalId);
+          response = removed
+            ? `✅ *META #${goalId} REMOVIDA*\n\n🕑 ${timestamp.formatted}`
+            : `❌ *Meta #${goalId} não encontrada*\n\n🕑 ${timestamp.formatted}`;
+        }
+      }
+
+      else if (command.command === 'goalsComplete') {
+        const goalId = parseInt(command.amount, 10);
+        if (!goalId) {
+          response = '❌ *ID inválido*\n\nUse `/meta concluir [id]`\n\n🕑 ' + timestamp.formatted;
+        } else {
+          const completed = this.dao.completeSavingsGoal(user.id, goalId);
+          response = completed
+            ? `✅ *META #${goalId} CONCLUÍDA*\n\nParabéns pelo resultado.\n\n🕑 ${timestamp.formatted}`
+            : `❌ *Meta #${goalId} não encontrada*\n\n🕑 ${timestamp.formatted}`;
+        }
+      }
+
+      else if (command.command === 'exportExcel' || command.command === 'exportPdf' || command.command === 'exportAll') {
+        const wantsExcel = command.command === 'exportExcel' || command.command === 'exportAll';
+        const wantsPdf = command.command === 'exportPdf' || command.command === 'exportAll';
+        const sentFiles = [];
+
+        if (wantsExcel) {
+          const excel = await this.exportService.exportExcel(user.id);
+          if (excel.success && this.whatsapp.sendDocument) {
+            await this.whatsapp.sendDocument(info.chatId, excel.filePath, excel.fileName, '📊 Exportação Excel');
+            sentFiles.push('Excel');
+          } else if (!excel.success) {
+            response = '❌ *Falha ao gerar Excel*\n\n' + excel.error + '\n\n🕑 ' + timestamp.formatted;
+          }
+        }
+
+        if (!response && wantsPdf) {
+          const pdf = await this.exportService.exportPdf(user.id);
+          if (pdf.success && this.whatsapp.sendDocument) {
+            await this.whatsapp.sendDocument(info.chatId, pdf.filePath, pdf.fileName, '📄 Exportação PDF');
+            sentFiles.push('PDF');
+          } else if (!pdf.success) {
+            response = '❌ *Falha ao gerar PDF*\n\n' + pdf.error + '\n\n🕑 ' + timestamp.formatted;
+          }
+        }
+
+        if (!response) {
+          response = '✅ *EXPORTAÇÃO CONCLUÍDA*\n\n' +
+            `Arquivos enviados: ${sentFiles.join(', ') || 'nenhum'}\n\n` +
+            '🕑 ' + timestamp.formatted;
+        }
+      }
+
+      else if (command.command === 'dashboard') {
+        const dashboardEnabled = String(process.env.DASHBOARD_ENABLED || '').toLowerCase() === 'true';
+        const link = this.getDashboardUrl();
+        if (!dashboardEnabled) {
+          response = '⚠️ *DASHBOARD DESABILITADO*\n\n' +
+            'Defina `DASHBOARD_ENABLED=true` no .env e reinicie o bot.\n\n' +
+            '🕑 ' + timestamp.formatted;
+        } else {
+          const tokenHint = process.env.DASHBOARD_TOKEN ? '\n🔐 Token ativo: adicione `?token=SEU_TOKEN` no link.' : '';
+          response = '📊 *DASHBOARD WEB*\n\n' +
+            `Acesse: ${link}\n` +
+            'Modo: leitura (read-only)\n' +
+            tokenHint +
+            '\n\n🕑 ' + timestamp.formatted;
+        }
+      }
+
+      else if (command.command === 'forecast') {
+        response = this.forecastService.generateForecastMessage(user.id);
+      }
+
+      else if (command.command === 'syncStatus') {
+        if (!isAdmin) {
+          response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕑 ' + timestamp.formatted;
+        } else if (!this.dao.cloudSyncService) {
+          response = 'ℹ️ *SYNC POSTGRESQL*\n\nSincronização não configurada.\n\n🕑 ' + timestamp.formatted;
+        } else {
+          const status = this.dao.cloudSyncService.getStatus();
+          response = '☁️ *STATUS DO SYNC (POSTGRESQL)*\n\n' +
+            `Ativo: ${status.enabled ? 'sim' : 'não'}\n` +
+            `Em execução: ${status.inProgress ? 'sim' : 'não'}\n` +
+            `Pendente: ${status.pending ? 'sim' : 'não'}\n` +
+            `Último sync: ${status.lastSyncAt || 'nunca'}\n` +
+            `Último status: ${status.lastStatus || 'n/a'}\n` +
+            `Último erro: ${status.lastError || 'nenhum'}\n\n` +
+            '🕑 ' + timestamp.formatted;
+        }
+      }
+
+      else if (command.command === 'syncNow') {
+        if (!isAdmin) {
+          response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕑 ' + timestamp.formatted;
+        } else if (!this.dao.cloudSyncService) {
+          response = 'ℹ️ *SYNC POSTGRESQL*\n\nSincronização não configurada.\n\n🕑 ' + timestamp.formatted;
+        } else {
+          const syncResult = await this.dao.cloudSyncService.syncNow();
+          response = syncResult.success
+            ? `✅ *SYNC CONCLUÍDO*\n\n☁️ PostgreSQL atualizado em ${syncResult.syncedAt}\n\n🕑 ${timestamp.formatted}`
+            : `❌ *Falha no sync*\n\n📌 ${syncResult.error}\n\n🕑 ${timestamp.formatted}`;
+        }
       }
       
       else if (command.command === 'getInstallments') {

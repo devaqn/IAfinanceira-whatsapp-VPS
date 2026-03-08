@@ -144,6 +144,22 @@ class DatabaseSchema {
       )
     `);
 
+    this.db.run(`
+      CREATE TABLE IF NOT EXISTS savings_goals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        target_amount REAL NOT NULL,
+        baseline_total REAL DEFAULT 0.0,
+        target_date DATETIME,
+        status TEXT DEFAULT 'active',
+        completed_at DATETIME,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+      )
+    `);
+
     // ============ ÍNDICES ============
     
     try {
@@ -160,6 +176,8 @@ class DatabaseSchema {
       this.db.run('CREATE INDEX IF NOT EXISTS idx_user_cards_user_id ON user_cards(user_id)');
       this.db.run('CREATE INDEX IF NOT EXISTS idx_card_transactions_card_id ON card_transactions(card_id)');
       this.db.run('CREATE INDEX IF NOT EXISTS idx_card_transactions_user_id ON card_transactions(user_id)');
+      this.db.run('CREATE INDEX IF NOT EXISTS idx_savings_goals_user_id ON savings_goals(user_id)');
+      this.db.run('CREATE INDEX IF NOT EXISTS idx_savings_goals_status ON savings_goals(status)');
     } catch (e) {
       // Índices já existem
     }

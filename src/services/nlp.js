@@ -1,72 +1,129 @@
 class NLPProcessor {
   constructor() {
+    this.amountRegexSource = '(?:\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{1,2})?|\\d+(?:[.,]\\d{1,2})?)';
+    const amountCapture = `(${this.amountRegexSource})`;
+
     this.moneyPatterns = [
-      /(?:gastei|paguei|comprei|saiu|foi|custou|deu)\s+(?:r\$|rs)?\s*(\d+(?:[.,]\d{1,2})?)/i,
-      /(?:r\$|rs)\s*(\d+(?:[.,]\d{1,2})?)/i,
-      /(\d+(?:[.,]\d{1,2})?)\s*(?:reais|real|conto|contos|pila|pilas|pau|mangos)/i,
-      /(\d+(?:[.,]\d{1,2})?)\s*(?:R\$|RS)/i,
-      /^(\d+(?:[.,]\d{1,2})?)\s+/
+      new RegExp(`(?:gastei|paguei|comprei|saiu|foi|custou|deu)\\s+(?:r\\$|rs)?\\s*${amountCapture}`, 'i'),
+      new RegExp(`(?:r\\$|rs)\\s*${amountCapture}`, 'i'),
+      new RegExp(`${amountCapture}\\s*(?:reais|real|conto|contos|pila|pilas|pau|mangos)`, 'i'),
+      new RegExp(`${amountCapture}\\s*(?:R\\$|RS)`, 'i'),
+      new RegExp(`^${amountCapture}\\s+`, 'i')
     ];
 
-    this.installmentPattern = /(\d+(?:[.,]\d{1,2})?)\s*(?:em|por|parcelado em|parcelada em|parcelado|parcelada)\s*(\d+)x?/i;
+    this.installmentPattern = new RegExp(
+      `(${this.amountRegexSource})\\s*(?:em|por|parcelado em|parcelada em|parcelado|parcelada)\\s*(\\d+)x?`,
+      'i'
+    );
 
     this.commandPatterns = {
-      // Saldo principal
-      setBalance: /^\/saldo\s+(\d+(?:[.,]\d{1,2})?)/i,
+      setBalance: new RegExp(`^\\/saldo\\s+${amountCapture}\\s*$`, 'i'),
       getBalance: /^\/saldo\s*$/i,
-      addBalance: /^\/adicionar\s+(\d+(?:[.,]\d{1,2})?)/i,
-      
-      // Poupança
-      getSavings: /^\/poupan[cç]a\s*$/i,
-      depositSavings: /^\/guardar\s+(\d+(?:[.,]\d{1,2})?)/i,
-      withdrawSavings: /^\/retirar\s+(\d+(?:[.,]\d{1,2})?)/i,
-      
-      // Reserva de emergência
-      getEmergency: /^\/emerg[eê]ncia\s*$/i,
-      depositEmergency: /^\/reservar\s+(\d+(?:[.,]\d{1,2})?)/i,
-      withdrawEmergency: /^\/usar\s+(?:reserva\s+)?(\d+(?:[.,]\d{1,2})?)/i,
-      
-      // 💳 Cartões de crédito (NOVOS COMANDOS - MÚLTIPLOS CARTÕES)
-      createCard: /^\/cart[aã]o\s+criar\s*$/i,
-      listCards: /^\/cart[oõ]es\s*$/i,
-      setCardLimit: /^\/cart[aã]o\s+limite\s+(\d+(?:[.,]\d{1,2})?)/i,
-      getCard: /^\/cart[aã]o\s*$/i,
-      getCardByName: /^\/cart[aã]o\s+(.+)/i,
+      addBalance: new RegExp(`^\\/adicionar\\s+${amountCapture}\\s*$`, 'i'),
+
+      getSavings: /^\/poupan[c\u00E7]a\s*$/i,
+      depositSavings: new RegExp(`^\\/guardar\\s+${amountCapture}\\s*$`, 'i'),
+      withdrawSavings: new RegExp(`^\\/retirar\\s+${amountCapture}\\s*$`, 'i'),
+
+      getEmergency: /^\/emerg[e\u00EA]ncia\s*$/i,
+      depositEmergency: new RegExp(`^\\/reservar\\s+${amountCapture}\\s*$`, 'i'),
+      withdrawEmergency: new RegExp(`^\\/usar\\s+(?:reserva\\s+)?${amountCapture}\\s*$`, 'i'),
+
+      createCard: /^\/cart[a\u00E3]o\s+criar\s*$/i,
+      listCards: /^\/cart[o\u00F5]es\s*$/i,
+      setCardLimit: new RegExp(`^\\/cart[a\\u00E3]o\\s+limite\\s+${amountCapture}\\s*$`, 'i'),
+      getCard: /^\/cart[a\u00E3]o\s*$/i,
+      getCardByName: /^\/cart[a\u00E3]o\s+(.+)/i,
+      payInvoiceCardDefault: /^\/pagar\s+fatura\s*$/i,
       payInvoiceCard: /^\/pagar\s+fatura\s+(.+)/i,
-      deleteCard: /^\/deletar\s+cart[aã]o\s+(.+)/i,
-      resetCard: /^\/zerar\s+cart[aã]o\s+(.+)/i,
+      deleteCard: /^\/deletar\s+cart[a\u00E3]o\s+(.+)/i,
+      resetCard: /^\/zerar\s+cart[a\u00E3]o\s+(.+)/i,
       vencimentos: /^\/vencimentos?\s*$/i,
-      
-      // Parcelamentos
+
       getInstallments: /^\/parcelamentos?\s*$/i,
       payInstallment: /^\/pagar\s+(?:parcela\s+)?(.+)/i,
-      
-      // Lembretes
+
       getReminders: /^\/(?:lembretes?|lembrar|avisos?)/i,
       getDuePayments: /^\/(?:vencidas?|atrasadas?|pendentes?)/i,
-      
-      // Zeragem
+
       resetBalance: /^\/(?:zerar|resetar|limpar)\s+saldo\s*$/i,
-      resetSavings: /^\/(?:zerar|resetar|limpar)\s+poupan[cç]a\s*$/i,
-      resetEmergency: /^\/(?:zerar|resetar|limpar)\s+(?:reserva|reserva\s+emerg[eê]ncia|reserva\s+emergencia)\s*$/i,
+      resetSavings: /^\/(?:zerar|resetar|limpar)\s+poupan[c\u00E7]a\s*$/i,
+      resetEmergency: /^\/(?:zerar|resetar|limpar)\s+(?:reserva|reserva\s+emerg[e\u00EA]ncia|reserva\s+emergencia)\s*$/i,
       resetInstallments: /^\/(?:zerar|resetar|limpar|apagar)\s+(?:parcelas?|parcelamentos?)\s*$/i,
       resetEverything: /^\/(?:zerar|resetar|limpar)\s+(?:tudo|sistema)\s*$/i,
-      
-      // Confirmação de zeragem
+
       confirmReset: /^SIM,?\s*ZERAR\s+TUDO\s*$/i,
-      
-      // Relatórios
-      reportWeekly: /^\/relat[oó]rio\s+(?:semana|semanal|week|weekly)/i,
-      reportMonthly: /^\/relat[oó]rio\s+(?:m[eê]s|mes|mensal|month|monthly)/i,
-      
-      // Comandos diretos
+
+      reportWeekly: /^\/relat[o\u00F3]rio\s+(?:semana|semanal|week|weekly)/i,
+      reportMonthly: /^\/relat[o\u00F3]rio\s+(?:m[e\u00EA]s|mes|mensal|month|monthly)/i,
+
       reportWeeklyShort: /^\/(?:semana|semanal)\s*$/i,
-      reportMonthlyShort: /^\/(?:m[eê]s|mes|mensal)\s*$/i,
-      
-      // Outros
+      reportMonthlyShort: /^\/(?:m[e\u00EA]s|mes|mensal)\s*$/i,
+
+      reportChartWeekly: /^\/grafico\s+(?:semana|semanal)\s*$/i,
+      reportChartMonthly: /^\/grafico\s+(?:m[e\u00EA]s|mes|mensal)\s*$/i,
+
+      goalsList: /^\/metas?\s*$/i,
+      goalsCreate: /^\/metas?\s+criar\s+(.+)$/i,
+      goalsDelete: /^\/metas?\s+(?:remover|apagar|deletar)\s+(\d+)\s*$/i,
+      goalsComplete: /^\/metas?\s+(?:concluir|finalizar)\s+(\d+)\s*$/i,
+
+      exportExcel: /^\/exportar\s+(?:excel|xlsx)\s*$/i,
+      exportPdf: /^\/exportar\s+pdf\s*$/i,
+      exportAll: /^\/exportar\s+(?:ambos|tudo)\s*$/i,
+
+      dashboard: /^\/dashboard\s*$/i,
+      forecast: /^\/previs[a\u00E3]o(?:\s+ia)?\s*$/i,
+
+      syncStatus: /^\/sync\s+status\s*$/i,
+      syncNow: /^\/sync\s+agora\s*$/i,
+
       help: /^\/(?:ajuda|help|comandos)/i,
-      start: /^\/(?:start|come[çc]ar|comecar)/i
+      start: /^\/(?:start|come[\u00E7c]ar|comecar)/i
     };
+  }
+
+  parseAmountString(rawValue) {
+    if (rawValue === null || rawValue === undefined) return null;
+
+    let value = String(rawValue).trim().replace(/[^\d.,-]/g, '');
+    if (!value) return null;
+
+    const hasComma = value.includes(',');
+    const hasDot = value.includes('.');
+
+    if (hasComma && hasDot) {
+      if (value.lastIndexOf(',') > value.lastIndexOf('.')) {
+        value = value.replace(/\./g, '').replace(',', '.');
+      } else {
+        value = value.replace(/,/g, '');
+      }
+    } else if (hasComma) {
+      const commaCount = (value.match(/,/g) || []).length;
+      if (commaCount > 1) {
+        value = value.replace(/,/g, '');
+      } else {
+        const parts = value.split(',');
+        if (parts[1] && parts[1].length === 3) {
+          value = parts.join('');
+        } else {
+          value = value.replace(',', '.');
+        }
+      }
+    } else if (hasDot) {
+      const dotCount = (value.match(/\./g) || []).length;
+      if (dotCount > 1) {
+        value = value.replace(/\./g, '');
+      } else {
+        const parts = value.split('.');
+        if (parts[1] && parts[1].length === 3) {
+          value = parts.join('');
+        }
+      }
+    }
+
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : null;
   }
 
   extractAmount(text) {
@@ -74,8 +131,8 @@ class NLPProcessor {
       const pattern = this.moneyPatterns[i];
       const match = text.match(pattern);
       if (match) {
-        const amount = match[1].replace(',', '.');
-        return parseFloat(amount);
+        const amount = this.parseAmountString(match[1]);
+        if (amount !== null) return amount;
       }
     }
     return null;
@@ -88,14 +145,14 @@ class NLPProcessor {
   extractInstallmentInfo(text) {
     const match = text.match(this.installmentPattern);
     if (!match) return null;
-    
-    const totalAmount = parseFloat(match[1].replace(',', '.'));
+
+    const totalAmount = this.parseAmountString(match[1]);
     const installments = parseInt(match[2]);
-    
-    if (totalAmount <= 0 || installments <= 0 || installments > 100) return null;
-    
+
+    if (!totalAmount || totalAmount <= 0 || installments <= 0 || installments > 100) return null;
+
     const installmentAmount = parseFloat((totalAmount / installments).toFixed(2));
-    
+
     return {
       totalAmount: totalAmount,
       installments: installments,
@@ -103,82 +160,95 @@ class NLPProcessor {
     };
   }
 
-  extractInstallmentDescription(text, totalAmount, installments) {
+  extractInstallmentDescription(text) {
     let description = text;
-    
+
     description = description.replace(/^(?:gastei|paguei|comprei|saiu|foi|custou|deu)\s+/i, '');
-    
-    const amountStr = totalAmount.toString().replace('.', '[.,]');
-    description = description.replace(new RegExp('(?:r\\$|rs)?\\s*' + amountStr, 'gi'), '');
+    description = description.replace(
+      new RegExp('(?:r\\$|rs)?\\s*' + this.amountRegexSource, 'i'),
+      ''
+    );
     description = description.replace(/\s*(?:em|por|parcelado em|parcelada em|parcelado|parcelada)\s*\d+x?/gi, '');
-    
-    description = description.replace(/(?:r\$|rs)\s*/gi, '');
+
+    description = description.replace(/(?:r\$|\brs\b)\s*/gi, '');
     description = description.replace(/^\s*(?:em|de|com|no|na|para|pro|pra)\s+/i, '');
     description = description.trim();
-    
+
     return description || 'Compra parcelada';
   }
 
-  extractDescription(text, amount) {
+  extractDescription(text) {
     let description = text;
-    
+
     description = description.replace(/^(?:gastei|paguei|comprei|saiu|foi|custou|deu)\s+/i, '');
-    
-    const amountStr = amount.toString().replace('.', '[.,]');
-    description = description.replace(new RegExp('(?:r\\$|rs)?\\s*' + amountStr + '\\s*(?:reais?|contos?|pilas?|pau|mangos)?', 'gi'), '');
-    
-    description = description.replace(/(?:r\$|rs)\s*/gi, '');
+    description = description.replace(
+      new RegExp('(?:r\\$|rs)?\\s*' + this.amountRegexSource + '\\s*(?:reais?|contos?|pilas?|pau|mangos)?', 'i'),
+      ''
+    );
+
+    description = description.replace(/(?:r\$|\brs\b)\s*/gi, '');
     description = description.replace(/^\s*(?:em|de|com|no|na|para|pro|pra)\s+/i, '');
     description = description.trim();
-    
+
     return description || 'Gasto';
   }
 
   identifyCommand(text) {
     const trimmedText = text.trim();
-    
+
     const keys = Object.keys(this.commandPatterns);
     for (let i = 0; i < keys.length; i++) {
       const command = keys[i];
       const pattern = this.commandPatterns[command];
       const match = trimmedText.match(pattern);
-      
+
       if (match) {
         const result = { command: command };
-        
+
         if (match[1]) {
-          // Comandos que precisam do texto completo (nome de cartão, produto, etc)
-          if (command === 'payInstallment' || 
-              command === 'getCardByName' || 
-              command === 'payInvoiceCard' || 
-              command === 'deleteCard' || 
-              command === 'resetCard') {
+          if (command === 'payInstallment' ||
+              command === 'getCardByName' ||
+              command === 'payInvoiceCard' ||
+              command === 'deleteCard' ||
+              command === 'resetCard' ||
+              command === 'goalsCreate') {
             result.description = match[1].trim();
           } else {
-            result.amount = parseFloat(match[1].replace(',', '.'));
+            result.amount = this.parseAmountString(match[1]);
           }
         }
-        
-        // Mapear comandos curtos
+
         if (command === 'reportWeeklyShort') result.command = 'reportWeekly';
         if (command === 'reportMonthlyShort') result.command = 'reportMonthly';
-        
+        if (command === 'reportChartWeekly') {
+          result.command = 'reportChart';
+          result.description = 'week';
+        }
+        if (command === 'reportChartMonthly') {
+          result.command = 'reportChart';
+          result.description = 'month';
+        }
+        if (command === 'payInvoiceCardDefault') {
+          result.command = 'payInvoiceCard';
+          result.description = '';
+        }
+
         return result;
       }
     }
-    
+
     return null;
   }
 
   looksLikeExpense(text) {
     const hasAmount = this.extractAmount(text) !== null;
-    
+
     const expenseKeywords = [
-      'gastei', 'paguei', 'comprei', 'saiu', 'foi', 'custou', 
-      'deu', 'comprando', 'no mercado', 'na farmácia', 'almocei',
+      'gastei', 'paguei', 'comprei', 'saiu', 'foi', 'custou',
+      'deu', 'comprando', 'no mercado', 'na farmacia', 'na farmácia', 'almocei',
       'jantei', 'lanchou', 'tomei'
     ];
-    
+
     const textLower = text.toLowerCase();
     let hasKeyword = false;
     for (let i = 0; i < expenseKeywords.length; i++) {
@@ -187,7 +257,7 @@ class NLPProcessor {
         break;
       }
     }
-    
+
     return hasAmount || hasKeyword;
   }
 
@@ -204,14 +274,10 @@ class NLPProcessor {
 
     if (this.isInstallmentPurchase(text) && this.looksLikeExpense(text)) {
       const installmentInfo = this.extractInstallmentInfo(text);
-      
+
       if (installmentInfo) {
-        const description = this.extractInstallmentDescription(
-          text, 
-          installmentInfo.totalAmount, 
-          installmentInfo.installments
-        );
-        
+        const description = this.extractInstallmentDescription(text);
+
         return {
           type: 'installment',
           totalAmount: installmentInfo.totalAmount,
@@ -226,10 +292,10 @@ class NLPProcessor {
 
     if (this.looksLikeExpense(text)) {
       const amount = this.extractAmount(text);
-      
+
       if (amount && amount > 0) {
-        const description = this.extractDescription(text, amount);
-        
+        const description = this.extractDescription(text);
+
         return {
           type: 'expense',
           amount: amount,

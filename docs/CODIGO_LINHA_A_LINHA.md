@@ -1,0 +1,12324 @@
+# C�digo Linha a Linha
+
+Este arquivo explica cada linha dos arquivos de `src/` sem alterar o c�digo de produ��o.
+
+Gerado em: 2026-03-08T22:21:27.413Z
+
+## src/config/constants.js
+
+- L1: `module.exports = {`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L2: `  TIMEOUTS: {`
+  - Abre bloco de execu��o.
+- L3: `    PENDING_PURCHASE: 120000,        // 2 minutos para responder compra`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L4: `    PENDING_INSTALLMENT: 120000,     // 2 minutos para responder parcelamento`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L5: `    PENDING_INVOICE: 120000,         // 2 minutos para informar valor de pagamento`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L6: `    PENDING_RESET: 120000,           // 2 minutos para confirmar zeragem`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L7: `    PENDING_CARD_CREATION: 180000,   // 3 minutos para cadastrar cartão`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L8: `    MESSAGE_DEDUPLICATION: 30000     // 30 segundos de cache de mensagem`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L9: `  },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L10: `  `
+  - Linha em branco para organizar blocos.
+- L11: `  INVOICE_DUE_DAY: 10,               // Dia padrão de vencimento`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L12: `  DAYS_BEFORE_DUE_ALERT: 5,          // Alertar 5 dias antes do vencimento`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L13: `  `
+  - Linha em branco para organizar blocos.
+- L14: `  PAYMENT_METHODS: {`
+  - Abre bloco de execu��o.
+- L15: `    CARD: ['cartao', 'cartão', 'card', 'credito', 'crédito'],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L16: `    BALANCE: ['saldo', 'dinheiro', 'conta', 'debito', 'débito']`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L17: `  },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L18: `  `
+  - Linha em branco para organizar blocos.
+- L19: `  WARNING_THRESHOLDS: {`
+  - Abre bloco de execu��o.
+- L20: `    LOW_BALANCE: 0.30,               // Alertar quando restar 30% do saldo`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L21: `    LOW_CARD_LIMIT: 0.20,            // Alertar quando restar 20% do limite`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L22: `    CARD_USAGE_ALERT: 0.30           // Alertar quando usar 30% do cartão`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L23: `  },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L24: `  `
+  - Linha em branco para organizar blocos.
+- L25: `  CARD_LIMITS: {`
+  - Abre bloco de execu��o.
+- L26: `    MIN_LIMIT: 100,                  // Limite mínimo de R$ 100`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L27: `    MAX_LIMIT: 1000000,              // Limite máximo de R$ 1.000.000`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L28: `    MIN_DUE_DAY: 1,                  // Dia mínimo de vencimento`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L29: `    MAX_DUE_DAY: 31,                 // Dia máximo de vencimento`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L30: `    MIN_NAME_LENGTH: 2,              // Mínimo de 2 caracteres no nome`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L31: `    MAX_NAME_LENGTH: 50              // Máximo de 50 caracteres no nome`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L32: `  }`
+  - Fecha bloco de execu��o.
+- L33: `};`
+  - Executa uma instru��o da l�gica de neg�cio.
+
+## src/database/dao.js
+
+- L1: `const initSqlJs = require('sql.js');`
+  - Importa um m�dulo para uso neste arquivo.
+- L2: `const fs = require('fs');`
+  - Importa um m�dulo para uso neste arquivo.
+- L3: `const path = require('path');`
+  - Importa um m�dulo para uso neste arquivo.
+- L4: ``
+  - Linha em branco para organizar blocos.
+- L5: `class DAO {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L6: `  constructor(dbPath) {`
+  - Inicializa estado da classe e depend�ncias.
+- L7: `    this.dbPath = dbPath || path.join(__dirname, '../../database/finance.db');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L8: `    this.db = null;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L9: `    this.hasTransactionType = false;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L10: `    this.cloudSyncService = null;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L11: `  }`
+  - Fecha bloco de execu��o.
+- L12: ``
+  - Linha em branco para organizar blocos.
+- L13: `  async init() {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L14: `    const SQL = await initSqlJs();`
+  - Declara uma constante usada na l�gica.
+- L15: `    `
+  - Linha em branco para organizar blocos.
+- L16: `    if (fs.existsSync(this.dbPath)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L17: `      const buffer = fs.readFileSync(this.dbPath);`
+  - Declara uma constante usada na l�gica.
+- L18: `      this.db = new SQL.Database(buffer);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L19: `    } else {`
+  - Abre bloco de execu��o.
+- L20: `      this.db = new SQL.Database();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L21: `    }`
+  - Fecha bloco de execu��o.
+- L22: `    `
+  - Linha em branco para organizar blocos.
+- L23: `    return this.db;`
+  - Retorna valor da fun��o/m�todo.
+- L24: `  }`
+  - Fecha bloco de execu��o.
+- L25: ``
+  - Linha em branco para organizar blocos.
+- L26: `  setDatabase(db) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L27: `    this.db = db;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L28: `    `
+  - Linha em branco para organizar blocos.
+- L29: `    // Verificar se coluna transaction_type existe`
+  - Coment�rio explicativo j� existente no c�digo.
+- L30: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L31: `      const columns = this.db.exec("PRAGMA table_info(expenses)");`
+  - Declara uma constante usada na l�gica.
+- L32: `      if (columns[0]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L33: `        const columnNames = columns[0].values.map(row => row[1]);`
+  - Declara uma constante usada na l�gica.
+- L34: `        this.hasTransactionType = columnNames.includes('transaction_type');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L35: `      }`
+  - Fecha bloco de execu��o.
+- L36: `    } catch (e) {`
+  - Abre bloco de execu��o.
+- L37: `      this.hasTransactionType = false;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L38: `    }`
+  - Fecha bloco de execu��o.
+- L39: `  }`
+  - Fecha bloco de execu��o.
+- L40: ``
+  - Linha em branco para organizar blocos.
+- L41: `  save() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L42: `    const data = this.db.export();`
+  - Declara uma constante usada na l�gica.
+- L43: `    const buffer = Buffer.from(data);`
+  - Declara uma constante usada na l�gica.
+- L44: `    fs.writeFileSync(this.dbPath, buffer);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L45: ``
+  - Linha em branco para organizar blocos.
+- L46: `    if (this.cloudSyncService && typeof this.cloudSyncService.queueSync === 'function') {`
+  - Verifica condi��o para decidir o fluxo.
+- L47: `      try {`
+  - Inicia bloco protegido contra exce��es.
+- L48: `        this.cloudSyncService.queueSync();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L49: `      } catch (_) {}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L50: `    }`
+  - Fecha bloco de execu��o.
+- L51: `  }`
+  - Fecha bloco de execu��o.
+- L52: ``
+  - Linha em branco para organizar blocos.
+- L53: `  setCloudSyncService(syncService) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L54: `    this.cloudSyncService = syncService || null;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L55: `  }`
+  - Fecha bloco de execu��o.
+- L56: ``
+  - Linha em branco para organizar blocos.
+- L57: `  // ============ USUÁRIOS ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L58: `  `
+  - Linha em branco para organizar blocos.
+- L59: `  upsertUser(whatsappId, name) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L60: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L61: `      'INSERT INTO users (whatsapp_id, name) VALUES (?, ?) ON CONFLICT(whatsapp_id) DO UPDATE SET name = excluded.name, updated_at = CURRENT_TIMESTAMP',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L62: `      [whatsappId, name]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L63: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L64: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L65: `    `
+  - Linha em branco para organizar blocos.
+- L66: `    const result = this.db.exec('SELECT * FROM users WHERE whatsapp_id = ?', [whatsappId]);`
+  - Declara uma constante usada na l�gica.
+- L67: `    return result[0] ? this.rowToObject(result[0]) : null;`
+  - Retorna valor da fun��o/m�todo.
+- L68: `  }`
+  - Fecha bloco de execu��o.
+- L69: ``
+  - Linha em branco para organizar blocos.
+- L70: `  getUserByWhatsAppId(whatsappId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L71: `    const result = this.db.exec('SELECT * FROM users WHERE whatsapp_id = ?', [whatsappId]);`
+  - Declara uma constante usada na l�gica.
+- L72: `    return result[0] ? this.rowToObject(result[0]) : null;`
+  - Retorna valor da fun��o/m�todo.
+- L73: `  }`
+  - Fecha bloco de execu��o.
+- L74: ``
+  - Linha em branco para organizar blocos.
+- L75: `  getUserById(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L76: `    const result = this.db.exec('SELECT * FROM users WHERE id = ?', [userId]);`
+  - Declara uma constante usada na l�gica.
+- L77: `    return result[0] ? this.rowToObject(result[0]) : null;`
+  - Retorna valor da fun��o/m�todo.
+- L78: `  }`
+  - Fecha bloco de execu��o.
+- L79: ``
+  - Linha em branco para organizar blocos.
+- L80: `  getAllUsers() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L81: `    const result = this.db.exec('SELECT * FROM users ORDER BY created_at DESC');`
+  - Declara uma constante usada na l�gica.
+- L82: `    if (!result[0]) return [];`
+  - Verifica condi��o para decidir o fluxo.
+- L83: `    return this.rowsToObjects(result[0]);`
+  - Retorna valor da fun��o/m�todo.
+- L84: `  }`
+  - Fecha bloco de execu��o.
+- L85: ``
+  - Linha em branco para organizar blocos.
+- L86: `  getTableCount(tableName) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L87: `    const allowedTables = ['users', 'expenses', 'installments', 'user_cards', 'savings_goals'];`
+  - Declara uma constante usada na l�gica.
+- L88: `    if (!allowedTables.includes(tableName)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L89: `      throw new Error('Tabela não permitida para contagem: ' + tableName);`
+  - Dispara erro para interromper e sinalizar falha.
+- L90: `    }`
+  - Fecha bloco de execu��o.
+- L91: ``
+  - Linha em branco para organizar blocos.
+- L92: `    const result = this.db.exec(\`SELECT COUNT(*) as count FROM ${tableName}\`);`
+  - Declara uma constante usada na l�gica.
+- L93: `    return result[0] ? result[0].values[0][0] : 0;`
+  - Retorna valor da fun��o/m�todo.
+- L94: `  }`
+  - Fecha bloco de execu��o.
+- L95: ``
+  - Linha em branco para organizar blocos.
+- L96: `  getSystemStats() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L97: `    const allUsers = this.getAllUsers();`
+  - Declara uma constante usada na l�gica.
+- L98: `    let totalBalance = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L99: `    let totalSavings = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L100: `    let totalEmergency = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L101: ``
+  - Linha em branco para organizar blocos.
+- L102: `    for (let i = 0; i < allUsers.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L103: `      totalBalance += allUsers[i].current_balance || 0;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L104: `      totalSavings += allUsers[i].savings_balance || 0;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L105: `      totalEmergency += allUsers[i].emergency_fund || 0;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L106: `    }`
+  - Fecha bloco de execu��o.
+- L107: ``
+  - Linha em branco para organizar blocos.
+- L108: `    return {`
+  - Retorna valor da fun��o/m�todo.
+- L109: `      totalUsers: allUsers.length,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L110: `      totalExpenses: this.getTableCount('expenses'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L111: `      totalInstallments: this.getTableCount('installments'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L112: `      totalCards: this.getTableCount('user_cards'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L113: `      totalGoals: this.getTableCount('savings_goals'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L114: `      totalBalance: totalBalance,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L115: `      totalSavings: totalSavings,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L116: `      totalEmergency: totalEmergency`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L117: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L118: `  }`
+  - Fecha bloco de execu��o.
+- L119: ``
+  - Linha em branco para organizar blocos.
+- L120: `  // ============ SALDO PRINCIPAL ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L121: `  `
+  - Linha em branco para organizar blocos.
+- L122: `  setInitialBalance(whatsappId, amount) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L123: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L124: `      'UPDATE users SET initial_balance = ?, current_balance = ?, updated_at = CURRENT_TIMESTAMP WHERE whatsapp_id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L125: `      [amount, amount, whatsappId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L126: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L127: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L128: `  }`
+  - Fecha bloco de execu��o.
+- L129: ``
+  - Linha em branco para organizar blocos.
+- L130: `  addBalance(whatsappId, amount) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L131: `    const user = this.getUserByWhatsAppId(whatsappId);`
+  - Declara uma constante usada na l�gica.
+- L132: `    if (!user) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L133: `    `
+  - Linha em branco para organizar blocos.
+- L134: `    const newInitial = parseFloat((user.initial_balance + amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L135: `    const newCurrent = parseFloat((user.current_balance + amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L136: `    `
+  - Linha em branco para organizar blocos.
+- L137: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L138: `      'UPDATE users SET initial_balance = ?, current_balance = ?, updated_at = CURRENT_TIMESTAMP WHERE whatsapp_id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L139: `      [newInitial, newCurrent, whatsappId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L140: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L141: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L142: `    return true;`
+  - Retorna valor da fun��o/m�todo.
+- L143: `  }`
+  - Fecha bloco de execu��o.
+- L144: ``
+  - Linha em branco para organizar blocos.
+- L145: `  updateBalance(userId, newBalance) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L146: `    const balance = parseFloat(newBalance.toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L147: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L148: `      'UPDATE users SET current_balance = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L149: `      [balance, userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L150: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L151: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L152: `  }`
+  - Fecha bloco de execu��o.
+- L153: ``
+  - Linha em branco para organizar blocos.
+- L154: `  // ============ POUPANÇA ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L155: `  `
+  - Linha em branco para organizar blocos.
+- L156: `  addToSavings(userId, amount, description = 'Transferência para poupança') {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L157: `    const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L158: `    if (!user || user.current_balance < amount) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L159: `    `
+  - Linha em branco para organizar blocos.
+- L160: `    const newCurrent = parseFloat((user.current_balance - amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L161: `    const newSavings = parseFloat(((user.savings_balance || 0) + amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L162: `    `
+  - Linha em branco para organizar blocos.
+- L163: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L164: `      'UPDATE users SET current_balance = ?, savings_balance = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L165: `      [newCurrent, newSavings, userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L166: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L167: `    `
+  - Linha em branco para organizar blocos.
+- L168: `    // ✅ CORREÇÃO: Buscar categoria ou usar "Outros" (ID 11)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L169: `    let categoryId = 11; // Fallback para "Outros"`
+  - Declara vari�vel com valor que pode ser alterado.
+- L170: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L171: `      const category = this.getCategoryByName('Poupança');`
+  - Declara uma constante usada na l�gica.
+- L172: `      if (category && category.id) {`
+  - Verifica condi��o para decidir o fluxo.
+- L173: `        categoryId = category.id;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L174: `      }`
+  - Fecha bloco de execu��o.
+- L175: `    } catch (e) {`
+  - Abre bloco de execu��o.
+- L176: `      console.log('⚠️ Categoria Poupança não encontrada, usando Outros');`
+  - Registra informa��o de execu��o no log.
+- L177: `    }`
+  - Fecha bloco de execu��o.
+- L178: `    `
+  - Linha em branco para organizar blocos.
+- L179: `    this.createTransaction({`
+  - Abre bloco de execu��o.
+- L180: `      userId: userId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L181: `      amount: amount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L182: `      description: description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L183: `      categoryId: categoryId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L184: `      transactionType: 'savings_deposit',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L185: `      chatId: user.whatsapp_id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L186: `      messageId: null`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L187: `    });`
+  - Fecha bloco de execu��o.
+- L188: `    `
+  - Linha em branco para organizar blocos.
+- L189: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L190: `    return true;`
+  - Retorna valor da fun��o/m�todo.
+- L191: `  }`
+  - Fecha bloco de execu��o.
+- L192: ``
+  - Linha em branco para organizar blocos.
+- L193: `  withdrawFromSavings(userId, amount, description = 'Retirada da poupança') {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L194: `    const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L195: `    const savingsBalance = user.savings_balance || 0;`
+  - Declara uma constante usada na l�gica.
+- L196: `    if (!user || savingsBalance < amount) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L197: `    `
+  - Linha em branco para organizar blocos.
+- L198: `    const newSavings = parseFloat((savingsBalance - amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L199: `    const newCurrent = parseFloat((user.current_balance + amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L200: `    `
+  - Linha em branco para organizar blocos.
+- L201: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L202: `      'UPDATE users SET savings_balance = ?, current_balance = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L203: `      [newSavings, newCurrent, userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L204: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L205: `    `
+  - Linha em branco para organizar blocos.
+- L206: `    // ✅ CORREÇÃO: Buscar categoria ou usar "Outros" (ID 11)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L207: `    let categoryId = 11; // Fallback para "Outros"`
+  - Declara vari�vel com valor que pode ser alterado.
+- L208: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L209: `      const category = this.getCategoryByName('Poupança');`
+  - Declara uma constante usada na l�gica.
+- L210: `      if (category && category.id) {`
+  - Verifica condi��o para decidir o fluxo.
+- L211: `        categoryId = category.id;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L212: `      }`
+  - Fecha bloco de execu��o.
+- L213: `    } catch (e) {`
+  - Abre bloco de execu��o.
+- L214: `      console.log('⚠️ Categoria Poupança não encontrada, usando Outros');`
+  - Registra informa��o de execu��o no log.
+- L215: `    }`
+  - Fecha bloco de execu��o.
+- L216: `    `
+  - Linha em branco para organizar blocos.
+- L217: `    this.createTransaction({`
+  - Abre bloco de execu��o.
+- L218: `      userId: userId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L219: `      amount: amount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L220: `      description: description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L221: `      categoryId: categoryId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L222: `      transactionType: 'savings_withdrawal',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L223: `      chatId: user.whatsapp_id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L224: `      messageId: null`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L225: `    });`
+  - Fecha bloco de execu��o.
+- L226: `    `
+  - Linha em branco para organizar blocos.
+- L227: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L228: `    return true;`
+  - Retorna valor da fun��o/m�todo.
+- L229: `  }`
+  - Fecha bloco de execu��o.
+- L230: ``
+  - Linha em branco para organizar blocos.
+- L231: `  // ============ RESERVA DE EMERGÊNCIA ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L232: `  `
+  - Linha em branco para organizar blocos.
+- L233: `  addToEmergencyFund(userId, amount, description = 'Depósito na reserva de emergência') {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L234: `    const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L235: `    if (!user || user.current_balance < amount) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L236: `    `
+  - Linha em branco para organizar blocos.
+- L237: `    const newCurrent = parseFloat((user.current_balance - amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L238: `    const newEmergency = parseFloat(((user.emergency_fund || 0) + amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L239: `    `
+  - Linha em branco para organizar blocos.
+- L240: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L241: `      'UPDATE users SET current_balance = ?, emergency_fund = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L242: `      [newCurrent, newEmergency, userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L243: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L244: `    `
+  - Linha em branco para organizar blocos.
+- L245: `    // ✅ CORREÇÃO: Buscar categoria ou usar "Outros" (ID 11)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L246: `    let categoryId = 11; // Fallback para "Outros"`
+  - Declara vari�vel com valor que pode ser alterado.
+- L247: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L248: `      const category = this.getCategoryByName('Emergência');`
+  - Declara uma constante usada na l�gica.
+- L249: `      if (category && category.id) {`
+  - Verifica condi��o para decidir o fluxo.
+- L250: `        categoryId = category.id;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L251: `      }`
+  - Fecha bloco de execu��o.
+- L252: `    } catch (e) {`
+  - Abre bloco de execu��o.
+- L253: `      console.log('⚠️ Categoria Emergência não encontrada, usando Outros');`
+  - Registra informa��o de execu��o no log.
+- L254: `    }`
+  - Fecha bloco de execu��o.
+- L255: `    `
+  - Linha em branco para organizar blocos.
+- L256: `    this.createTransaction({`
+  - Abre bloco de execu��o.
+- L257: `      userId: userId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L258: `      amount: amount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L259: `      description: description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L260: `      categoryId: categoryId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L261: `      transactionType: 'emergency_deposit',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L262: `      chatId: user.whatsapp_id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L263: `      messageId: null`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L264: `    });`
+  - Fecha bloco de execu��o.
+- L265: `    `
+  - Linha em branco para organizar blocos.
+- L266: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L267: `    return true;`
+  - Retorna valor da fun��o/m�todo.
+- L268: `  }`
+  - Fecha bloco de execu��o.
+- L269: ``
+  - Linha em branco para organizar blocos.
+- L270: `  withdrawFromEmergencyFund(userId, amount, description = 'Retirada da reserva de emergência') {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L271: `    const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L272: `    const emergencyFund = user.emergency_fund || 0;`
+  - Declara uma constante usada na l�gica.
+- L273: `    if (!user || emergencyFund < amount) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L274: `    `
+  - Linha em branco para organizar blocos.
+- L275: `    const newEmergency = parseFloat((emergencyFund - amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L276: `    const newCurrent = parseFloat((user.current_balance + amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L277: `    `
+  - Linha em branco para organizar blocos.
+- L278: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L279: `      'UPDATE users SET emergency_fund = ?, current_balance = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L280: `      [newEmergency, newCurrent, userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L281: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L282: `    `
+  - Linha em branco para organizar blocos.
+- L283: `    // ✅ CORREÇÃO: Buscar categoria ou usar "Outros" (ID 11)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L284: `    let categoryId = 11; // Fallback para "Outros"`
+  - Declara vari�vel com valor que pode ser alterado.
+- L285: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L286: `      const category = this.getCategoryByName('Emergência');`
+  - Declara uma constante usada na l�gica.
+- L287: `      if (category && category.id) {`
+  - Verifica condi��o para decidir o fluxo.
+- L288: `        categoryId = category.id;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L289: `      }`
+  - Fecha bloco de execu��o.
+- L290: `    } catch (e) {`
+  - Abre bloco de execu��o.
+- L291: `      console.log('⚠️ Categoria Emergência não encontrada, usando Outros');`
+  - Registra informa��o de execu��o no log.
+- L292: `    }`
+  - Fecha bloco de execu��o.
+- L293: `    `
+  - Linha em branco para organizar blocos.
+- L294: `    this.createTransaction({`
+  - Abre bloco de execu��o.
+- L295: `      userId: userId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L296: `      amount: amount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L297: `      description: description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L298: `      categoryId: categoryId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L299: `      transactionType: 'emergency_withdrawal',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L300: `      chatId: user.whatsapp_id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L301: `      messageId: null`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L302: `    });`
+  - Fecha bloco de execu��o.
+- L303: `    `
+  - Linha em branco para organizar blocos.
+- L304: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L305: `    return true;`
+  - Retorna valor da fun��o/m�todo.
+- L306: `  }`
+  - Fecha bloco de execu��o.
+- L307: ``
+  - Linha em branco para organizar blocos.
+- L308: `  // ============ CATEGORIAS ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L309: `  `
+  - Linha em branco para organizar blocos.
+- L310: `  getCategories() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L311: `    const result = this.db.exec('SELECT * FROM categories ORDER BY name');`
+  - Declara uma constante usada na l�gica.
+- L312: `    return result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Retorna valor da fun��o/m�todo.
+- L313: `  }`
+  - Fecha bloco de execu��o.
+- L314: ``
+  - Linha em branco para organizar blocos.
+- L315: `  getCategoryById(id) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L316: `    const result = this.db.exec('SELECT * FROM categories WHERE id = ?', [id]);`
+  - Declara uma constante usada na l�gica.
+- L317: `    return result[0] ? this.rowToObject(result[0]) : null;`
+  - Retorna valor da fun��o/m�todo.
+- L318: `  }`
+  - Fecha bloco de execu��o.
+- L319: ``
+  - Linha em branco para organizar blocos.
+- L320: `  getCategoryByName(name) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L321: `    const result = this.db.exec('SELECT * FROM categories WHERE name = ?', [name]);`
+  - Declara uma constante usada na l�gica.
+- L322: `    return result[0] ? this.rowToObject(result[0]) : null;`
+  - Retorna valor da fun��o/m�todo.
+- L323: `  }`
+  - Fecha bloco de execu��o.
+- L324: ``
+  - Linha em branco para organizar blocos.
+- L325: `  identifyCategory(text) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L326: `    const categories = this.getCategories();`
+  - Declara uma constante usada na l�gica.
+- L327: `    const textLower = text.toLowerCase().trim();`
+  - Declara uma constante usada na l�gica.
+- L328: `    `
+  - Linha em branco para organizar blocos.
+- L329: `    const matches = [];`
+  - Declara uma constante usada na l�gica.
+- L330: `    `
+  - Linha em branco para organizar blocos.
+- L331: `    for (const category of categories) {`
+  - Inicia la�o de repeti��o.
+- L332: `      if (category.name === 'Outros' || category.name === 'Poupança' || category.name === 'Emergência') {`
+  - Verifica condi��o para decidir o fluxo.
+- L333: `        continue;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L334: `      }`
+  - Fecha bloco de execu��o.
+- L335: `      `
+  - Linha em branco para organizar blocos.
+- L336: `      const keywords = category.keywords.split(',');`
+  - Declara uma constante usada na l�gica.
+- L337: `      let score = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L338: `      let matchedKeyword = '';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L339: `      `
+  - Linha em branco para organizar blocos.
+- L340: `      for (const keyword of keywords) {`
+  - Inicia la�o de repeti��o.
+- L341: `        const cleanKeyword = keyword.trim().toLowerCase();`
+  - Declara uma constante usada na l�gica.
+- L342: `        `
+  - Linha em branco para organizar blocos.
+- L343: `        if (textLower === cleanKeyword) {`
+  - Verifica condi��o para decidir o fluxo.
+- L344: `          score += 100;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L345: `          matchedKeyword = cleanKeyword;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L346: `          break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L347: `        }`
+  - Fecha bloco de execu��o.
+- L348: `        `
+  - Linha em branco para organizar blocos.
+- L349: `        const wordBoundaryRegex = new RegExp('\\b' + cleanKeyword + '\\b', 'i');`
+  - Declara uma constante usada na l�gica.
+- L350: `        if (wordBoundaryRegex.test(textLower)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L351: `          score += 50;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L352: `          matchedKeyword = cleanKeyword;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L353: `        }`
+  - Fecha bloco de execu��o.
+- L354: `        else if (textLower.includes(cleanKeyword)) {`
+  - Verifica condi��o alternativa no fluxo.
+- L355: `          score += 10;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L356: `          matchedKeyword = cleanKeyword;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L357: `        }`
+  - Fecha bloco de execu��o.
+- L358: `      }`
+  - Fecha bloco de execu��o.
+- L359: `      `
+  - Linha em branco para organizar blocos.
+- L360: `      if (score > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L361: `        matches.push({ category, score, matchedKeyword });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L362: `      }`
+  - Fecha bloco de execu��o.
+- L363: `    }`
+  - Fecha bloco de execu��o.
+- L364: `    `
+  - Linha em branco para organizar blocos.
+- L365: `    if (matches.length > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L366: `      matches.sort((a, b) => b.score - a.score);`
+  - Define fun��o an�nima/arrow function.
+- L367: `      return matches[0].category.id;`
+  - Retorna valor da fun��o/m�todo.
+- L368: `    }`
+  - Fecha bloco de execu��o.
+- L369: `    `
+  - Linha em branco para organizar blocos.
+- L370: `    const othersCategory = categories.find(c => c.name === 'Outros');`
+  - Declara uma constante usada na l�gica.
+- L371: `    return othersCategory ? othersCategory.id : categories[categories.length - 1].id;`
+  - Retorna valor da fun��o/m�todo.
+- L372: `  }`
+  - Fecha bloco de execu��o.
+- L373: ``
+  - Linha em branco para organizar blocos.
+- L374: `  // ============ TRANSAÇÕES ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L375: `  `
+  - Linha em branco para organizar blocos.
+- L376: `  createTransaction(transaction) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L377: `    const { userId, amount, description, categoryId, transactionType, chatId, messageId } = transaction;`
+  - Declara uma constante usada na l�gica.
+- L378: `    const type = transactionType || 'expense';`
+  - Declara uma constante usada na l�gica.
+- L379: `    `
+  - Linha em branco para organizar blocos.
+- L380: `    if (!this.hasTransactionType) {`
+  - Verifica condi��o para decidir o fluxo.
+- L381: `      this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L382: `        'INSERT INTO expenses (user_id, amount, description, category_id, chat_id, message_id) VALUES (?, ?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L383: `        [userId, amount, description, categoryId, chatId, messageId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L384: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L385: `    } else {`
+  - Abre bloco de execu��o.
+- L386: `      this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L387: `        'INSERT INTO expenses (user_id, amount, description, category_id, transaction_type, chat_id, message_id) VALUES (?, ?, ?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L388: `        [userId, amount, description, categoryId, type, chatId, messageId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L389: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L390: `    }`
+  - Fecha bloco de execu��o.
+- L391: `    `
+  - Linha em branco para organizar blocos.
+- L392: `    const expenseResult = this.db.exec('SELECT * FROM expenses WHERE rowid = last_insert_rowid()');`
+  - Declara uma constante usada na l�gica.
+- L393: `    const savedExpense = expenseResult[0] ? this.rowToObject(expenseResult[0]) : null;`
+  - Declara uma constante usada na l�gica.
+- L394: `    `
+  - Linha em branco para organizar blocos.
+- L395: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L396: `    return savedExpense;`
+  - Retorna valor da fun��o/m�todo.
+- L397: `  }`
+  - Fecha bloco de execu��o.
+- L398: ``
+  - Linha em branco para organizar blocos.
+- L399: `  createExpense(expense) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L400: `    const { userId, amount, description, categoryId, chatId, messageId } = expense;`
+  - Declara uma constante usada na l�gica.
+- L401: `    `
+  - Linha em branco para organizar blocos.
+- L402: `    if (!this.hasTransactionType) {`
+  - Verifica condi��o para decidir o fluxo.
+- L403: `      this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L404: `        'INSERT INTO expenses (user_id, amount, description, category_id, chat_id, message_id) VALUES (?, ?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L405: `        [userId, amount, description, categoryId, chatId, messageId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L406: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L407: `    } else {`
+  - Abre bloco de execu��o.
+- L408: `      this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L409: `        'INSERT INTO expenses (user_id, amount, description, category_id, transaction_type, chat_id, message_id) VALUES (?, ?, ?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L410: `        [userId, amount, description, categoryId, 'expense', chatId, messageId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L411: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L412: `    }`
+  - Fecha bloco de execu��o.
+- L413: `    `
+  - Linha em branco para organizar blocos.
+- L414: `    const expenseResult = this.db.exec('SELECT * FROM expenses WHERE rowid = last_insert_rowid()');`
+  - Declara uma constante usada na l�gica.
+- L415: `    const savedExpense = expenseResult[0] ? this.rowToObject(expenseResult[0]) : null;`
+  - Declara uma constante usada na l�gica.
+- L416: `    `
+  - Linha em branco para organizar blocos.
+- L417: `    const userResult = this.db.exec('SELECT current_balance FROM users WHERE id = ?', [userId]);`
+  - Declara uma constante usada na l�gica.
+- L418: `    if (userResult[0]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L419: `      const user = this.rowToObject(userResult[0]);`
+  - Declara uma constante usada na l�gica.
+- L420: `      const newBalance = parseFloat((user.current_balance - amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L421: `      this.updateBalance(userId, newBalance);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L422: `    }`
+  - Fecha bloco de execu��o.
+- L423: `    `
+  - Linha em branco para organizar blocos.
+- L424: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L425: `    return savedExpense;`
+  - Retorna valor da fun��o/m�todo.
+- L426: `  }`
+  - Fecha bloco de execu��o.
+- L427: ``
+  - Linha em branco para organizar blocos.
+- L428: `  getExpensesByUser(userId, filters = {}) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L429: `    let query = \``
+  - Declara vari�vel com valor que pode ser alterado.
+- L430: `      SELECT `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L431: `        e.*,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L432: `        c.name as category_name,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L433: `        c.emoji as category_emoji`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L434: `      FROM expenses e`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L435: `      JOIN categories c ON e.category_id = c.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L436: `      WHERE e.user_id = ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L437: `    \`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L438: `    `
+  - Linha em branco para organizar blocos.
+- L439: `    const params = [userId];`
+  - Declara uma constante usada na l�gica.
+- L440: `    `
+  - Linha em branco para organizar blocos.
+- L441: `    if (filters.startDate) {`
+  - Verifica condi��o para decidir o fluxo.
+- L442: `      query += ' AND e.date >= ?';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L443: `      params.push(filters.startDate);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L444: `    }`
+  - Fecha bloco de execu��o.
+- L445: `    `
+  - Linha em branco para organizar blocos.
+- L446: `    if (filters.endDate) {`
+  - Verifica condi��o para decidir o fluxo.
+- L447: `      query += ' AND e.date <= ?';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L448: `      params.push(filters.endDate);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L449: `    }`
+  - Fecha bloco de execu��o.
+- L450: `    `
+  - Linha em branco para organizar blocos.
+- L451: `    if (filters.categoryId) {`
+  - Verifica condi��o para decidir o fluxo.
+- L452: `      query += ' AND e.category_id = ?';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L453: `      params.push(filters.categoryId);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L454: `    }`
+  - Fecha bloco de execu��o.
+- L455: `    `
+  - Linha em branco para organizar blocos.
+- L456: `    if (filters.transactionType && this.hasTransactionType) {`
+  - Verifica condi��o para decidir o fluxo.
+- L457: `      query += ' AND e.transaction_type = ?';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L458: `      params.push(filters.transactionType);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L459: `    }`
+  - Fecha bloco de execu��o.
+- L460: `    `
+  - Linha em branco para organizar blocos.
+- L461: `    query += ' ORDER BY e.date DESC';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L462: `    `
+  - Linha em branco para organizar blocos.
+- L463: `    const result = this.db.exec(query, params);`
+  - Declara uma constante usada na l�gica.
+- L464: `    return result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Retorna valor da fun��o/m�todo.
+- L465: `  }`
+  - Fecha bloco de execu��o.
+- L466: ``
+  - Linha em branco para organizar blocos.
+- L467: `  getExpensesByCategory(userId, startDate, endDate) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L468: `    let query = \``
+  - Declara vari�vel com valor que pode ser alterado.
+- L469: `      SELECT `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L470: `        c.name as category,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L471: `        c.emoji,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L472: `        COUNT(e.id) as count,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L473: `        SUM(e.amount) as total`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L474: `      FROM expenses e`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L475: `      JOIN categories c ON e.category_id = c.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L476: `      WHERE e.user_id = ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L477: `        AND e.date >= ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L478: `        AND e.date <= ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L479: `    \`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L480: `    `
+  - Linha em branco para organizar blocos.
+- L481: `    if (this.hasTransactionType) {`
+  - Verifica condi��o para decidir o fluxo.
+- L482: `      query += " AND e.transaction_type = 'expense'";`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L483: `    }`
+  - Fecha bloco de execu��o.
+- L484: `    `
+  - Linha em branco para organizar blocos.
+- L485: `    query += \``
+  - Executa uma instru��o da l�gica de neg�cio.
+- L486: `      GROUP BY c.id, c.name, c.emoji`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L487: `      ORDER BY total DESC`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L488: `    \`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L489: `    `
+  - Linha em branco para organizar blocos.
+- L490: `    const result = this.db.exec(query, [userId, startDate, endDate]);`
+  - Declara uma constante usada na l�gica.
+- L491: `    return result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Retorna valor da fun��o/m�todo.
+- L492: `  }`
+  - Fecha bloco de execu��o.
+- L493: ``
+  - Linha em branco para organizar blocos.
+- L494: `  getUserStats(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L495: `    let query = \``
+  - Declara vari�vel com valor que pode ser alterado.
+- L496: `      SELECT `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L497: `        COUNT(*) as total_expenses,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L498: `        SUM(amount) as total_spent,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L499: `        AVG(amount) as avg_expense,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L500: `        MAX(amount) as max_expense,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L501: `        MIN(amount) as min_expense`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L502: `      FROM expenses`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L503: `      WHERE user_id = ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L504: `    \`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L505: `    `
+  - Linha em branco para organizar blocos.
+- L506: `    if (this.hasTransactionType) {`
+  - Verifica condi��o para decidir o fluxo.
+- L507: `      query += " AND transaction_type = 'expense'";`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L508: `    }`
+  - Fecha bloco de execu��o.
+- L509: `    `
+  - Linha em branco para organizar blocos.
+- L510: `    const result = this.db.exec(query, [userId]);`
+  - Declara uma constante usada na l�gica.
+- L511: `    return result[0] ? this.rowToObject(result[0]) : { `
+  - Retorna valor da fun��o/m�todo.
+- L512: `      total_expenses: 0, `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L513: `      total_spent: 0, `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L514: `      avg_expense: 0, `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L515: `      max_expense: 0, `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L516: `      min_expense: 0 `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L517: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L518: `  }`
+  - Fecha bloco de execu��o.
+- L519: ``
+  - Linha em branco para organizar blocos.
+- L520: `  // ============ 🆕 PARCELAMENTOS ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L521: `  `
+  - Linha em branco para organizar blocos.
+- L522: `  createInstallment(data) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L523: `    const { userId, description, totalAmount, installmentAmount, totalInstallments, categoryId, chatId, firstDueDate } = data;`
+  - Declara uma constante usada na l�gica.
+- L524: `    `
+  - Linha em branco para organizar blocos.
+- L525: `    // Criar registro principal de parcelamento`
+  - Coment�rio explicativo j� existente no c�digo.
+- L526: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L527: `      'INSERT INTO installments (user_id, description, total_amount, installment_amount, total_installments, category_id, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L528: `      [userId, description, totalAmount, installmentAmount, totalInstallments, categoryId, chatId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L529: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L530: `    `
+  - Linha em branco para organizar blocos.
+- L531: `    const result = this.db.exec('SELECT * FROM installments WHERE rowid = last_insert_rowid()');`
+  - Declara uma constante usada na l�gica.
+- L532: `    const installment = result[0] ? this.rowToObject(result[0]) : null;`
+  - Declara uma constante usada na l�gica.
+- L533: `    `
+  - Linha em branco para organizar blocos.
+- L534: `    if (installment) {`
+  - Verifica condi��o para decidir o fluxo.
+- L535: `      // 🆕 Calcular datas de vencimento`
+  - Coment�rio explicativo j� existente no c�digo.
+- L536: `      const dueDate = firstDueDate ? new Date(firstDueDate) : new Date();`
+  - Declara uma constante usada na l�gica.
+- L537: `      `
+  - Linha em branco para organizar blocos.
+- L538: `      // Criar todas as parcelas com data de vencimento`
+  - Coment�rio explicativo j� existente no c�digo.
+- L539: `      for (let i = 1; i <= totalInstallments; i++) {`
+  - Inicia la�o de repeti��o.
+- L540: `        const currentDueDate = new Date(dueDate);`
+  - Declara uma constante usada na l�gica.
+- L541: `        currentDueDate.setMonth(currentDueDate.getMonth() + (i - 1));`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L542: `        `
+  - Linha em branco para organizar blocos.
+- L543: `        this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L544: `          'INSERT INTO installment_payments (installment_id, installment_number, amount, status, due_date) VALUES (?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L545: `          [installment.id, i, installmentAmount, 'pending', currentDueDate.toISOString()]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L546: `        );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L547: `      }`
+  - Fecha bloco de execu��o.
+- L548: `    }`
+  - Fecha bloco de execu��o.
+- L549: `    `
+  - Linha em branco para organizar blocos.
+- L550: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L551: `    return installment;`
+  - Retorna valor da fun��o/m�todo.
+- L552: `  }`
+  - Fecha bloco de execu��o.
+- L553: ``
+  - Linha em branco para organizar blocos.
+- L554: `  getInstallmentsByUser(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L555: `    const query = \``
+  - Declara uma constante usada na l�gica.
+- L556: `      SELECT `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L557: `        i.*,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L558: `        c.name as category_name,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L559: `        c.emoji as category_emoji,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L560: `        (SELECT COUNT(*) FROM installment_payments WHERE installment_id = i.id AND status = 'paid') as paid_count,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L561: `        (SELECT COUNT(*) FROM installment_payments WHERE installment_id = i.id AND status = 'pending') as pending_count`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L562: `      FROM installments i`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L563: `      JOIN categories c ON i.category_id = c.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L564: `      WHERE i.user_id = ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L565: `      ORDER BY i.created_at DESC`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L566: `    \`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L567: `    `
+  - Linha em branco para organizar blocos.
+- L568: `    const result = this.db.exec(query, [userId]);`
+  - Declara uma constante usada na l�gica.
+- L569: `    return result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Retorna valor da fun��o/m�todo.
+- L570: `  }`
+  - Fecha bloco de execu��o.
+- L571: ``
+  - Linha em branco para organizar blocos.
+- L572: `  getInstallmentById(installmentId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L573: `    const query = \``
+  - Declara uma constante usada na l�gica.
+- L574: `      SELECT `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L575: `        i.*,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L576: `        c.name as category_name,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L577: `        c.emoji as category_emoji`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L578: `      FROM installments i`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L579: `      JOIN categories c ON i.category_id = c.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L580: `      WHERE i.id = ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L581: `    \`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L582: `    `
+  - Linha em branco para organizar blocos.
+- L583: `    const result = this.db.exec(query, [installmentId]);`
+  - Declara uma constante usada na l�gica.
+- L584: `    return result[0] ? this.rowToObject(result[0]) : null;`
+  - Retorna valor da fun��o/m�todo.
+- L585: `  }`
+  - Fecha bloco de execu��o.
+- L586: ``
+  - Linha em branco para organizar blocos.
+- L587: `  getInstallmentPayments(installmentId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L588: `    const result = this.db.exec(`
+  - Declara uma constante usada na l�gica.
+- L589: `      'SELECT * FROM installment_payments WHERE installment_id = ? ORDER BY installment_number',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L590: `      [installmentId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L591: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L592: `    return result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Retorna valor da fun��o/m�todo.
+- L593: `  }`
+  - Fecha bloco de execu��o.
+- L594: ``
+  - Linha em branco para organizar blocos.
+- L595: `  getNextPendingPayment(installmentId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L596: `    const result = this.db.exec(`
+  - Declara uma constante usada na l�gica.
+- L597: `      'SELECT * FROM installment_payments WHERE installment_id = ? AND status = ? ORDER BY installment_number LIMIT 1',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L598: `      [installmentId, 'pending']`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L599: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L600: `    return result[0] ? this.rowToObject(result[0]) : null;`
+  - Retorna valor da fun��o/m�todo.
+- L601: `  }`
+  - Fecha bloco de execu��o.
+- L602: ``
+  - Linha em branco para organizar blocos.
+- L603: `  payInstallment(paymentId, userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L604: `  const payment = this.db.exec('SELECT * FROM installment_payments WHERE id = ?', [paymentId]);`
+  - Declara uma constante usada na l�gica.
+- L605: `  if (!payment[0]) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L606: `  `
+  - Linha em branco para organizar blocos.
+- L607: `  const paymentData = this.rowToObject(payment[0]);`
+  - Declara uma constante usada na l�gica.
+- L608: `  const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L609: `  `
+  - Linha em branco para organizar blocos.
+- L610: `  if (!user || user.current_balance < paymentData.amount) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L611: `  `
+  - Linha em branco para organizar blocos.
+- L612: `  // Marcar como paga`
+  - Coment�rio explicativo j� existente no c�digo.
+- L613: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L614: `    'UPDATE installment_payments SET status = ?, paid_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L615: `    ['paid', paymentId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L616: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L617: `  `
+  - Linha em branco para organizar blocos.
+- L618: `  // Descontar do saldo`
+  - Coment�rio explicativo j� existente no c�digo.
+- L619: `  const newBalance = parseFloat((user.current_balance - paymentData.amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L620: `  this.updateBalance(userId, newBalance);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L621: `  `
+  - Linha em branco para organizar blocos.
+- L622: `  // 🆕 SE FOR COMPRA NO CARTÃO, LIBERAR LIMITE`
+  - Coment�rio explicativo j� existente no c�digo.
+- L623: `  this.releaseCardLimitOnPayment(userId, paymentData.installment_id, paymentData.amount);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L624: `  `
+  - Linha em branco para organizar blocos.
+- L625: `  // Registrar como despesa`
+  - Coment�rio explicativo j� existente no c�digo.
+- L626: `  const installment = this.db.exec('SELECT * FROM installments WHERE id = ?', [paymentData.installment_id]);`
+  - Declara uma constante usada na l�gica.
+- L627: `  if (installment[0]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L628: `    const inst = this.rowToObject(installment[0]);`
+  - Declara uma constante usada na l�gica.
+- L629: `    const description = inst.description + ' (parcela ' + paymentData.installment_number + '/' + inst.total_installments + ')';`
+  - Declara uma constante usada na l�gica.
+- L630: `    `
+  - Linha em branco para organizar blocos.
+- L631: `    this.createTransaction({`
+  - Abre bloco de execu��o.
+- L632: `      userId: userId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L633: `      amount: paymentData.amount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L634: `      description: description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L635: `      categoryId: inst.category_id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L636: `      transactionType: 'expense',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L637: `      chatId: inst.chat_id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L638: `      messageId: null`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L639: `    });`
+  - Fecha bloco de execu��o.
+- L640: `  }`
+  - Fecha bloco de execu��o.
+- L641: `  `
+  - Linha em branco para organizar blocos.
+- L642: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L643: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L644: `}`
+  - Fecha bloco de execu��o.
+- L645: ``
+  - Linha em branco para organizar blocos.
+- L646: `  findInstallmentByDescription(userId, partialDescription) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L647: `    const installments = this.getInstallmentsByUser(userId);`
+  - Declara uma constante usada na l�gica.
+- L648: `    const searchLower = partialDescription.toLowerCase().trim();`
+  - Declara uma constante usada na l�gica.
+- L649: `    `
+  - Linha em branco para organizar blocos.
+- L650: `    for (const inst of installments) {`
+  - Inicia la�o de repeti��o.
+- L651: `      if (inst.description.toLowerCase().includes(searchLower)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L652: `        return inst;`
+  - Retorna valor da fun��o/m�todo.
+- L653: `      }`
+  - Fecha bloco de execu��o.
+- L654: `    }`
+  - Fecha bloco de execu��o.
+- L655: `    `
+  - Linha em branco para organizar blocos.
+- L656: `    return null;`
+  - Retorna valor da fun��o/m�todo.
+- L657: `  }`
+  - Fecha bloco de execu��o.
+- L658: ``
+  - Linha em branco para organizar blocos.
+- L659: `  // ============ GRUPOS ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L660: `  `
+  - Linha em branco para organizar blocos.
+- L661: `  upsertGroup(chatId, name) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L662: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L663: `      'INSERT INTO groups (chat_id, name) VALUES (?, ?) ON CONFLICT(chat_id) DO UPDATE SET name = excluded.name, active = 1',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L664: `      [chatId, name]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L665: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L666: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L667: `  }`
+  - Fecha bloco de execu��o.
+- L668: ``
+  - Linha em branco para organizar blocos.
+- L669: `  // ============ AVISO DE SALDO BAIXO ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L670: `  `
+  - Linha em branco para organizar blocos.
+- L671: `  setLowBalanceWarned(userId, warned) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L672: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L673: `      this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L674: `        'UPDATE users SET low_balance_warned = ? WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L675: `        [warned ? 1 : 0, userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L676: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L677: `      this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L678: `    } catch (e) {`
+  - Abre bloco de execu��o.
+- L679: `      // Coluna não existe ainda`
+  - Coment�rio explicativo j� existente no c�digo.
+- L680: `    }`
+  - Fecha bloco de execu��o.
+- L681: `  }`
+  - Fecha bloco de execu��o.
+- L682: ``
+  - Linha em branco para organizar blocos.
+- L683: `  // ============ UTILITÁRIOS ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L684: `  `
+  - Linha em branco para organizar blocos.
+- L685: `  rowToObject(result) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L686: `    const obj = {};`
+  - Declara uma constante usada na l�gica.
+- L687: `    for (let i = 0; i < result.columns.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L688: `      obj[result.columns[i]] = result.values[0][i];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L689: `    }`
+  - Fecha bloco de execu��o.
+- L690: `    return obj;`
+  - Retorna valor da fun��o/m�todo.
+- L691: `  }`
+  - Fecha bloco de execu��o.
+- L692: ``
+  - Linha em branco para organizar blocos.
+- L693: `  rowsToObjects(result) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L694: `    const objects = [];`
+  - Declara uma constante usada na l�gica.
+- L695: `    for (let i = 0; i < result.values.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L696: `      const obj = {};`
+  - Declara uma constante usada na l�gica.
+- L697: `      for (let j = 0; j < result.columns.length; j++) {`
+  - Inicia la�o de repeti��o.
+- L698: `        obj[result.columns[j]] = result.values[i][j];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L699: `      }`
+  - Fecha bloco de execu��o.
+- L700: `      objects.push(obj);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L701: `    }`
+  - Fecha bloco de execu��o.
+- L702: `    return objects;`
+  - Retorna valor da fun��o/m�todo.
+- L703: `  }`
+  - Fecha bloco de execu��o.
+- L704: ``
+  - Linha em branco para organizar blocos.
+- L705: `  // ============ 🆕 LEMBRETES E VENCIMENTOS ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L706: ``
+  - Linha em branco para organizar blocos.
+- L707: `  getDueTodayPayments() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L708: `    const today = new Date();`
+  - Declara uma constante usada na l�gica.
+- L709: `    today.setHours(0, 0, 0, 0);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L710: `    const tomorrow = new Date(today);`
+  - Declara uma constante usada na l�gica.
+- L711: `    tomorrow.setDate(tomorrow.getDate() + 1);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L712: `    `
+  - Linha em branco para organizar blocos.
+- L713: `    const query = \``
+  - Declara uma constante usada na l�gica.
+- L714: `      SELECT `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L715: `        ip.*,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L716: `        i.description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L717: `        i.user_id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L718: `        i.chat_id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L719: `        i.total_installments,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L720: `        c.emoji`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L721: `      FROM installment_payments ip`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L722: `      JOIN installments i ON ip.installment_id = i.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L723: `      JOIN categories c ON i.category_id = c.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L724: `      WHERE ip.status = 'pending'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L725: `        AND ip.due_date >= ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L726: `        AND ip.due_date < ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L727: `        AND (ip.reminded_at IS NULL OR date(ip.reminded_at) < date(?))`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L728: `      ORDER BY ip.due_date`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L729: `    \`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L730: `    `
+  - Linha em branco para organizar blocos.
+- L731: `    const result = this.db.exec(query, [today.toISOString(), tomorrow.toISOString(), today.toISOString()]);`
+  - Declara uma constante usada na l�gica.
+- L732: `    return result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Retorna valor da fun��o/m�todo.
+- L733: `  }`
+  - Fecha bloco de execu��o.
+- L734: ``
+  - Linha em branco para organizar blocos.
+- L735: `  getOverduePayments() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L736: `    const today = new Date();`
+  - Declara uma constante usada na l�gica.
+- L737: `    today.setHours(0, 0, 0, 0);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L738: `    `
+  - Linha em branco para organizar blocos.
+- L739: `    const query = \``
+  - Declara uma constante usada na l�gica.
+- L740: `      SELECT `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L741: `        ip.*,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L742: `        i.description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L743: `        i.user_id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L744: `        i.chat_id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L745: `        i.total_installments,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L746: `        c.emoji`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L747: `      FROM installment_payments ip`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L748: `      JOIN installments i ON ip.installment_id = i.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L749: `      JOIN categories c ON i.category_id = c.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L750: `      WHERE ip.status = 'pending'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L751: `        AND ip.due_date < ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L752: `      ORDER BY ip.due_date`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L753: `    \`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L754: `    `
+  - Linha em branco para organizar blocos.
+- L755: `    const result = this.db.exec(query, [today.toISOString()]);`
+  - Declara uma constante usada na l�gica.
+- L756: `    return result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Retorna valor da fun��o/m�todo.
+- L757: `  }`
+  - Fecha bloco de execu��o.
+- L758: ``
+  - Linha em branco para organizar blocos.
+- L759: `  getPendingPaymentsByUser(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L760: `    const query = \``
+  - Declara uma constante usada na l�gica.
+- L761: `      SELECT `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L762: `        ip.*,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L763: `        i.description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L764: `        i.total_installments,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L765: `        c.emoji`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L766: `      FROM installment_payments ip`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L767: `      JOIN installments i ON ip.installment_id = i.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L768: `      JOIN categories c ON i.category_id = c.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L769: `      WHERE i.user_id = ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L770: `        AND ip.status = 'pending'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L771: `      ORDER BY ip.due_date`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L772: `    \`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L773: `    `
+  - Linha em branco para organizar blocos.
+- L774: `    const result = this.db.exec(query, [userId]);`
+  - Declara uma constante usada na l�gica.
+- L775: `    return result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Retorna valor da fun��o/m�todo.
+- L776: `  }`
+  - Fecha bloco de execu��o.
+- L777: ``
+  - Linha em branco para organizar blocos.
+- L778: `  markAsReminded(paymentId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L779: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L780: `      'UPDATE installment_payments SET reminded_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L781: `      [paymentId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L782: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L783: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L784: `  }`
+  - Fecha bloco de execu��o.
+- L785: ``
+  - Linha em branco para organizar blocos.
+- L786: `  updateDueDate(paymentId, newDueDate) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L787: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L788: `      'UPDATE installment_payments SET due_date = ? WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L789: `      [newDueDate.toISOString(), paymentId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L790: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L791: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L792: `  }`
+  - Fecha bloco de execu��o.
+- L793: ``
+  - Linha em branco para organizar blocos.
+- L794: ` // ============ 🆕 FUNÇÕES DE ZERAGEM ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L795: ``
+  - Linha em branco para organizar blocos.
+- L796: `resetBalance(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L797: `  const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L798: `  if (!user) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L799: `  `
+  - Linha em branco para organizar blocos.
+- L800: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L801: `    'UPDATE users SET current_balance = 0, initial_balance = 0, low_balance_warned = 0 WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L802: `    [userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L803: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L804: `  this.save(); // ✅ SALVAR IMEDIATAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L805: `  `
+  - Linha em branco para organizar blocos.
+- L806: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L807: `    'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L808: `    [userId, 0, 'Saldo zerado', 1, new Date().toISOString(), 'reset', user.whatsapp_id]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L809: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L810: `  this.save(); // ✅ SALVAR NOVAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L811: `  `
+  - Linha em branco para organizar blocos.
+- L812: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L813: `}`
+  - Fecha bloco de execu��o.
+- L814: ``
+  - Linha em branco para organizar blocos.
+- L815: `resetSavings(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L816: `  const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L817: `  if (!user || user.savings_balance === 0) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L818: `  `
+  - Linha em branco para organizar blocos.
+- L819: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L820: `    'UPDATE users SET savings_balance = 0 WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L821: `    [userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L822: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L823: `  this.save(); // ✅ SALVAR IMEDIATAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L824: `  `
+  - Linha em branco para organizar blocos.
+- L825: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L826: `    'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L827: `    [userId, 0, 'Poupança zerada', 1, new Date().toISOString(), 'reset', user.whatsapp_id]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L828: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L829: `  this.save(); // ✅ SALVAR NOVAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L830: `  `
+  - Linha em branco para organizar blocos.
+- L831: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L832: `}`
+  - Fecha bloco de execu��o.
+- L833: ``
+  - Linha em branco para organizar blocos.
+- L834: `resetEmergencyFund(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L835: `  const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L836: `  if (!user || user.emergency_fund === 0) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L837: `  `
+  - Linha em branco para organizar blocos.
+- L838: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L839: `    'UPDATE users SET emergency_fund = 0 WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L840: `    [userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L841: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L842: `  this.save(); // ✅ SALVAR IMEDIATAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L843: `  `
+  - Linha em branco para organizar blocos.
+- L844: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L845: `    'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L846: `    [userId, 0, 'Reserva de emergência zerada', 1, new Date().toISOString(), 'reset', user.whatsapp_id]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L847: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L848: `  this.save(); // ✅ SALVAR NOVAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L849: `  `
+  - Linha em branco para organizar blocos.
+- L850: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L851: `}`
+  - Fecha bloco de execu��o.
+- L852: ``
+  - Linha em branco para organizar blocos.
+- L853: `resetInstallments(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L854: `  const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L855: `  if (!user) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L856: `  `
+  - Linha em branco para organizar blocos.
+- L857: `  // Buscar todos os parcelamentos do usuário`
+  - Coment�rio explicativo j� existente no c�digo.
+- L858: `  const installments = this.getInstallmentsByUser(userId);`
+  - Declara uma constante usada na l�gica.
+- L859: `  if (installments.length === 0) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L860: `  `
+  - Linha em branco para organizar blocos.
+- L861: `  // Deletar todos os pagamentos`
+  - Coment�rio explicativo j� existente no c�digo.
+- L862: `  this.db.run('DELETE FROM installment_payments WHERE installment_id IN (SELECT id FROM installments WHERE user_id = ?)', [userId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L863: `  this.save(); // ✅ SALVAR IMEDIATAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L864: `  `
+  - Linha em branco para organizar blocos.
+- L865: `  // Deletar todos os parcelamentos`
+  - Coment�rio explicativo j� existente no c�digo.
+- L866: `  this.db.run('DELETE FROM installments WHERE user_id = ?', [userId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L867: `  this.save(); // ✅ SALVAR IMEDIATAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L868: `  `
+  - Linha em branco para organizar blocos.
+- L869: `  // Registrar histórico (COM chat_id!)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L870: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L871: `    'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L872: `    [userId, 0, 'Parcelamentos zerados', 1, new Date().toISOString(), 'reset', user.whatsapp_id]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L873: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L874: `  this.save(); // ✅ SALVAR NOVAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L875: `  `
+  - Linha em branco para organizar blocos.
+- L876: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L877: `}`
+  - Fecha bloco de execu��o.
+- L878: ``
+  - Linha em branco para organizar blocos.
+- L879: `resetEverything(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L880: `  const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L881: `  if (!user) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L882: `  `
+  - Linha em branco para organizar blocos.
+- L883: `  // Zerar tudo`
+  - Coment�rio explicativo j� existente no c�digo.
+- L884: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L885: `    'UPDATE users SET current_balance = 0, initial_balance = 0, savings_balance = 0, emergency_fund = 0, low_balance_warned = 0 WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L886: `    [userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L887: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L888: `  this.save(); // ✅ SALVAR IMEDIATAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L889: `  `
+  - Linha em branco para organizar blocos.
+- L890: `  // Deletar parcelas`
+  - Coment�rio explicativo j� existente no c�digo.
+- L891: `  this.db.run('DELETE FROM installment_payments WHERE installment_id IN (SELECT id FROM installments WHERE user_id = ?)', [userId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L892: `  this.save(); // ✅ SALVAR IMEDIATAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L893: `  `
+  - Linha em branco para organizar blocos.
+- L894: `  this.db.run('DELETE FROM installments WHERE user_id = ?', [userId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L895: `  this.save(); // ✅ SALVAR IMEDIATAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L896: `  `
+  - Linha em branco para organizar blocos.
+- L897: `  // Deletar transações de cartão e cartões`
+  - Coment�rio explicativo j� existente no c�digo.
+- L898: `  this.db.run('DELETE FROM card_transactions WHERE user_id = ?', [userId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L899: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L900: ``
+  - Linha em branco para organizar blocos.
+- L901: `  this.db.run('DELETE FROM user_cards WHERE user_id = ?', [userId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L902: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L903: ``
+  - Linha em branco para organizar blocos.
+- L904: `  // Deletar gastos`
+  - Coment�rio explicativo j� existente no c�digo.
+- L905: `  this.db.run('DELETE FROM expenses WHERE user_id = ?', [userId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L906: `  this.save(); // ✅ SALVAR IMEDIATAMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L907: `  `
+  - Linha em branco para organizar blocos.
+- L908: `  // Registrar histórico da zeragem completa (COM chat_id!)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L909: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L910: `    'INSERT INTO expenses (user_id, amount, description, category_id, date, transaction_type, chat_id) VALUES (?, ?, ?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L911: `    [userId, 0, 'Sistema totalmente zerado', 1, new Date().toISOString(), 'reset', user.whatsapp_id]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L912: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L913: `  this.save(); // ✅ SALVAR FINALMENTE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L914: `  `
+  - Linha em branco para organizar blocos.
+- L915: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L916: `}`
+  - Fecha bloco de execu��o.
+- L917: `// ============ 💳 GESTÃO DE CARTÕES DE CRÉDITO (MÚLTIPLOS CARTÕES) ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L918: ``
+  - Linha em branco para organizar blocos.
+- L919: `// Criar novo cartão (com nome e vencimento)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L920: `createCard(userId, cardName, cardLimit, dueDay = 10) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L921: `  try {`
+  - Inicia bloco protegido contra exce��es.
+- L922: `    // Validar nome duplicado`
+  - Coment�rio explicativo j� existente no c�digo.
+- L923: `    const existing = this.getCardByName(userId, cardName);`
+  - Declara uma constante usada na l�gica.
+- L924: `    if (existing) {`
+  - Verifica condi��o para decidir o fluxo.
+- L925: `      return { success: false, message: '❌ Já existe um cartão com esse nome!' };`
+  - Retorna valor da fun��o/m�todo.
+- L926: `    }`
+  - Fecha bloco de execu��o.
+- L927: ``
+  - Linha em branco para organizar blocos.
+- L928: `    // Validar dia de vencimento (1-31)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L929: `    const dueDayNum = parseInt(dueDay) || 10;`
+  - Declara uma constante usada na l�gica.
+- L930: `    if (dueDayNum < 1 || dueDayNum > 31) {`
+  - Verifica condi��o para decidir o fluxo.
+- L931: `      return { success: false, message: '❌ Dia de vencimento deve ser entre 1 e 31' };`
+  - Retorna valor da fun��o/m�todo.
+- L932: `    }`
+  - Fecha bloco de execu��o.
+- L933: ``
+  - Linha em branco para organizar blocos.
+- L934: `    this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L935: `      \`INSERT INTO user_cards (user_id, card_name, card_limit, available_limit, invoice_due_day)`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L936: `       VALUES (?, ?, ?, ?, ?)\`,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L937: `      [userId, cardName, cardLimit, cardLimit, dueDayNum]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L938: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L939: `    `
+  - Linha em branco para organizar blocos.
+- L940: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L941: ``
+  - Linha em branco para organizar blocos.
+- L942: `    return {`
+  - Retorna valor da fun��o/m�todo.
+- L943: `      success: true,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L944: `      cardName: cardName,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L945: `      limit: cardLimit,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L946: `      dueDay: dueDayNum`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L947: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L948: `  } catch (error) {`
+  - Abre bloco de execu��o.
+- L949: `    console.error('Erro ao criar cartão:', error);`
+  - Registra erro no log para diagn�stico.
+- L950: `    return { success: false, message: 'Erro: ' + error.message };`
+  - Retorna valor da fun��o/m�todo.
+- L951: `  }`
+  - Fecha bloco de execu��o.
+- L952: `}`
+  - Fecha bloco de execu��o.
+- L953: ``
+  - Linha em branco para organizar blocos.
+- L954: `// Listar todos os cartões do usuário`
+  - Coment�rio explicativo j� existente no c�digo.
+- L955: `getAllCardsByUserId(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L956: `  const result = this.db.exec('SELECT * FROM user_cards WHERE user_id = ? ORDER BY created_at DESC', [userId]);`
+  - Declara uma constante usada na l�gica.
+- L957: `  return result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Retorna valor da fun��o/m�todo.
+- L958: `}`
+  - Fecha bloco de execu��o.
+- L959: ``
+  - Linha em branco para organizar blocos.
+- L960: `// Buscar cartão por ID`
+  - Coment�rio explicativo j� existente no c�digo.
+- L961: `getCardById(cardId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L962: `  const result = this.db.exec('SELECT * FROM user_cards WHERE id = ?', [cardId]);`
+  - Declara uma constante usada na l�gica.
+- L963: `  return result[0] ? this.rowToObject(result[0]) : null;`
+  - Retorna valor da fun��o/m�todo.
+- L964: `}`
+  - Fecha bloco de execu��o.
+- L965: ``
+  - Linha em branco para organizar blocos.
+- L966: `// Buscar cartão por nome`
+  - Coment�rio explicativo j� existente no c�digo.
+- L967: `getCardByName(userId, cardName) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L968: `  const result = this.db.exec(`
+  - Declara uma constante usada na l�gica.
+- L969: `    'SELECT * FROM user_cards WHERE user_id = ? AND LOWER(card_name) = LOWER(?)', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L970: `    [userId, cardName.trim()]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L971: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L972: `  return result[0] ? this.rowToObject(result[0]) : null;`
+  - Retorna valor da fun��o/m�todo.
+- L973: `}`
+  - Fecha bloco de execu��o.
+- L974: ``
+  - Linha em branco para organizar blocos.
+- L975: `// Buscar cartão por nome parcial (para quando usuário digita parte do nome)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L976: `findCardByPartialName(userId, partialName) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L977: `  const cards = this.getAllCardsByUserId(userId);`
+  - Declara uma constante usada na l�gica.
+- L978: `  const searchLower = partialName.toLowerCase().trim();`
+  - Declara uma constante usada na l�gica.
+- L979: `  `
+  - Linha em branco para organizar blocos.
+- L980: `  // Busca exata primeiro`
+  - Coment�rio explicativo j� existente no c�digo.
+- L981: `  for (const card of cards) {`
+  - Inicia la�o de repeti��o.
+- L982: `    if (card.card_name.toLowerCase() === searchLower) {`
+  - Verifica condi��o para decidir o fluxo.
+- L983: `      return card;`
+  - Retorna valor da fun��o/m�todo.
+- L984: `    }`
+  - Fecha bloco de execu��o.
+- L985: `  }`
+  - Fecha bloco de execu��o.
+- L986: `  `
+  - Linha em branco para organizar blocos.
+- L987: `  // Busca parcial`
+  - Coment�rio explicativo j� existente no c�digo.
+- L988: `  for (const card of cards) {`
+  - Inicia la�o de repeti��o.
+- L989: `    if (card.card_name.toLowerCase().includes(searchLower)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L990: `      return card;`
+  - Retorna valor da fun��o/m�todo.
+- L991: `    }`
+  - Fecha bloco de execu��o.
+- L992: `  }`
+  - Fecha bloco de execu��o.
+- L993: `  `
+  - Linha em branco para organizar blocos.
+- L994: `  return null;`
+  - Retorna valor da fun��o/m�todo.
+- L995: `}`
+  - Fecha bloco de execu��o.
+- L996: ``
+  - Linha em branco para organizar blocos.
+- L997: `// Atualizar limite do cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L998: `updateCardLimit(cardId, newLimit) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L999: `  const card = this.getCardById(cardId);`
+  - Declara uma constante usada na l�gica.
+- L1000: `  if (!card) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1001: `  `
+  - Linha em branco para organizar blocos.
+- L1002: `  if (newLimit < 100 || newLimit > 1000000) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1003: `  `
+  - Linha em branco para organizar blocos.
+- L1004: `  const usedAmount = card.current_balance;`
+  - Declara uma constante usada na l�gica.
+- L1005: `  const newAvailable = newLimit - usedAmount;`
+  - Declara uma constante usada na l�gica.
+- L1006: `  `
+  - Linha em branco para organizar blocos.
+- L1007: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1008: `    'UPDATE user_cards SET card_limit = ?, available_limit = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1009: `    [newLimit, newAvailable, cardId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1010: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1011: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1012: `  `
+  - Linha em branco para organizar blocos.
+- L1013: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L1014: `}`
+  - Fecha bloco de execu��o.
+- L1015: ``
+  - Linha em branco para organizar blocos.
+- L1016: `// Adicionar compra à vista no cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1017: `addCardPurchase(userId, cardId, amount, description, categoryId, chatId, messageId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1018: `  const card = this.getCardById(cardId);`
+  - Declara uma constante usada na l�gica.
+- L1019: `  if (!card || card.user_id !== userId) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1020: ``
+  - Linha em branco para organizar blocos.
+- L1021: `  const newBalance = parseFloat((card.current_balance + amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1022: `  const newAvailable = parseFloat((card.available_limit - amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1023: `  const newInvoice = parseFloat((card.invoice_amount + amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1024: ``
+  - Linha em branco para organizar blocos.
+- L1025: `  // Atualizar cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1026: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1027: `    'UPDATE user_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1028: `    [newBalance, newAvailable, newInvoice, cardId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1029: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1030: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1031: ``
+  - Linha em branco para organizar blocos.
+- L1032: `  // Registrar transação no card_transactions`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1033: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1034: `    'INSERT INTO card_transactions (user_id, card_id, amount, description, category_id, is_installment, chat_id, message_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1035: `    [userId, cardId, amount, description, categoryId, 0, chatId, messageId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1036: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1037: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1038: ``
+  - Linha em branco para organizar blocos.
+- L1039: `  // ⭐ Registrar tambem em expenses para aparecer nos relatorios semanal/mensal`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1040: `  const descWithCard = description + ' (cartão ' + card.card_name + ')';`
+  - Declara uma constante usada na l�gica.
+- L1041: `  this.createTransaction({`
+  - Abre bloco de execu��o.
+- L1042: `    userId: userId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1043: `    amount: amount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1044: `    description: descWithCard,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1045: `    categoryId: categoryId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1046: `    transactionType: 'expense',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1047: `    chatId: chatId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1048: `    messageId: messageId`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1049: `  });`
+  - Fecha bloco de execu��o.
+- L1050: ``
+  - Linha em branco para organizar blocos.
+- L1051: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L1052: `}`
+  - Fecha bloco de execu��o.
+- L1053: ``
+  - Linha em branco para organizar blocos.
+- L1054: `// Adicionar parcelamento ao cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1055: `addCardInstallment(userId, cardId, installmentId, totalAmount) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1056: `  const card = this.getCardById(cardId);`
+  - Declara uma constante usada na l�gica.
+- L1057: `  if (!card || card.user_id !== userId) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1058: `  `
+  - Linha em branco para organizar blocos.
+- L1059: `  const newBalance = parseFloat((card.current_balance + totalAmount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1060: `  const newAvailable = parseFloat((card.available_limit - totalAmount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1061: `  const newInvoice = parseFloat((card.invoice_amount + totalAmount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1062: `  `
+  - Linha em branco para organizar blocos.
+- L1063: `  // Atualizar cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1064: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1065: `    'UPDATE user_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1066: `    [newBalance, newAvailable, newInvoice, cardId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1067: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1068: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1069: `  `
+  - Linha em branco para organizar blocos.
+- L1070: `  // Marcar parcelamento como sendo do cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1071: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1072: `    'UPDATE installments SET is_card_purchase = 1, card_id = ? WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1073: `    [cardId, installmentId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1074: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1075: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1076: `  `
+  - Linha em branco para organizar blocos.
+- L1077: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L1078: `}`
+  - Fecha bloco de execu��o.
+- L1079: ``
+  - Linha em branco para organizar blocos.
+- L1080: `// Pagar fatura do cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1081: `payCardInvoice(userId, cardId, paymentAmount) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1082: `  const card = this.getCardById(cardId);`
+  - Declara uma constante usada na l�gica.
+- L1083: `  const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L1084: `  `
+  - Linha em branco para organizar blocos.
+- L1085: `  if (!card || !user || card.user_id !== userId) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1086: `  if (!paymentAmount || paymentAmount <= 0) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1087: `  if (paymentAmount > card.invoice_amount) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1088: `  if (user.current_balance < paymentAmount) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1089: `  `
+  - Linha em branco para organizar blocos.
+- L1090: `  // Descontar do saldo do usuário`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1091: `  const newUserBalance = parseFloat((user.current_balance - paymentAmount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1092: `  this.updateBalance(userId, newUserBalance);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1093: `  `
+  - Linha em branco para organizar blocos.
+- L1094: `  // Liberar limite do cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1095: `  const newCardBalance = parseFloat(Math.max(0, card.current_balance - paymentAmount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1096: `  const newAvailable = parseFloat((card.available_limit + paymentAmount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1097: `  const newInvoice = parseFloat(Math.max(0, card.invoice_amount - paymentAmount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1098: `  `
+  - Linha em branco para organizar blocos.
+- L1099: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1100: `    'UPDATE user_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, last_payment_date = CURRENT_TIMESTAMP, last_payment_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1101: `    [newCardBalance, newAvailable, newInvoice, paymentAmount, cardId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1102: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1103: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1104: `  `
+  - Linha em branco para organizar blocos.
+- L1105: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L1106: `}`
+  - Fecha bloco de execu��o.
+- L1107: ``
+  - Linha em branco para organizar blocos.
+- L1108: `// Quando paga parcela de compra no cartão, libera o limite proporcional`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1109: `releaseCardLimitOnPayment(userId, installmentId, amount) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1110: `  const installment = this.getInstallmentById(installmentId);`
+  - Declara uma constante usada na l�gica.
+- L1111: `  if (!installment || installment.is_card_purchase !== 1) return;`
+  - Verifica condi��o para decidir o fluxo.
+- L1112: `  `
+  - Linha em branco para organizar blocos.
+- L1113: `  const cardId = installment.card_id;`
+  - Declara uma constante usada na l�gica.
+- L1114: `  if (!cardId) return;`
+  - Verifica condi��o para decidir o fluxo.
+- L1115: `  `
+  - Linha em branco para organizar blocos.
+- L1116: `  const card = this.getCardById(cardId);`
+  - Declara uma constante usada na l�gica.
+- L1117: `  if (!card || card.user_id !== userId) return;`
+  - Verifica condi��o para decidir o fluxo.
+- L1118: `  `
+  - Linha em branco para organizar blocos.
+- L1119: `  // Liberar o limite proporcional da parcela`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1120: `  const newCardBalance = parseFloat(Math.max(0, card.current_balance - amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1121: `  const newAvailable = parseFloat((card.available_limit + amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1122: `  const newInvoice = parseFloat(Math.max(0, card.invoice_amount - amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L1123: `  `
+  - Linha em branco para organizar blocos.
+- L1124: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1125: `    'UPDATE user_cards SET current_balance = ?, available_limit = ?, invoice_amount = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1126: `    [newCardBalance, newAvailable, newInvoice, cardId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1127: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1128: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1129: `}`
+  - Fecha bloco de execu��o.
+- L1130: ``
+  - Linha em branco para organizar blocos.
+- L1131: `// Registrar alerta de 30% de uso`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1132: `setCard30PercentAlert(cardId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1133: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1134: `    'UPDATE user_cards SET last_alert_30_percent = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1135: `    [cardId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1136: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1137: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1138: `}`
+  - Fecha bloco de execu��o.
+- L1139: ``
+  - Linha em branco para organizar blocos.
+- L1140: `// Verificar se precisa alertar sobre 30% de uso`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1141: `shouldAlert30Percent(card) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1142: `  if (!card || card.card_limit === 0) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1143: `  `
+  - Linha em branco para organizar blocos.
+- L1144: `  const percentUsed = (card.current_balance / card.card_limit) * 100;`
+  - Declara uma constante usada na l�gica.
+- L1145: `  if (percentUsed < 30) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1146: `  `
+  - Linha em branco para organizar blocos.
+- L1147: `  // Se nunca alertou, alertar agora`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1148: `  if (!card.last_alert_30_percent) return true;`
+  - Verifica condi��o para decidir o fluxo.
+- L1149: `  `
+  - Linha em branco para organizar blocos.
+- L1150: `  // Se já alertou, só alertar novamente após 24 horas`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1151: `  const lastAlert = new Date(card.last_alert_30_percent);`
+  - Declara uma constante usada na l�gica.
+- L1152: `  const now = new Date();`
+  - Declara uma constante usada na l�gica.
+- L1153: `  const hoursSinceLastAlert = (now - lastAlert) / (1000 * 60 * 60);`
+  - Declara uma constante usada na l�gica.
+- L1154: `  `
+  - Linha em branco para organizar blocos.
+- L1155: `  return hoursSinceLastAlert >= 24;`
+  - Retorna valor da fun��o/m�todo.
+- L1156: `}`
+  - Fecha bloco de execu��o.
+- L1157: ``
+  - Linha em branco para organizar blocos.
+- L1158: `// Buscar cartões com vencimento próximo (próximos 5 dias)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1159: `getCardsWithUpcomingDueDate(userId, daysAhead = 5) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1160: `  const cards = this.getAllCardsByUserId(userId);`
+  - Declara uma constante usada na l�gica.
+- L1161: `  const today = new Date();`
+  - Declara uma constante usada na l�gica.
+- L1162: `  const currentDay = today.getDate();`
+  - Declara uma constante usada na l�gica.
+- L1163: `  `
+  - Linha em branco para organizar blocos.
+- L1164: `  const upcoming = [];`
+  - Declara uma constante usada na l�gica.
+- L1165: `  `
+  - Linha em branco para organizar blocos.
+- L1166: `  for (const card of cards) {`
+  - Inicia la�o de repeti��o.
+- L1167: `    if (card.invoice_amount === 0) continue;`
+  - Verifica condi��o para decidir o fluxo.
+- L1168: `    `
+  - Linha em branco para organizar blocos.
+- L1169: `    let daysUntil = card.invoice_due_day - currentDay;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L1170: `    if (daysUntil < 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1171: `      daysUntil += 30; // Próximo mês`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1172: `    }`
+  - Fecha bloco de execu��o.
+- L1173: `    `
+  - Linha em branco para organizar blocos.
+- L1174: `    if (daysUntil <= daysAhead) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1175: `      upcoming.push({`
+  - Abre bloco de execu��o.
+- L1176: `        ...card,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1177: `        daysUntilDue: daysUntil`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1178: `      });`
+  - Fecha bloco de execu��o.
+- L1179: `    }`
+  - Fecha bloco de execu��o.
+- L1180: `  }`
+  - Fecha bloco de execu��o.
+- L1181: `  `
+  - Linha em branco para organizar blocos.
+- L1182: `  return upcoming.sort((a, b) => a.daysUntilDue - b.daysUntilDue);`
+  - Retorna valor da fun��o/m�todo.
+- L1183: `}`
+  - Fecha bloco de execu��o.
+- L1184: ``
+  - Linha em branco para organizar blocos.
+- L1185: `// Deletar cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1186: `deleteCard(cardId, userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1187: `  const card = this.getCardById(cardId);`
+  - Declara uma constante usada na l�gica.
+- L1188: `  if (!card || card.user_id !== userId) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1189: `  `
+  - Linha em branco para organizar blocos.
+- L1190: `  // Deletar transações do cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1191: `  this.db.run('DELETE FROM card_transactions WHERE card_id = ?', [cardId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1192: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1193: `  `
+  - Linha em branco para organizar blocos.
+- L1194: `  // Resetar flag de parcelamentos que eram deste cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1195: `  this.db.run('UPDATE installments SET is_card_purchase = 0, card_id = NULL WHERE card_id = ?', [cardId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1196: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1197: `  `
+  - Linha em branco para organizar blocos.
+- L1198: `  // Deletar o cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1199: `  this.db.run('DELETE FROM user_cards WHERE id = ?', [cardId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1200: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1201: `  `
+  - Linha em branco para organizar blocos.
+- L1202: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L1203: `}`
+  - Fecha bloco de execu��o.
+- L1204: ``
+  - Linha em branco para organizar blocos.
+- L1205: `// Resetar cartão (zerar saldo mas manter cadastro)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1206: `resetCard(cardId, userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1207: `  const card = this.getCardById(cardId);`
+  - Declara uma constante usada na l�gica.
+- L1208: `  if (!card || card.user_id !== userId) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1209: `  `
+  - Linha em branco para organizar blocos.
+- L1210: `  // Zerar saldo do cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1211: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1212: `    'UPDATE user_cards SET current_balance = 0, available_limit = card_limit, invoice_amount = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1213: `    [cardId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1214: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1215: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1216: `  `
+  - Linha em branco para organizar blocos.
+- L1217: `  // Deletar transações do cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1218: `  this.db.run('DELETE FROM card_transactions WHERE card_id = ?', [cardId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1219: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1220: `  `
+  - Linha em branco para organizar blocos.
+- L1221: `  // Resetar flag de parcelamentos que eram deste cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1222: `  this.db.run('UPDATE installments SET is_card_purchase = 0, card_id = NULL WHERE card_id = ?', [cardId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1223: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1224: `  `
+  - Linha em branco para organizar blocos.
+- L1225: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L1226: `}`
+  - Fecha bloco de execu��o.
+- L1227: ``
+  - Linha em branco para organizar blocos.
+- L1228: `// MANTER a função antiga para compatibilidade (busca o primeiro cartão ou retorna null)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1229: `// ============ METAS DE ECONOMIA ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1230: `getSavingsAndEmergencyTotal(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1231: `  const user = this.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L1232: `  if (!user) return 0;`
+  - Verifica condi��o para decidir o fluxo.
+- L1233: `  return parseFloat(((user.savings_balance || 0) + (user.emergency_fund || 0)).toFixed(2));`
+  - Retorna valor da fun��o/m�todo.
+- L1234: `}`
+  - Fecha bloco de execu��o.
+- L1235: ``
+  - Linha em branco para organizar blocos.
+- L1236: `createSavingsGoal(userId, name, targetAmount, targetDate = null) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1237: `  const normalizedName = (name || '').trim();`
+  - Declara uma constante usada na l�gica.
+- L1238: `  const amount = Number(targetAmount);`
+  - Declara uma constante usada na l�gica.
+- L1239: ``
+  - Linha em branco para organizar blocos.
+- L1240: `  if (!normalizedName || normalizedName.length < 2) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1241: `    return { success: false, error: 'Nome da meta invalido.' };`
+  - Retorna valor da fun��o/m�todo.
+- L1242: `  }`
+  - Fecha bloco de execu��o.
+- L1243: `  if (!Number.isFinite(amount) || amount <= 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1244: `    return { success: false, error: 'Valor alvo invalido.' };`
+  - Retorna valor da fun��o/m�todo.
+- L1245: `  }`
+  - Fecha bloco de execu��o.
+- L1246: ``
+  - Linha em branco para organizar blocos.
+- L1247: `  const baseline = this.getSavingsAndEmergencyTotal(userId);`
+  - Declara uma constante usada na l�gica.
+- L1248: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1249: `    \`INSERT INTO savings_goals (user_id, name, target_amount, baseline_total, target_date, status, updated_at)`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1250: `     VALUES (?, ?, ?, ?, ?, 'active', CURRENT_TIMESTAMP)\`,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1251: `    [userId, normalizedName, amount, baseline, targetDate || null]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1252: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1253: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1254: ``
+  - Linha em branco para organizar blocos.
+- L1255: `  const result = this.db.exec('SELECT * FROM savings_goals WHERE rowid = last_insert_rowid()');`
+  - Declara uma constante usada na l�gica.
+- L1256: `  if (!result[0]) return { success: false, error: 'Falha ao criar meta.' };`
+  - Verifica condi��o para decidir o fluxo.
+- L1257: ``
+  - Linha em branco para organizar blocos.
+- L1258: `  return { success: true, goal: this.rowToObject(result[0]) };`
+  - Retorna valor da fun��o/m�todo.
+- L1259: `}`
+  - Fecha bloco de execu��o.
+- L1260: ``
+  - Linha em branco para organizar blocos.
+- L1261: `deleteSavingsGoal(userId, goalId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1262: `  const before = this.getSavingsGoalById(userId, goalId);`
+  - Declara uma constante usada na l�gica.
+- L1263: `  if (!before) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1264: ``
+  - Linha em branco para organizar blocos.
+- L1265: `  this.db.run('DELETE FROM savings_goals WHERE id = ? AND user_id = ?', [goalId, userId]);`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1266: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1267: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L1268: `}`
+  - Fecha bloco de execu��o.
+- L1269: ``
+  - Linha em branco para organizar blocos.
+- L1270: `completeSavingsGoal(userId, goalId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1271: `  const goal = this.getSavingsGoalById(userId, goalId);`
+  - Declara uma constante usada na l�gica.
+- L1272: `  if (!goal) return false;`
+  - Verifica condi��o para decidir o fluxo.
+- L1273: ``
+  - Linha em branco para organizar blocos.
+- L1274: `  this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1275: `    "UPDATE savings_goals SET status = 'completed', completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?",`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1276: `    [goalId, userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1277: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1278: `  this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1279: `  return true;`
+  - Retorna valor da fun��o/m�todo.
+- L1280: `}`
+  - Fecha bloco de execu��o.
+- L1281: ``
+  - Linha em branco para organizar blocos.
+- L1282: `getSavingsGoalById(userId, goalId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1283: `  const result = this.db.exec('SELECT * FROM savings_goals WHERE id = ? AND user_id = ?', [goalId, userId]);`
+  - Declara uma constante usada na l�gica.
+- L1284: `  return result[0] ? this.rowToObject(result[0]) : null;`
+  - Retorna valor da fun��o/m�todo.
+- L1285: `}`
+  - Fecha bloco de execu��o.
+- L1286: ``
+  - Linha em branco para organizar blocos.
+- L1287: `getSavingsGoalsByUser(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1288: `  const result = this.db.exec(`
+  - Declara uma constante usada na l�gica.
+- L1289: `    'SELECT * FROM savings_goals WHERE user_id = ? ORDER BY CASE status WHEN \'active\' THEN 0 ELSE 1 END, created_at DESC',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1290: `    [userId]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1291: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1292: `  const goals = result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Declara uma constante usada na l�gica.
+- L1293: `  const totalNow = this.getSavingsAndEmergencyTotal(userId);`
+  - Declara uma constante usada na l�gica.
+- L1294: ``
+  - Linha em branco para organizar blocos.
+- L1295: `  for (let i = 0; i < goals.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L1296: `    const goal = goals[i];`
+  - Declara uma constante usada na l�gica.
+- L1297: `    const baseline = Number(goal.baseline_total || 0);`
+  - Declara uma constante usada na l�gica.
+- L1298: `    const target = Number(goal.target_amount || 0);`
+  - Declara uma constante usada na l�gica.
+- L1299: `    const currentProgress = Math.max(0, parseFloat((totalNow - baseline).toFixed(2)));`
+  - Declara uma constante usada na l�gica.
+- L1300: `    const percent = target > 0 ? Math.min(100, parseFloat(((currentProgress / target) * 100).toFixed(1))) : 0;`
+  - Declara uma constante usada na l�gica.
+- L1301: ``
+  - Linha em branco para organizar blocos.
+- L1302: `    goal.current_progress = currentProgress;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1303: `    goal.progress_percent = percent;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1304: `    goal.remaining_amount = Math.max(0, parseFloat((target - currentProgress).toFixed(2)));`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1305: `    goal.current_total = totalNow;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1306: ``
+  - Linha em branco para organizar blocos.
+- L1307: `    if (goal.status === 'active' && currentProgress >= target && target > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1308: `      this.db.run(`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L1309: `        "UPDATE savings_goals SET status = 'completed', completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?",`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1310: `        [goal.id]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1311: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1312: `      goal.status = 'completed';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1313: `      goal.completed_at = new Date().toISOString();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1314: `    }`
+  - Fecha bloco de execu��o.
+- L1315: `  }`
+  - Fecha bloco de execu��o.
+- L1316: ``
+  - Linha em branco para organizar blocos.
+- L1317: `  if (goals.length > 0) this.save();`
+  - Verifica condi��o para decidir o fluxo.
+- L1318: `  return goals;`
+  - Retorna valor da fun��o/m�todo.
+- L1319: `}`
+  - Fecha bloco de execu��o.
+- L1320: ``
+  - Linha em branco para organizar blocos.
+- L1321: `// ============ ANALYTICS / DASHBOARD ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1322: `getExpenseTrendByDay(userId, startDate, endDate) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1323: `  let query = \``
+  - Declara vari�vel com valor que pode ser alterado.
+- L1324: `    SELECT DATE(e.date) as day, SUM(e.amount) as total`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1325: `    FROM expenses e`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1326: `    WHERE e.user_id = ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1327: `      AND e.date >= ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1328: `      AND e.date <= ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1329: `  \`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1330: ``
+  - Linha em branco para organizar blocos.
+- L1331: `  if (this.hasTransactionType) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1332: `    query += " AND e.transaction_type = 'expense'";`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1333: `  }`
+  - Fecha bloco de execu��o.
+- L1334: ``
+  - Linha em branco para organizar blocos.
+- L1335: `  query += ' GROUP BY DATE(e.date) ORDER BY day ASC';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1336: ``
+  - Linha em branco para organizar blocos.
+- L1337: `  const result = this.db.exec(query, [userId, startDate, endDate]);`
+  - Declara uma constante usada na l�gica.
+- L1338: `  return result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Retorna valor da fun��o/m�todo.
+- L1339: `}`
+  - Fecha bloco de execu��o.
+- L1340: ``
+  - Linha em branco para organizar blocos.
+- L1341: `getExpenseTrendByMonth(userId, months = 6) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1342: `  const safeMonths = Math.max(1, Math.min(24, parseInt(months, 10) || 6));`
+  - Declara uma constante usada na l�gica.
+- L1343: `  const end = new Date();`
+  - Declara uma constante usada na l�gica.
+- L1344: `  const start = new Date(end);`
+  - Declara uma constante usada na l�gica.
+- L1345: `  start.setMonth(start.getMonth() - safeMonths + 1);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1346: `  start.setDate(1);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1347: `  start.setHours(0, 0, 0, 0);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1348: ``
+  - Linha em branco para organizar blocos.
+- L1349: `  let query = \``
+  - Declara vari�vel com valor que pode ser alterado.
+- L1350: `    SELECT strftime('%Y-%m', e.date) as month, SUM(e.amount) as total`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1351: `    FROM expenses e`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1352: `    WHERE e.user_id = ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1353: `      AND e.date >= ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1354: `      AND e.date <= ?`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1355: `  \`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1356: ``
+  - Linha em branco para organizar blocos.
+- L1357: `  if (this.hasTransactionType) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1358: `    query += " AND e.transaction_type = 'expense'";`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1359: `  }`
+  - Fecha bloco de execu��o.
+- L1360: ``
+  - Linha em branco para organizar blocos.
+- L1361: `  query += " GROUP BY strftime('%Y-%m', e.date) ORDER BY month ASC";`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1362: ``
+  - Linha em branco para organizar blocos.
+- L1363: `  const result = this.db.exec(query, [userId, start.toISOString(), end.toISOString()]);`
+  - Declara uma constante usada na l�gica.
+- L1364: `  return result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Retorna valor da fun��o/m�todo.
+- L1365: `}`
+  - Fecha bloco de execu��o.
+- L1366: ``
+  - Linha em branco para organizar blocos.
+- L1367: `getExpensesForForecast(userId, days = 120) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1368: `  const safeDays = Math.max(7, Math.min(365, parseInt(days, 10) || 120));`
+  - Declara uma constante usada na l�gica.
+- L1369: `  const end = new Date();`
+  - Declara uma constante usada na l�gica.
+- L1370: `  const start = new Date(end);`
+  - Declara uma constante usada na l�gica.
+- L1371: `  start.setDate(start.getDate() - safeDays);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1372: `  start.setHours(0, 0, 0, 0);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1373: `  return this.getExpenseTrendByDay(userId, start.toISOString(), end.toISOString());`
+  - Retorna valor da fun��o/m�todo.
+- L1374: `}`
+  - Fecha bloco de execu��o.
+- L1375: ``
+  - Linha em branco para organizar blocos.
+- L1376: `getAllTableData() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1377: `  const tableNames = [`
+  - Declara uma constante usada na l�gica.
+- L1378: `    'users',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1379: `    'expenses',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1380: `    'categories',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1381: `    'groups',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1382: `    'installments',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1383: `    'installment_payments',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1384: `    'user_cards',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1385: `    'card_transactions',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1386: `    'savings_goals'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1387: `  ];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1388: ``
+  - Linha em branco para organizar blocos.
+- L1389: `  const dump = {};`
+  - Declara uma constante usada na l�gica.
+- L1390: `  for (let i = 0; i < tableNames.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L1391: `    const table = tableNames[i];`
+  - Declara uma constante usada na l�gica.
+- L1392: `    const result = this.db.exec(\`SELECT * FROM ${table}\`);`
+  - Declara uma constante usada na l�gica.
+- L1393: `    dump[table] = result[0] ? this.rowsToObjects(result[0]) : [];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1394: `  }`
+  - Fecha bloco de execu��o.
+- L1395: `  return dump;`
+  - Retorna valor da fun��o/m�todo.
+- L1396: `}`
+  - Fecha bloco de execu��o.
+- L1397: ``
+  - Linha em branco para organizar blocos.
+- L1398: `getCreditCardByUserId(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1399: `  const cards = this.getAllCardsByUserId(userId);`
+  - Declara uma constante usada na l�gica.
+- L1400: `  return cards.length > 0 ? cards[0] : null;`
+  - Retorna valor da fun��o/m�todo.
+- L1401: `}`
+  - Fecha bloco de execu��o.
+- L1402: `}`
+  - Fecha bloco de execu��o.
+- L1403: ``
+  - Linha em branco para organizar blocos.
+- L1404: `module.exports = { DAO };`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L1405: ``
+  - Linha em branco para organizar blocos.
+
+## src/database/schema.js
+
+- L1: `const initSqlJs = require('sql.js');`
+  - Importa um m�dulo para uso neste arquivo.
+- L2: `const fs = require('fs');`
+  - Importa um m�dulo para uso neste arquivo.
+- L3: `const path = require('path');`
+  - Importa um m�dulo para uso neste arquivo.
+- L4: ``
+  - Linha em branco para organizar blocos.
+- L5: `class DatabaseSchema {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L6: `  constructor(dbPath) {`
+  - Inicializa estado da classe e depend�ncias.
+- L7: `    this.dbPath = dbPath || path.join(__dirname, '../../database/finance.db');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L8: `    this.db = null;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L9: `  }`
+  - Fecha bloco de execu��o.
+- L10: ``
+  - Linha em branco para organizar blocos.
+- L11: `  async init() {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L12: `    const SQL = await initSqlJs();`
+  - Declara uma constante usada na l�gica.
+- L13: `    `
+  - Linha em branco para organizar blocos.
+- L14: `    if (fs.existsSync(this.dbPath)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L15: `      const buffer = fs.readFileSync(this.dbPath);`
+  - Declara uma constante usada na l�gica.
+- L16: `      this.db = new SQL.Database(buffer);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L17: `    } else {`
+  - Abre bloco de execu��o.
+- L18: `      this.db = new SQL.Database();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L19: `    }`
+  - Fecha bloco de execu��o.
+- L20: `    `
+  - Linha em branco para organizar blocos.
+- L21: `    return this.db;`
+  - Retorna valor da fun��o/m�todo.
+- L22: `  }`
+  - Fecha bloco de execu��o.
+- L23: ``
+  - Linha em branco para organizar blocos.
+- L24: `  initialize() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L25: `    console.log('🗄️ Inicializando banco de dados...');`
+  - Registra informa��o de execu��o no log.
+- L26: ``
+  - Linha em branco para organizar blocos.
+- L27: `    // ============ TABELAS PRINCIPAIS ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L28: `    `
+  - Linha em branco para organizar blocos.
+- L29: `    this.db.run(\``
+  - Executa comando SQL de escrita (insert/update/delete).
+- L30: `      CREATE TABLE IF NOT EXISTS users (`
+  - Define estrutura de tabela no banco de dados.
+- L31: `        id INTEGER PRIMARY KEY AUTOINCREMENT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L32: `        whatsapp_id TEXT UNIQUE NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L33: `        name TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L34: `        initial_balance REAL DEFAULT 0.0,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L35: `        current_balance REAL DEFAULT 0.0,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L36: `        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L37: `        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L38: `      )`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L39: `    \`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L40: ``
+  - Linha em branco para organizar blocos.
+- L41: `    this.db.run(\``
+  - Executa comando SQL de escrita (insert/update/delete).
+- L42: `      CREATE TABLE IF NOT EXISTS categories (`
+  - Define estrutura de tabela no banco de dados.
+- L43: `        id INTEGER PRIMARY KEY AUTOINCREMENT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L44: `        name TEXT UNIQUE NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L45: `        emoji TEXT DEFAULT '📌',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L46: `        keywords TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L47: `        created_at DATETIME DEFAULT CURRENT_TIMESTAMP`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L48: `      )`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L49: `    \`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L50: ``
+  - Linha em branco para organizar blocos.
+- L51: `    this.db.run(\``
+  - Executa comando SQL de escrita (insert/update/delete).
+- L52: `      CREATE TABLE IF NOT EXISTS expenses (`
+  - Define estrutura de tabela no banco de dados.
+- L53: `        id INTEGER PRIMARY KEY AUTOINCREMENT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L54: `        user_id INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L55: `        amount REAL NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L56: `        description TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L57: `        category_id INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L58: `        date DATETIME DEFAULT CURRENT_TIMESTAMP,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L59: `        chat_id TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L60: `        message_id TEXT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L61: `        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L62: `        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L63: `        FOREIGN KEY (category_id) REFERENCES categories (id)`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L64: `      )`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L65: `    \`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L66: ``
+  - Linha em branco para organizar blocos.
+- L67: `    this.db.run(\``
+  - Executa comando SQL de escrita (insert/update/delete).
+- L68: `      CREATE TABLE IF NOT EXISTS groups (`
+  - Define estrutura de tabela no banco de dados.
+- L69: `        id INTEGER PRIMARY KEY AUTOINCREMENT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L70: `        chat_id TEXT UNIQUE NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L71: `        name TEXT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L72: `        active INTEGER DEFAULT 1,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L73: `        created_at DATETIME DEFAULT CURRENT_TIMESTAMP`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L74: `      )`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L75: `    \`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L76: ``
+  - Linha em branco para organizar blocos.
+- L77: `    this.db.run(\``
+  - Executa comando SQL de escrita (insert/update/delete).
+- L78: `      CREATE TABLE IF NOT EXISTS installments (`
+  - Define estrutura de tabela no banco de dados.
+- L79: `        id INTEGER PRIMARY KEY AUTOINCREMENT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L80: `        user_id INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L81: `        description TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L82: `        total_amount REAL NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L83: `        installment_amount REAL NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L84: `        total_installments INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L85: `        category_id INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L86: `        chat_id TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L87: `        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L88: `        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L89: `        FOREIGN KEY (category_id) REFERENCES categories (id)`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L90: `      )`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L91: `    \`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L92: ``
+  - Linha em branco para organizar blocos.
+- L93: `    this.db.run(\``
+  - Executa comando SQL de escrita (insert/update/delete).
+- L94: `      CREATE TABLE IF NOT EXISTS installment_payments (`
+  - Define estrutura de tabela no banco de dados.
+- L95: `        id INTEGER PRIMARY KEY AUTOINCREMENT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L96: `        installment_id INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L97: `        installment_number INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L98: `        amount REAL NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L99: `        status TEXT DEFAULT 'pending',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L100: `        paid_at DATETIME,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L101: `        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L102: `        FOREIGN KEY (installment_id) REFERENCES installments (id) ON DELETE CASCADE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L103: `      )`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L104: `    \`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L105: ``
+  - Linha em branco para organizar blocos.
+- L106: `    // ============ 💳 TABELAS DE CARTÕES (MÚLTIPLOS CARTÕES) ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L107: `    `
+  - Linha em branco para organizar blocos.
+- L108: `    this.db.run(\``
+  - Executa comando SQL de escrita (insert/update/delete).
+- L109: `      CREATE TABLE IF NOT EXISTS user_cards (`
+  - Define estrutura de tabela no banco de dados.
+- L110: `        id INTEGER PRIMARY KEY AUTOINCREMENT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L111: `        user_id INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L112: `        card_name TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L113: `        card_limit REAL DEFAULT 0.0,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L114: `        current_balance REAL DEFAULT 0.0,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L115: `        available_limit REAL DEFAULT 0.0,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L116: `        invoice_amount REAL DEFAULT 0.0,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L117: `        invoice_due_day INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L118: `        last_alert_30_percent DATETIME,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L119: `        last_payment_date DATETIME,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L120: `        last_payment_amount REAL DEFAULT 0.0,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L121: `        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L122: `        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L123: `        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L124: `      )`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L125: `    \`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L126: ``
+  - Linha em branco para organizar blocos.
+- L127: `    this.db.run(\``
+  - Executa comando SQL de escrita (insert/update/delete).
+- L128: `      CREATE TABLE IF NOT EXISTS card_transactions (`
+  - Define estrutura de tabela no banco de dados.
+- L129: `        id INTEGER PRIMARY KEY AUTOINCREMENT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L130: `        user_id INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L131: `        card_id INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L132: `        amount REAL NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L133: `        description TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L134: `        category_id INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L135: `        transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L136: `        is_installment INTEGER DEFAULT 0,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L137: `        installment_id INTEGER,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L138: `        chat_id TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L139: `        message_id TEXT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L140: `        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L141: `        FOREIGN KEY (card_id) REFERENCES user_cards (id) ON DELETE CASCADE,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L142: `        FOREIGN KEY (category_id) REFERENCES categories (id),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L143: `        FOREIGN KEY (installment_id) REFERENCES installments (id) ON DELETE SET NULL`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L144: `      )`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L145: `    \`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L146: ``
+  - Linha em branco para organizar blocos.
+- L147: `    this.db.run(\``
+  - Executa comando SQL de escrita (insert/update/delete).
+- L148: `      CREATE TABLE IF NOT EXISTS savings_goals (`
+  - Define estrutura de tabela no banco de dados.
+- L149: `        id INTEGER PRIMARY KEY AUTOINCREMENT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L150: `        user_id INTEGER NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L151: `        name TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L152: `        target_amount REAL NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L153: `        baseline_total REAL DEFAULT 0.0,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L154: `        target_date DATETIME,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L155: `        status TEXT DEFAULT 'active',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L156: `        completed_at DATETIME,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L157: `        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L158: `        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L159: `        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L160: `      )`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L161: `    \`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L162: ``
+  - Linha em branco para organizar blocos.
+- L163: `    // ============ ÍNDICES ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L164: `    `
+  - Linha em branco para organizar blocos.
+- L165: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L166: `      // Índices existentes`
+  - Coment�rio explicativo j� existente no c�digo.
+- L167: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_expenses_user_id ON expenses(user_id)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L168: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L169: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_expenses_category_id ON expenses(category_id)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L170: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_users_whatsapp_id ON users(whatsapp_id)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L171: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_installments_user_id ON installments(user_id)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L172: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_installment_payments_installment_id ON installment_payments(installment_id)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L173: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_installment_payments_status ON installment_payments(status)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L174: `      `
+  - Linha em branco para organizar blocos.
+- L175: `      // 💳 NOVOS ÍNDICES PARA CARTÕES`
+  - Coment�rio explicativo j� existente no c�digo.
+- L176: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_user_cards_user_id ON user_cards(user_id)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L177: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_card_transactions_card_id ON card_transactions(card_id)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L178: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_card_transactions_user_id ON card_transactions(user_id)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L179: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_savings_goals_user_id ON savings_goals(user_id)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L180: `      this.db.run('CREATE INDEX IF NOT EXISTS idx_savings_goals_status ON savings_goals(status)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L181: `    } catch (e) {`
+  - Abre bloco de execu��o.
+- L182: `      // Índices já existem`
+  - Coment�rio explicativo j� existente no c�digo.
+- L183: `    }`
+  - Fecha bloco de execu��o.
+- L184: ``
+  - Linha em branco para organizar blocos.
+- L185: `    console.log('✅ Estrutura básica criada!');`
+  - Registra informa��o de execu��o no log.
+- L186: `    `
+  - Linha em branco para organizar blocos.
+- L187: `    this.migrateDatabase();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L188: `    this.insertDefaultCategories();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L189: `    `
+  - Linha em branco para organizar blocos.
+- L190: `    this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L191: `    console.log('✅ Banco de dados pronto!\n');`
+  - Registra informa��o de execu��o no log.
+- L192: `  }`
+  - Fecha bloco de execu��o.
+- L193: ``
+  - Linha em branco para organizar blocos.
+- L194: `  migrateDatabase() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L195: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L196: `      console.log('🔄 Verificando migração...');`
+  - Registra informa��o de execu��o no log.
+- L197: `      `
+  - Linha em branco para organizar blocos.
+- L198: `      // MIGRAÇÃO: USERS`
+  - Coment�rio explicativo j� existente no c�digo.
+- L199: `      const userColumns = this.db.exec("PRAGMA table_info(users)");`
+  - Declara uma constante usada na l�gica.
+- L200: `      if (userColumns[0]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L201: `        const columnNames = userColumns[0].values.map(row => row[1]);`
+  - Declara uma constante usada na l�gica.
+- L202: `        `
+  - Linha em branco para organizar blocos.
+- L203: `        if (!columnNames.includes('savings_balance')) {`
+  - Verifica condi��o para decidir o fluxo.
+- L204: `          console.log('   ↳ Adicionando savings_balance');`
+  - Registra informa��o de execu��o no log.
+- L205: `          this.db.run('ALTER TABLE users ADD COLUMN savings_balance REAL DEFAULT 0.0');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L206: `        }`
+  - Fecha bloco de execu��o.
+- L207: `        `
+  - Linha em branco para organizar blocos.
+- L208: `        if (!columnNames.includes('emergency_fund')) {`
+  - Verifica condi��o para decidir o fluxo.
+- L209: `          console.log('   ↳ Adicionando emergency_fund');`
+  - Registra informa��o de execu��o no log.
+- L210: `          this.db.run('ALTER TABLE users ADD COLUMN emergency_fund REAL DEFAULT 0.0');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L211: `        }`
+  - Fecha bloco de execu��o.
+- L212: `        `
+  - Linha em branco para organizar blocos.
+- L213: `        if (!columnNames.includes('low_balance_warned')) {`
+  - Verifica condi��o para decidir o fluxo.
+- L214: `          console.log('   ↳ Adicionando low_balance_warned');`
+  - Registra informa��o de execu��o no log.
+- L215: `          this.db.run('ALTER TABLE users ADD COLUMN low_balance_warned INTEGER DEFAULT 0');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L216: `        }`
+  - Fecha bloco de execu��o.
+- L217: `      }`
+  - Fecha bloco de execu��o.
+- L218: ``
+  - Linha em branco para organizar blocos.
+- L219: `      // MIGRAÇÃO: EXPENSES`
+  - Coment�rio explicativo j� existente no c�digo.
+- L220: `      const expenseColumns = this.db.exec("PRAGMA table_info(expenses)");`
+  - Declara uma constante usada na l�gica.
+- L221: `      if (expenseColumns[0]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L222: `        const columnNames = expenseColumns[0].values.map(row => row[1]);`
+  - Declara uma constante usada na l�gica.
+- L223: `        `
+  - Linha em branco para organizar blocos.
+- L224: `        if (!columnNames.includes('transaction_type')) {`
+  - Verifica condi��o para decidir o fluxo.
+- L225: `          console.log('   ↳ Adicionando transaction_type');`
+  - Registra informa��o de execu��o no log.
+- L226: `          this.db.run("ALTER TABLE expenses ADD COLUMN transaction_type TEXT DEFAULT 'expense'");`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L227: `          `
+  - Linha em branco para organizar blocos.
+- L228: `          try {`
+  - Inicia bloco protegido contra exce��es.
+- L229: `            this.db.run('CREATE INDEX IF NOT EXISTS idx_expenses_type ON expenses(transaction_type)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L230: `          } catch (e) {}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L231: `        }`
+  - Fecha bloco de execu��o.
+- L232: `      }`
+  - Fecha bloco de execu��o.
+- L233: ``
+  - Linha em branco para organizar blocos.
+- L234: `      // MIGRAÇÃO: INSTALLMENT_PAYMENTS (VENCIMENTO E LEMBRETE)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L235: `      const paymentColumns = this.db.exec("PRAGMA table_info(installment_payments)");`
+  - Declara uma constante usada na l�gica.
+- L236: `      if (paymentColumns[0]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L237: `        const columnNames = paymentColumns[0].values.map(row => row[1]);`
+  - Declara uma constante usada na l�gica.
+- L238: `        `
+  - Linha em branco para organizar blocos.
+- L239: `        if (!columnNames.includes('due_date')) {`
+  - Verifica condi��o para decidir o fluxo.
+- L240: `          console.log('   ↳ Adicionando due_date (vencimento)');`
+  - Registra informa��o de execu��o no log.
+- L241: `          this.db.run('ALTER TABLE installment_payments ADD COLUMN due_date DATETIME');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L242: `        }`
+  - Fecha bloco de execu��o.
+- L243: `        `
+  - Linha em branco para organizar blocos.
+- L244: `        if (!columnNames.includes('reminded_at')) {`
+  - Verifica condi��o para decidir o fluxo.
+- L245: `          console.log('   ↳ Adicionando reminded_at (último lembrete)');`
+  - Registra informa��o de execu��o no log.
+- L246: `          this.db.run('ALTER TABLE installment_payments ADD COLUMN reminded_at DATETIME');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L247: `        }`
+  - Fecha bloco de execu��o.
+- L248: `        `
+  - Linha em branco para organizar blocos.
+- L249: `        try {`
+  - Inicia bloco protegido contra exce��es.
+- L250: `          this.db.run('CREATE INDEX IF NOT EXISTS idx_installment_payments_due_date ON installment_payments(due_date)');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L251: `          console.log('   ↳ Índice de vencimento criado');`
+  - Registra informa��o de execu��o no log.
+- L252: `        } catch (e) {}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L253: `      }`
+  - Fecha bloco de execu��o.
+- L254: ``
+  - Linha em branco para organizar blocos.
+- L255: `      // 💳 MIGRAÇÃO: INSTALLMENTS (campo para identificar compra no cartão)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L256: `      const installmentColumns = this.db.exec("PRAGMA table_info(installments)");`
+  - Declara uma constante usada na l�gica.
+- L257: `      if (installmentColumns[0]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L258: `        const columnNames = installmentColumns[0].values.map(row => row[1]);`
+  - Declara uma constante usada na l�gica.
+- L259: `        `
+  - Linha em branco para organizar blocos.
+- L260: `        if (!columnNames.includes('is_card_purchase')) {`
+  - Verifica condi��o para decidir o fluxo.
+- L261: `          console.log('   ↳ Adicionando is_card_purchase');`
+  - Registra informa��o de execu��o no log.
+- L262: `          this.db.run('ALTER TABLE installments ADD COLUMN is_card_purchase INTEGER DEFAULT 0');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L263: `        }`
+  - Fecha bloco de execu��o.
+- L264: `        `
+  - Linha em branco para organizar blocos.
+- L265: `        if (!columnNames.includes('card_id')) {`
+  - Verifica condi��o para decidir o fluxo.
+- L266: `          console.log('   ↳ Adicionando card_id (qual cartão foi usado)');`
+  - Registra informa��o de execu��o no log.
+- L267: `          this.db.run('ALTER TABLE installments ADD COLUMN card_id INTEGER');`
+  - Executa comando SQL de escrita (insert/update/delete).
+- L268: `        }`
+  - Fecha bloco de execu��o.
+- L269: `      }`
+  - Fecha bloco de execu��o.
+- L270: ``
+  - Linha em branco para organizar blocos.
+- L271: `      console.log('✅ Migração concluída!');`
+  - Registra informa��o de execu��o no log.
+- L272: `      this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L273: `    } catch (error) {`
+  - Abre bloco de execu��o.
+- L274: `      console.log('⚠️ Aviso: ' + error.message);`
+  - Registra informa��o de execu��o no log.
+- L275: `    }`
+  - Fecha bloco de execu��o.
+- L276: `  }`
+  - Fecha bloco de execu��o.
+- L277: ``
+  - Linha em branco para organizar blocos.
+- L278: `  insertDefaultCategories() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L279: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L280: `      const check = this.db.exec('SELECT COUNT(*) as count FROM categories');`
+  - Declara uma constante usada na l�gica.
+- L281: `      const count = check[0] ? check[0].values[0][0] : 0;`
+  - Declara uma constante usada na l�gica.
+- L282: `      `
+  - Linha em branco para organizar blocos.
+- L283: `      if (count > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L284: `        console.log('✅ Categorias já existem (' + count + ')');`
+  - Registra informa��o de execu��o no log.
+- L285: `        return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L286: `      }`
+  - Fecha bloco de execu��o.
+- L287: ``
+  - Linha em branco para organizar blocos.
+- L288: `      const categories = [`
+  - Declara uma constante usada na l�gica.
+- L289: `        { `
+  - Abre bloco de execu��o.
+- L290: `          name: 'Alimentação', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L291: `          emoji: '🍔', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L292: `          keywords: 'comida,almoço,almoco,jantar,café,cafe,lanche,restaurante,delivery,ifood,rappi,pizza,hamburger,hamburguer,sorvete,açai,acai,pastel,coxinha,salgado,bebida,cerveja,refri,refrigerante,suco,padaria,pão,pao,bolo,doce,chocolate,mcdonalds,burger king,subway,kfc,starbucks,outback'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L293: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L294: `        { `
+  - Abre bloco de execu��o.
+- L295: `          name: 'Transporte', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L296: `          emoji: '🚗', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L297: `          keywords: 'uber,99,taxi,ônibus,onibus,metrô,metro,trem,gasolina,combustível,combustivel,etanol,diesel,passagem,estacionamento,pedágio,pedagio,aplicativo,corrida,viagem,carro,moto,bicicleta,patinete,mobilidade,frete,entrega'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L298: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L299: `        { `
+  - Abre bloco de execu��o.
+- L300: `          name: 'Mercado', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L301: `          emoji: '🛒', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L302: `          keywords: 'mercado,supermercado,feira,compras,açougue,acougue,padaria,hortifruti,verduras,frutas,legumes,carrefour,extra,pão de açucar,atacadão,atacadao,walmart,makro,assaí,assai,cesta básica,basica'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L303: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L304: `        { `
+  - Abre bloco de execu��o.
+- L305: `          name: 'Lazer', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L306: `          emoji: '🎮', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L307: `          keywords: 'cinema,teatro,show,festa,balada,jogo,games,diversão,diversao,parque,viagem,passeio,netflix,streaming,spotify,amazon prime,disney,hbo,ingresso,concerto,museu,zoo,praia,piscina,clube,entretenimento'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L308: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L309: `        { `
+  - Abre bloco de execu��o.
+- L310: `          name: 'Contas', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L311: `          emoji: '💳', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L312: `          keywords: 'conta,luz,energia elétrica,eletrica,água,agua,saneamento,internet,telefone,celular,aluguel,condomínio,condominio,cartão,cartao,fatura,boleto,pagamento,financiamento,prestação,prestacao,iptu,ipva,seguro,taxa,tarifa,mensalidade'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L313: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L314: `        { `
+  - Abre bloco de execu��o.
+- L315: `          name: 'Saúde', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L316: `          emoji: '💊', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L317: `          keywords: 'médico,medico,remédio,remedio,farmácia,farmacia,consulta,exame,hospital,clínica,clinica,dentista,odonto,plano de saúde,saude,medicamento,drogaria,droga raia,drogasil,pague menos,ultrafarma,panvel,laboratório,laboratorio,fisioterapia,terapia,psicólogo,psicologo'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L318: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L319: `        { `
+  - Abre bloco de execu��o.
+- L320: `          name: 'Educação', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L321: `          emoji: '📚', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L322: `          keywords: 'curso,faculdade,universidade,escola,colégio,colegio,livro,material escolar,mensalidade,matrícula,matricula,apostila,aula,professor,educação,educacao,estudo,formação,formacao,treinamento,workshop,seminário,seminario,udemy,coursera,alura'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L323: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L324: `        { `
+  - Abre bloco de execu��o.
+- L325: `          name: 'Vestuário', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L326: `          emoji: '👕', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L327: `          keywords: 'roupa,calça,calca,camisa,blusa,camiseta,sapato,tênis,tenis,sandália,sandalia,chinelo,moda,loja de roupa,shopping,calçado,calcado,vestido,saia,bermuda,shorts,jaqueta,casaco,boné,bone,acessório,acessorio,bolsa,mochila,carteira,renner,c&a,riachuelo,marisa,hering,zara,adidas,nike'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L328: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L329: `        { `
+  - Abre bloco de execu��o.
+- L330: `          name: 'Poupança', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L331: `          emoji: '🐷', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L332: `          keywords: 'poupança,poupanca,guardado,economia,reserva,investimento,aplicação,aplicacao'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L333: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L334: `        { `
+  - Abre bloco de execu��o.
+- L335: `          name: 'Emergência', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L336: `          emoji: '🚨', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L337: `          keywords: 'emergência,emergencia,urgência,urgencia,imprevisto'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L338: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L339: `        { `
+  - Abre bloco de execu��o.
+- L340: `          name: 'Outros', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L341: `          emoji: '📦', `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L342: `          keywords: 'outro,diversos,variados,geral,vários,varios,demais'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L343: `        }`
+  - Fecha bloco de execu��o.
+- L344: `      ];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L345: ``
+  - Linha em branco para organizar blocos.
+- L346: `      const stmt = this.db.prepare('INSERT OR IGNORE INTO categories (name, emoji, keywords) VALUES (?, ?, ?)');`
+  - Declara uma constante usada na l�gica.
+- L347: `      let inserted = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L348: `      `
+  - Linha em branco para organizar blocos.
+- L349: `      for (const cat of categories) {`
+  - Inicia la�o de repeti��o.
+- L350: `        stmt.run([cat.name, cat.emoji, cat.keywords]);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L351: `        inserted++;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L352: `      }`
+  - Fecha bloco de execu��o.
+- L353: `      stmt.free();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L354: `      `
+  - Linha em branco para organizar blocos.
+- L355: `      console.log('✅ ' + inserted + ' categorias inseridas!');`
+  - Registra informa��o de execu��o no log.
+- L356: `      this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L357: `    } catch (error) {`
+  - Abre bloco de execu��o.
+- L358: `      console.log('⚠️ Erro ao inserir categorias: ' + error.message);`
+  - Registra informa��o de execu��o no log.
+- L359: `    }`
+  - Fecha bloco de execu��o.
+- L360: `  }`
+  - Fecha bloco de execu��o.
+- L361: ``
+  - Linha em branco para organizar blocos.
+- L362: `  save() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L363: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L364: `      const data = this.db.export();`
+  - Declara uma constante usada na l�gica.
+- L365: `      const buffer = Buffer.from(data);`
+  - Declara uma constante usada na l�gica.
+- L366: `      fs.writeFileSync(this.dbPath, buffer);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L367: `    } catch (error) {`
+  - Abre bloco de execu��o.
+- L368: `      console.error('Erro ao salvar banco:', error.message);`
+  - Registra erro no log para diagn�stico.
+- L369: `    }`
+  - Fecha bloco de execu��o.
+- L370: `  }`
+  - Fecha bloco de execu��o.
+- L371: ``
+  - Linha em branco para organizar blocos.
+- L372: `  close() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L373: `    if (this.db) {`
+  - Verifica condi��o para decidir o fluxo.
+- L374: `      this.save();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L375: `      this.db.close();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L376: `    }`
+  - Fecha bloco de execu��o.
+- L377: `  }`
+  - Fecha bloco de execu��o.
+- L378: ``
+  - Linha em branco para organizar blocos.
+- L379: `  getDatabase() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L380: `    return this.db;`
+  - Retorna valor da fun��o/m�todo.
+- L381: `  }`
+  - Fecha bloco de execu��o.
+- L382: `}`
+  - Fecha bloco de execu��o.
+- L383: ``
+  - Linha em branco para organizar blocos.
+- L384: `module.exports = DatabaseSchema;`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L385: ``
+  - Linha em branco para organizar blocos.
+
+## src/handlers/messageHandler.js
+
+- L1: `const NLPProcessor = require('../services/nlp');`
+  - Importa um m�dulo para uso neste arquivo.
+- L2: `const ReportGenerator = require('../services/reports');`
+  - Importa um m�dulo para uso neste arquivo.
+- L3: `const ExportService = require('../services/exportService');`
+  - Importa um m�dulo para uso neste arquivo.
+- L4: `const ForecastService = require('../services/forecastService');`
+  - Importa um m�dulo para uso neste arquivo.
+- L5: `const ErrorMessages = require('../utils/ErrorMessages');`
+  - Importa um m�dulo para uso neste arquivo.
+- L6: `const Logger = require('../utils/logger'); // ⭐ NOVO`
+  - Importa um m�dulo para uso neste arquivo.
+- L7: `const { TIMEOUTS, PAYMENT_METHODS } = require('../config/constants'); // ⭐ NOVOO CONTANTS`
+  - Importa um m�dulo para uso neste arquivo.
+- L8: `const path = require('path');`
+  - Importa um m�dulo para uso neste arquivo.
+- L9: ``
+  - Linha em branco para organizar blocos.
+- L10: `const { `
+  - Declara uma constante usada na l�gica.
+- L11: `  ADMIN_NUMBER, `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L12: `  limparMemoriaGlobal, `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L13: `  limparMemoriaUsuario, `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L14: `  verStatusMemoria, `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L15: `  mostrarAjuda `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L16: `} = require('../utils/memoryManager');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L17: ``
+  - Linha em branco para organizar blocos.
+- L18: `class MessageHandler {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L19: `constructor(dao, whatsappService) {`
+  - Inicializa estado da classe e depend�ncias.
+- L20: `  this.dao = dao;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L21: `  this.whatsapp = whatsappService;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L22: `  this.nlp = new NLPProcessor();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L23: `  this.reports = new ReportGenerator(dao);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L24: `  this.exportService = new ExportService(dao, this.reports, path.join(__dirname, '../../exports'));`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L25: `  this.forecastService = new ForecastService(dao, this.reports);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L26: `  `
+  - Linha em branco para organizar blocos.
+- L27: `  // ✅ INICIALIZAR TODOS OS OBJETOS PENDENTES`
+  - Coment�rio explicativo j� existente no c�digo.
+- L28: `  this.recentlyProcessed = {};`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L29: `  this.pendingResets = {};`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L30: `  this.pendingPurchases = {};`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L31: `  this.pendingInstallments = {};`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L32: `  this.pendingInvoicePayments = {};`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L33: `  this.pendingCardCreation = {};  // ⭐ NOVO: Para fluxo de criação de cartão`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L34: `  `
+  - Linha em branco para organizar blocos.
+- L35: `  // ✅ BIND DAS FUNÇÕES PARA EVITAR PERDER CONTEXTO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L36: `  this.cleanupPendingOperation = this.cleanupPendingOperation.bind(this);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L37: `}`
+  - Fecha bloco de execu��o.
+- L38: ``
+  - Linha em branco para organizar blocos.
+- L39: `isCardPayment(text) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L40: `  const textLower = text.toLowerCase().trim();`
+  - Declara uma constante usada na l�gica.
+- L41: `  return PAYMENT_METHODS.CARD.includes(textLower);`
+  - Retorna valor da fun��o/m�todo.
+- L42: `}`
+  - Fecha bloco de execu��o.
+- L43: ``
+  - Linha em branco para organizar blocos.
+- L44: `isBalancePayment(text) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L45: `  const textLower = text.toLowerCase().trim();`
+  - Declara uma constante usada na l�gica.
+- L46: `  return PAYMENT_METHODS.BALANCE.includes(textLower);`
+  - Retorna valor da fun��o/m�todo.
+- L47: `}`
+  - Fecha bloco de execu��o.
+- L48: ``
+  - Linha em branco para organizar blocos.
+- L49: `cleanupPendingOperation(userId, operationType, timeout = TIMEOUTS.PENDING_PURCHASE) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L50: `  const self = this;`
+  - Declara uma constante usada na l�gica.
+- L51: `  setTimeout(function() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L52: `    const pendingMap = {`
+  - Declara uma constante usada na l�gica.
+- L53: `      'purchase': self.pendingPurchases,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L54: `      'installment': self.pendingInstallments,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L55: `      'invoice': self.pendingInvoicePayments,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L56: `      'reset': self.pendingResets,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L57: `      'card_creation': self.pendingCardCreation`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L58: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L59: ``
+  - Linha em branco para organizar blocos.
+- L60: `    const targetMap = pendingMap[operationType];`
+  - Declara uma constante usada na l�gica.
+- L61: `    if (targetMap && targetMap[userId]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L62: `      delete targetMap[userId];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L63: `      Logger.info(\`Timeout: ${operationType} expirado para usuário ${userId}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L64: `    }`
+  - Fecha bloco de execu��o.
+- L65: `  }, timeout);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L66: `}`
+  - Fecha bloco de execu��o.
+- L67: ``
+  - Linha em branco para organizar blocos.
+- L68: `parseGoalCreateInput(rawText) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L69: `  const raw = String(rawText || '').trim();`
+  - Declara uma constante usada na l�gica.
+- L70: `  if (!raw) return null;`
+  - Verifica condi��o para decidir o fluxo.
+- L71: ``
+  - Linha em branco para organizar blocos.
+- L72: `  const amountMatch = raw.match(/(?:r\$|\brs\b)?\s*(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{1,2})?|\d+(?:[.,]\d{1,2})?)/i);`
+  - Declara uma constante usada na l�gica.
+- L73: `  if (!amountMatch) return null;`
+  - Verifica condi��o para decidir o fluxo.
+- L74: ``
+  - Linha em branco para organizar blocos.
+- L75: `  const amount = this.nlp.parseAmountString(amountMatch[1]);`
+  - Declara uma constante usada na l�gica.
+- L76: `  if (!amount || amount <= 0) return null;`
+  - Verifica condi��o para decidir o fluxo.
+- L77: ``
+  - Linha em branco para organizar blocos.
+- L78: `  let name = raw.replace(amountMatch[0], '').trim();`
+  - Declara vari�vel com valor que pode ser alterado.
+- L79: `  name = name.replace(/^(?:para|de|da|do)\s+/i, '').trim();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L80: `  if (!name) name = 'Meta de economia';`
+  - Verifica condi��o para decidir o fluxo.
+- L81: ``
+  - Linha em branco para organizar blocos.
+- L82: `  return { amount, name };`
+  - Retorna valor da fun��o/m�todo.
+- L83: `}`
+  - Fecha bloco de execu��o.
+- L84: ``
+  - Linha em branco para organizar blocos.
+- L85: `generateGoalsMessage(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L86: `  const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L87: `  const goals = this.dao.getSavingsGoalsByUser(userId);`
+  - Declara uma constante usada na l�gica.
+- L88: ``
+  - Linha em branco para organizar blocos.
+- L89: `  if (!goals.length) {`
+  - Verifica condi��o para decidir o fluxo.
+- L90: `    return '🎯 *METAS DE ECONOMIA*\n\n' +`
+  - Retorna valor da fun��o/m�todo.
+- L91: `      'Você ainda não tem metas cadastradas.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L92: `      'Use:\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L93: `      '\`/meta criar 5000 viagem\`\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L94: `      '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L95: `  }`
+  - Fecha bloco de execu��o.
+- L96: ``
+  - Linha em branco para organizar blocos.
+- L97: `  let msg = '🎯 *METAS DE ECONOMIA*\n\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L98: `  for (let i = 0; i < goals.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L99: `    const goal = goals[i];`
+  - Declara uma constante usada na l�gica.
+- L100: `    const bar = this.reports.buildProgressBar(goal.progress_percent || 0, 12);`
+  - Declara uma constante usada na l�gica.
+- L101: `    msg += \`#${goal.id} *${goal.name}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L102: `    msg += \`   Alvo: ${this.reports.formatMoney(Number(goal.target_amount || 0))}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L103: `    msg += \`   Progresso: ${this.reports.formatMoney(Number(goal.current_progress || 0))} (${goal.progress_percent || 0}%)\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L104: `    msg += \`   ${bar}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L105: `    msg += \`   Falta: ${this.reports.formatMoney(Number(goal.remaining_amount || 0))}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L106: `    msg += \`   Status: ${goal.status === 'completed' ? 'concluída' : 'ativa'}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L107: `    if (goal.target_date) {`
+  - Verifica condi��o para decidir o fluxo.
+- L108: `      msg += \`   Prazo: ${this.reports.formatDateShort(goal.target_date)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L109: `    }`
+  - Fecha bloco de execu��o.
+- L110: `    msg += '\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L111: `  }`
+  - Fecha bloco de execu��o.
+- L112: ``
+  - Linha em branco para organizar blocos.
+- L113: `  msg += '💡 Comandos:\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L114: `  msg += '• \`/meta criar 5000 viagem\`\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L115: `  msg += '• \`/meta remover [id]\`\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L116: `  msg += '• \`/meta concluir [id]\`\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L117: `  msg += '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L118: `  return msg;`
+  - Retorna valor da fun��o/m�todo.
+- L119: `}`
+  - Fecha bloco de execu��o.
+- L120: ``
+  - Linha em branco para organizar blocos.
+- L121: `generateVisualChartMessage(userId, period) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L122: `  const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L123: `  const now = new Date();`
+  - Declara uma constante usada na l�gica.
+- L124: `  const start = new Date(now);`
+  - Declara uma constante usada na l�gica.
+- L125: `  const title = period === 'week' ? 'SEMANA' : 'MÊS';`
+  - Declara uma constante usada na l�gica.
+- L126: ``
+  - Linha em branco para organizar blocos.
+- L127: `  if (period === 'week') {`
+  - Verifica condi��o para decidir o fluxo.
+- L128: `    start.setDate(start.getDate() - 7);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L129: `  } else {`
+  - Abre bloco de execu��o.
+- L130: `    start.setDate(1);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L131: `  }`
+  - Fecha bloco de execu��o.
+- L132: ``
+  - Linha em branco para organizar blocos.
+- L133: `  const byCategory = this.dao.getExpensesByCategory(userId, start.toISOString(), now.toISOString());`
+  - Declara uma constante usada na l�gica.
+- L134: `  if (!byCategory.length) {`
+  - Verifica condi��o para decidir o fluxo.
+- L135: `    return \`📊 *GRÁFICO ${title}*\n\nSem gastos no período.\n\n🕑 ${timestamp.formatted}\`;`
+  - Retorna valor da fun��o/m�todo.
+- L136: `  }`
+  - Fecha bloco de execu��o.
+- L137: ``
+  - Linha em branco para organizar blocos.
+- L138: `  const total = byCategory.reduce((sum, c) => sum + Number(c.total || 0), 0);`
+  - Declara uma constante usada na l�gica.
+- L139: `  let msg = \`📊 *GRÁFICO ${title} (CATEGORIAS)*\n\n\`;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L140: `  for (let i = 0; i < Math.min(byCategory.length, 8); i++) {`
+  - Inicia la�o de repeti��o.
+- L141: `    const c = byCategory[i];`
+  - Declara uma constante usada na l�gica.
+- L142: `    const pct = total > 0 ? (Number(c.total || 0) / total) * 100 : 0;`
+  - Declara uma constante usada na l�gica.
+- L143: `    const bar = this.reports.buildProgressBar(pct, 14);`
+  - Declara uma constante usada na l�gica.
+- L144: `    msg += \`${c.emoji || '•'} ${c.category}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L145: `    msg += \`${bar} ${pct.toFixed(0)}% (${this.reports.formatMoney(Number(c.total || 0))})\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L146: `  }`
+  - Fecha bloco de execu��o.
+- L147: `  msg += '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L148: `  return msg;`
+  - Retorna valor da fun��o/m�todo.
+- L149: `}`
+  - Fecha bloco de execu��o.
+- L150: ``
+  - Linha em branco para organizar blocos.
+- L151: `getDashboardUrl() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L152: `  const base = process.env.DASHBOARD_BASE_URL;`
+  - Declara uma constante usada na l�gica.
+- L153: `  const port = process.env.DASHBOARD_PORT || '3030';`
+  - Declara uma constante usada na l�gica.
+- L154: `  const fallback = \`http://localhost:${port}/dashboard\`;`
+  - Declara uma constante usada na l�gica.
+- L155: `  return (base ? \`${base.replace(/\/$/, '')}/dashboard\` : fallback);`
+  - Retorna valor da fun��o/m�todo.
+- L156: `}`
+  - Fecha bloco de execu��o.
+- L157: ``
+  - Linha em branco para organizar blocos.
+- L158: `  async process(message) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L159: `  try {`
+  - Inicia bloco protegido contra exce��es.
+- L160: `    // ✅ VALIDAÇÕES EXTRAS`
+  - Coment�rio explicativo j� existente no c�digo.
+- L161: `    if (!message || !message.key) {`
+  - Verifica condi��o para decidir o fluxo.
+- L162: `      console.log('⚠️ Mensagem inválida recebida');`
+  - Registra informa��o de execu��o no log.
+- L163: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L164: `    }`
+  - Fecha bloco de execu��o.
+- L165: ``
+  - Linha em branco para organizar blocos.
+- L166: `    // ✅ IGNORAR MENSAGENS ENVIADAS PELO BOT`
+  - Coment�rio explicativo j� existente no c�digo.
+- L167: `    if (message.key.fromMe) {`
+  - Verifica condi��o para decidir o fluxo.
+- L168: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L169: `    }`
+  - Fecha bloco de execu��o.
+- L170: ``
+  - Linha em branco para organizar blocos.
+- L171: `    const msg = message.message;`
+  - Declara uma constante usada na l�gica.
+- L172: `    const text = msg.conversation ||`
+  - Declara uma constante usada na l�gica.
+- L173: `      (msg.extendedTextMessage && msg.extendedTextMessage.text) ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L174: `      (msg.imageMessage && msg.imageMessage.caption) ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L175: `      (msg.videoMessage && msg.videoMessage.caption) ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L176: `      '';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L177: `      `
+  - Linha em branco para organizar blocos.
+- L178: `    if (!text || text.trim() === '') return;`
+  - Verifica condi��o para decidir o fluxo.
+- L179: ``
+  - Linha em branco para organizar blocos.
+- L180: `    const isGroup = message.key.remoteJid.endsWith('@g.us');`
+  - Declara uma constante usada na l�gica.
+- L181: `    const sender = isGroup ? message.key.participant : message.key.remoteJid;`
+  - Declara uma constante usada na l�gica.
+- L182: `    const info = {`
+  - Declara uma constante usada na l�gica.
+- L183: `      sender: sender,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L184: `      chatId: message.key.remoteJid,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L185: `      isGroup: isGroup,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L186: `      messageId: message.key.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L187: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L188: ``
+  - Linha em branco para organizar blocos.
+- L189: `      // ==================== ⭐ COMANDOS ADMINISTRATIVOS ⭐ ====================`
+  - Coment�rio explicativo j� existente no c�digo.
+- L190: `      // Comparar numeros ignorando sufixo :XX do Baileys`
+  - Coment�rio explicativo j� existente no c�digo.
+- L191: `      const senderClean = sender.split(':')[0].split('@')[0];`
+  - Declara uma constante usada na l�gica.
+- L192: `      const adminClean = ADMIN_NUMBER.split(':')[0].split('@')[0];`
+  - Declara uma constante usada na l�gica.
+- L193: `      const isAdmin = senderClean === adminClean;`
+  - Declara uma constante usada na l�gica.
+- L194: ``
+  - Linha em branco para organizar blocos.
+- L195: `      if (isAdmin) {`
+  - Verifica condi��o para decidir o fluxo.
+- L196: `        const comando = text.toLowerCase().trim();`
+  - Declara uma constante usada na l�gica.
+- L197: ``
+  - Linha em branco para organizar blocos.
+- L198: `        // !STATS - Estatísticas do bot`
+  - Coment�rio explicativo j� existente no c�digo.
+- L199: `        if (comando === '!stats') {`
+  - Verifica condi��o para decidir o fluxo.
+- L200: `          Logger.admin('!stats');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L201: `          const stats = this.dao.getSystemStats();`
+  - Declara uma constante usada na l�gica.
+- L202: ``
+  - Linha em branco para organizar blocos.
+- L203: `          const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L204: `          const resposta = \`📊 *ESTATÍSTICAS DO BOT*\n\n\` +`
+  - Declara uma constante usada na l�gica.
+- L205: `            \`👥 Total de usuários: *${stats.totalUsers}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L206: `            \`💸 Total de gastos: *${stats.totalExpenses}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L207: `            \`📦 Parcelamentos ativos: *${stats.totalInstallments}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L208: `            \`💳 Cartões cadastrados: *${stats.totalCards}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L209: `            \`🎯 Metas ativas: *${stats.totalGoals || 0}*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L210: `            \`💰 *SALDOS TOTAIS:*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L211: `            \`   Principal: ${this.reports.formatMoney(stats.totalBalance)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L212: `            \`   Poupança: ${this.reports.formatMoney(stats.totalSavings)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L213: `            \`   Emergência: ${this.reports.formatMoney(stats.totalEmergency)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L214: `            \`   Total: ${this.reports.formatMoney(stats.totalBalance + stats.totalSavings + stats.totalEmergency)}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L215: `            \`🕐 ${timestamp.formatted}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L216: ``
+  - Linha em branco para organizar blocos.
+- L217: `          await this.whatsapp.replyMessage(message, resposta);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L218: `          await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L219: `          return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L220: `        }`
+  - Fecha bloco de execu��o.
+- L221: ``
+  - Linha em branco para organizar blocos.
+- L222: `        // !BROADCAST - Enviar mensagem para todos`
+  - Coment�rio explicativo j� existente no c�digo.
+- L223: `        if (comando.startsWith('!broadcast ')) {`
+  - Verifica condi��o para decidir o fluxo.
+- L224: `          Logger.admin('!broadcast');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L225: `          const mensagem = text.substring('!broadcast '.length).trim();`
+  - Declara uma constante usada na l�gica.
+- L226: ``
+  - Linha em branco para organizar blocos.
+- L227: `          if (!mensagem) {`
+  - Verifica condi��o para decidir o fluxo.
+- L228: `            await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L229: `              '❌ *Erro!*\n\nUso: !broadcast [mensagem]\n\nExemplo:\n!broadcast Manutenção agendada para hoje às 22h'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L230: `            );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L231: `            return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L232: `          }`
+  - Fecha bloco de execu��o.
+- L233: ``
+  - Linha em branco para organizar blocos.
+- L234: `          const allUsers = this.dao.getAllUsers();`
+  - Declara uma constante usada na l�gica.
+- L235: `          const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L236: `          let sucessos = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L237: `          let falhas = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L238: ``
+  - Linha em branco para organizar blocos.
+- L239: `          for (let i = 0; i < allUsers.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L240: `            try {`
+  - Inicia bloco protegido contra exce��es.
+- L241: `              const userJid = allUsers[i].whatsapp_id;`
+  - Declara uma constante usada na l�gica.
+- L242: `              const broadcastMsg = \`📢 *MENSAGEM DO ADMINISTRADOR*\n\n${mensagem}\n\n🕐 ${timestamp.formatted}\`;`
+  - Declara uma constante usada na l�gica.
+- L243: `              await this.whatsapp.sendMessage(userJid, broadcastMsg);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L244: `              sucessos++;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L245: `              await new Promise(resolve => setTimeout(resolve, 1000)); // Delay de 1s entre envios`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L246: `            } catch (err) {`
+  - Abre bloco de execu��o.
+- L247: `              falhas++;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L248: `              console.error(\`❌ Erro ao enviar para ${allUsers[i].name}:\`, err.message);`
+  - Registra erro no log para diagn�stico.
+- L249: `            }`
+  - Fecha bloco de execu��o.
+- L250: `          }`
+  - Fecha bloco de execu��o.
+- L251: ``
+  - Linha em branco para organizar blocos.
+- L252: `          const resposta = \`✅ *BROADCAST CONCLUÍDO*\n\n\` +`
+  - Declara uma constante usada na l�gica.
+- L253: `            \`📤 Enviados: ${sucessos}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L254: `            \`❌ Falhas: ${falhas}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L255: `            \`👥 Total: ${allUsers.length}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L256: `            \`🕐 ${timestamp.formatted}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L257: ``
+  - Linha em branco para organizar blocos.
+- L258: `          await this.whatsapp.replyMessage(message, resposta);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L259: `          await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L260: `          return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L261: `        }`
+  - Fecha bloco de execu��o.
+- L262: ``
+  - Linha em branco para organizar blocos.
+- L263: `        if (comando === '!limpartudo') {`
+  - Verifica condi��o para decidir o fluxo.
+- L264: `          Logger.admin('!limpartudo');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L265: `          const resposta = limparMemoriaGlobal();`
+  - Declara uma constante usada na l�gica.
+- L266: `          await this.whatsapp.replyMessage(message, resposta);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L267: `          await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L268: `          return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L269: `        }`
+  - Fecha bloco de execu��o.
+- L270: ``
+  - Linha em branco para organizar blocos.
+- L271: `        if (comando === '!limpar') {`
+  - Verifica condi��o para decidir o fluxo.
+- L272: `          console.log('🧹 Admin executou: !limpar');`
+  - Registra informa��o de execu��o no log.
+- L273: `          const resposta = limparMemoriaUsuario(sender);`
+  - Declara uma constante usada na l�gica.
+- L274: `          await this.whatsapp.replyMessage(message, resposta);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L275: `          await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L276: `          return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L277: `        }`
+  - Fecha bloco de execu��o.
+- L278: ``
+  - Linha em branco para organizar blocos.
+- L279: `        if (comando === '!status') {`
+  - Verifica condi��o para decidir o fluxo.
+- L280: `          console.log('📊 Admin executou: !status');`
+  - Registra informa��o de execu��o no log.
+- L281: `          const resposta = verStatusMemoria();`
+  - Declara uma constante usada na l�gica.
+- L282: `          await this.whatsapp.replyMessage(message, resposta);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L283: `          await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L284: `          return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L285: `        }`
+  - Fecha bloco de execu��o.
+- L286: ``
+  - Linha em branco para organizar blocos.
+- L287: `        if (comando === '!ajuda' || comando === '!help') {`
+  - Verifica condi��o para decidir o fluxo.
+- L288: `          console.log('❓ Admin executou: !ajuda');`
+  - Registra informa��o de execu��o no log.
+- L289: `          const resposta = mostrarAjuda();`
+  - Declara uma constante usada na l�gica.
+- L290: `          await this.whatsapp.replyMessage(message, resposta);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L291: `          await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L292: `          return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L293: `        }`
+  - Fecha bloco de execu��o.
+- L294: `      }`
+  - Fecha bloco de execu��o.
+- L295: `      // ==================== FIM DOS COMANDOS ADMINISTRATIVOS ====================`
+  - Coment�rio explicativo j� existente no c�digo.
+- L296: ``
+  - Linha em branco para organizar blocos.
+- L297: `const messageKey = sender + '-' + info.messageId;`
+  - Declara uma constante usada na l�gica.
+- L298: `if (this.recentlyProcessed[messageKey]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L299: `  return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L300: `}`
+  - Fecha bloco de execu��o.
+- L301: `this.recentlyProcessed[messageKey] = true;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L302: ``
+  - Linha em branco para organizar blocos.
+- L303: `const self = this;`
+  - Declara uma constante usada na l�gica.
+- L304: `setTimeout(function() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L305: `  delete self.recentlyProcessed[messageKey];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L306: `}, 30000);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L307: ``
+  - Linha em branco para organizar blocos.
+- L308: ``
+  - Linha em branco para organizar blocos.
+- L309: `await this.whatsapp.markAsRead(info.chatId, info.messageId); // ✅ CORRETO`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L310: `await this.whatsapp.sendPresence(info.chatId, 'composing');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L311: `      let user = this.dao.getUserByWhatsAppId(sender);`
+  - Declara vari�vel com valor que pode ser alterado.
+- L312: `if (!user) {`
+  - Verifica condi��o para decidir o fluxo.
+- L313: `  const name = message.pushName || sender.split('@')[0];`
+  - Declara uma constante usada na l�gica.
+- L314: `  user = this.dao.upsertUser(sender, name);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L315: `  Logger.user('Novo usuário', name, sender);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L316: `  `
+  - Linha em branco para organizar blocos.
+- L317: `  await this.whatsapp.replyMessage(message, this.reports.generateWelcomeMessage(name));`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L318: `  await this.whatsapp.sendPresence(info.chatId, 'available'); // ✅ CORRIGIDO`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L319: `  return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L320: `}`
+  - Fecha bloco de execu��o.
+- L321: ``
+  - Linha em branco para organizar blocos.
+- L322: `if (info.isGroup) { // ✅ CORRIGIDO`
+  - Verifica condi��o para decidir o fluxo.
+- L323: `  const groupName = info.chatId.split('@')[0]; // ✅ CORRIGIDO`
+  - Declara uma constante usada na l�gica.
+- L324: `  this.dao.upsertGroup(info.chatId, groupName); // ✅ CORRIGIDO`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L325: `}`
+  - Fecha bloco de execu��o.
+- L326: `// 💳 VERIFICAR SE É RESPOSTA A PERGUNTA DE PAGAMENTO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L327: `if (this.pendingPurchases && this.pendingPurchases[user.id]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L328: `  const pending = this.pendingPurchases[user.id];`
+  - Declara uma constante usada na l�gica.
+- L329: `  const textLower = text.toLowerCase().trim();`
+  - Declara uma constante usada na l�gica.
+- L330: ``
+  - Linha em branco para organizar blocos.
+- L331: `  // ⭐ SUB-FLUXO: Aguardando resposta sobre parcelamento no cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L332: `  if (pending.awaitingInstallmentAnswer) {`
+  - Verifica condi��o para decidir o fluxo.
+- L333: `    const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L334: `    if (textLower === 'nao' || textLower === 'não' || textLower === 'n') {`
+  - Verifica condi��o para decidir o fluxo.
+- L335: `      // Compra à vista no cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L336: `      delete this.pendingPurchases[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L337: `      await this.registerExpenseInCard(pending.expense, user, message, pending.messageInfo, info.chatId, pending.selectedCard);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L338: `      await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L339: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L340: `    } else if (textLower === 'sim' || textLower === 's') {`
+  - Abre bloco de execu��o.
+- L341: `      // Quer parcelar - perguntar em quantas vezes`
+  - Coment�rio explicativo j� existente no c�digo.
+- L342: `      this.pendingPurchases[user.id] = {`
+  - Abre bloco de execu��o.
+- L343: `        ...pending,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L344: `        awaitingInstallmentAnswer: false,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L345: `        awaitingInstallmentCount: true`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L346: `      };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L347: `      await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L348: `        '📊 *PARCELAMENTO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L349: `        \`💰 Valor: ${this.reports.formatMoney(pending.expense.amount)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L350: `        \`💳 Cartão: *${pending.selectedCard.card_name}*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L351: `        'Em quantas vezes deseja parcelar?\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L352: `        '(Digite o número de parcelas, ex: 3, 6, 12)\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L353: `        '⏱️ Você tem 2 minutos para responder\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L354: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L355: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L356: `      this.cleanupPendingOperation(user.id, 'purchase', TIMEOUTS.PENDING_PURCHASE);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L357: `      await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L358: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L359: `    } else {`
+  - Abre bloco de execu��o.
+- L360: `      await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L361: `        '❌ Responda com *sim* ou *não*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L362: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L363: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L364: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L365: `    }`
+  - Fecha bloco de execu��o.
+- L366: `  }`
+  - Fecha bloco de execu��o.
+- L367: ``
+  - Linha em branco para organizar blocos.
+- L368: `  // ⭐ SUB-FLUXO: Aguardando numero de parcelas`
+  - Coment�rio explicativo j� existente no c�digo.
+- L369: `  if (pending.awaitingInstallmentCount) {`
+  - Verifica condi��o para decidir o fluxo.
+- L370: `    const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L371: `    const numParcelas = parseInt(textLower);`
+  - Declara uma constante usada na l�gica.
+- L372: `    if (isNaN(numParcelas) || numParcelas < 2 || numParcelas > 48) {`
+  - Verifica condi��o para decidir o fluxo.
+- L373: `      await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L374: `        '❌ *Número inválido!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L375: `        'Digite um número de parcelas entre 2 e 48.\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L376: `        'Exemplo: 3, 6, 12\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L377: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L378: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L379: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L380: `    }`
+  - Fecha bloco de execu��o.
+- L381: ``
+  - Linha em branco para organizar blocos.
+- L382: `    delete this.pendingPurchases[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L383: ``
+  - Linha em branco para organizar blocos.
+- L384: `    // Registrar como parcelamento no cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L385: `    const installmentAmount = parseFloat((pending.expense.amount / numParcelas).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L386: `    const installmentData = {`
+  - Declara uma constante usada na l�gica.
+- L387: `      description: pending.expense.description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L388: `      totalAmount: pending.expense.amount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L389: `      installments: numParcelas,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L390: `      installmentAmount: installmentAmount`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L391: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L392: `    await this.registerInstallmentInCard(installmentData, user, message, pending.messageInfo, info.chatId, pending.selectedCard);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L393: `    await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L394: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L395: `  }`
+  - Fecha bloco de execu��o.
+- L396: ``
+  - Linha em branco para organizar blocos.
+- L397: `  // Verificar se digitou "saldo" ou "dinheiro"`
+  - Coment�rio explicativo j� existente no c�digo.
+- L398: `  if (this.isBalancePayment(text)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L399: `    delete this.pendingPurchases[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L400: ``
+  - Linha em branco para organizar blocos.
+- L401: `    const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L402: `    await this.registerExpenseInBalance(pending.expense, user, message, pending.messageInfo, info.chatId, timestamp);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L403: `    await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L404: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L405: `  }`
+  - Fecha bloco de execu��o.
+- L406: ``
+  - Linha em branco para organizar blocos.
+- L407: `  // Caso contrário, tentar encontrar cartão pelo nome digitado`
+  - Coment�rio explicativo j� existente no c�digo.
+- L408: `  const card = this.dao.findCardByPartialName(user.id, text);`
+  - Declara uma constante usada na l�gica.
+- L409: ``
+  - Linha em branco para organizar blocos.
+- L410: `  if (card) {`
+  - Verifica condi��o para decidir o fluxo.
+- L411: `    // ⭐ Cartão encontrado - perguntar se vai parcelar`
+  - Coment�rio explicativo j� existente no c�digo.
+- L412: `    const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L413: `    this.pendingPurchases[user.id] = {`
+  - Abre bloco de execu��o.
+- L414: `      ...pending,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L415: `      selectedCard: card,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L416: `      awaitingInstallmentAnswer: true`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L417: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L418: ``
+  - Linha em branco para organizar blocos.
+- L419: `    await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L420: `      '💳 *COMPRA NO CARTÃO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L421: `      \`💰 Valor: ${this.reports.formatMoney(pending.expense.amount)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L422: `      \`📝 Descrição: ${pending.expense.description}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L423: `      \`💳 Cartão: *${card.card_name}*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L424: `      'Deseja parcelar esta compra?\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L425: `      'Responda com *sim* ou *não*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L426: `      '⏱️ Você tem 2 minutos para responder\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L427: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L428: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L429: `    this.cleanupPendingOperation(user.id, 'purchase', TIMEOUTS.PENDING_PURCHASE);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L430: `    await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L431: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L432: `  } else {`
+  - Abre bloco de execu��o.
+- L433: `    // Não encontrou cartão nem é saldo`
+  - Coment�rio explicativo j� existente no c�digo.
+- L434: `    const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L435: `    const cards = this.dao.getAllCardsByUserId(user.id);`
+  - Declara uma constante usada na l�gica.
+- L436: `    let cardList = '';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L437: `    for (let i = 0; i < cards.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L438: `      cardList += \`• *${cards[i].card_name}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L439: `    }`
+  - Fecha bloco de execu��o.
+- L440: `    await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L441: `      '❌ *Cartão não encontrado!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L442: `      \`Você digitou: "${text}"\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L443: `      '💡 *Opções válidas:*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L444: `      cardList +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L445: `      '• Ou digite *saldo* para pagar no saldo\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L446: `      'Use \`/cartoes\` para ver seus cartões\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L447: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L448: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L449: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L450: `  }`
+  - Fecha bloco de execu��o.
+- L451: `}`
+  - Fecha bloco de execu��o.
+- L452: `// 💳 VERIFICAR SE É RESPOSTA A PERGUNTA DE PARCELAMENTO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L453: `if (this.pendingInstallments && this.pendingInstallments[user.id]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L454: `  const pending = this.pendingInstallments[user.id];`
+  - Declara uma constante usada na l�gica.
+- L455: `  const textLower = text.toLowerCase().trim();`
+  - Declara uma constante usada na l�gica.
+- L456: ``
+  - Linha em branco para organizar blocos.
+- L457: `  // Verificar se digitou "saldo"`
+  - Coment�rio explicativo j� existente no c�digo.
+- L458: `  if (this.isBalancePayment(text)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L459: `    delete this.pendingInstallments[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L460: ``
+  - Linha em branco para organizar blocos.
+- L461: `    const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L462: `    await this.registerInstallmentNormal(pending.installment, user, message, pending.messageInfo, info.chatId, timestamp);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L463: `    await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L464: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L465: `  }`
+  - Fecha bloco de execu��o.
+- L466: ``
+  - Linha em branco para organizar blocos.
+- L467: `  // Tentar encontrar cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L468: `  const card = this.dao.findCardByPartialName(user.id, text);`
+  - Declara uma constante usada na l�gica.
+- L469: ``
+  - Linha em branco para organizar blocos.
+- L470: `  if (card) {`
+  - Verifica condi��o para decidir o fluxo.
+- L471: `    delete this.pendingInstallments[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L472: ``
+  - Linha em branco para organizar blocos.
+- L473: `    await this.registerInstallmentInCard(pending.installment, user, message, pending.messageInfo, info.chatId, card);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L474: `    await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L475: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L476: `  } else {`
+  - Abre bloco de execu��o.
+- L477: `    const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L478: `    const allCards = this.dao.getAllCardsByUserId(user.id);`
+  - Declara uma constante usada na l�gica.
+- L479: `    let cardList = '';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L480: `    for (let i = 0; i < allCards.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L481: `      cardList += \`• *${allCards[i].card_name}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L482: `    }`
+  - Fecha bloco de execu��o.
+- L483: `    await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L484: `      '❌ *Cartão não encontrado!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L485: `      \`Você digitou: "${text}"\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L486: `      '💡 *Opções válidas:*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L487: `      cardList +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L488: `      '• Ou digite *saldo* para parcelar manualmente\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L489: `      'Use \`/cartoes\` para ver seus cartões\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L490: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L491: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L492: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L493: `  }`
+  - Fecha bloco de execu��o.
+- L494: `}`
+  - Fecha bloco de execu��o.
+- L495: `// 💳 VERIFICAR SE É VALOR PARA PAGAMENTO DE FATURA`
+  - Coment�rio explicativo j� existente no c�digo.
+- L496: `if (this.pendingInvoicePayments && this.pendingInvoicePayments[user.id]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L497: `  const pending = this.pendingInvoicePayments[user.id];`
+  - Declara uma constante usada na l�gica.
+- L498: ``
+  - Linha em branco para organizar blocos.
+- L499: `  // Tentar extrair valor do texto - aceitar numero puro tambem`
+  - Coment�rio explicativo j� existente no c�digo.
+- L500: `  let amount = this.nlp.extractAmount(text);`
+  - Declara vari�vel com valor que pode ser alterado.
+- L501: `  if (!amount) {`
+  - Verifica condi��o para decidir o fluxo.
+- L502: `    const cleanVal = text.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');`
+  - Declara uma constante usada na l�gica.
+- L503: `    const parsed = parseFloat(cleanVal);`
+  - Declara uma constante usada na l�gica.
+- L504: `    if (!isNaN(parsed) && parsed > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L505: `      amount = parsed;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L506: `    }`
+  - Fecha bloco de execu��o.
+- L507: `  }`
+  - Fecha bloco de execu��o.
+- L508: ``
+  - Linha em branco para organizar blocos.
+- L509: `  if (amount && amount > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L510: `    const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L511: `    const cardBeforePayment = this.dao.getCardById(pending.cardId);`
+  - Declara uma constante usada na l�gica.
+- L512: ``
+  - Linha em branco para organizar blocos.
+- L513: `    if (!cardBeforePayment) {`
+  - Verifica condi��o para decidir o fluxo.
+- L514: `      delete this.pendingInvoicePayments[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L515: `      await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L516: `        '❌ *Cartão não encontrado!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L517: `        'Use \`/cartoes\` para conferir seus cartões.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L518: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L519: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L520: `      await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L521: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L522: `    }`
+  - Fecha bloco de execu��o.
+- L523: ``
+  - Linha em branco para organizar blocos.
+- L524: `    if (amount > cardBeforePayment.invoice_amount) {`
+  - Verifica condi��o para decidir o fluxo.
+- L525: `      await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L526: `        '❌ *Valor maior que a fatura atual!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L527: `        \`💳 Cartão: *${cardBeforePayment.card_name}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L528: `        \`📊 Fatura atual: ${this.reports.formatMoney(cardBeforePayment.invoice_amount)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L529: `        \`💰 Valor informado: ${this.reports.formatMoney(amount)}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L530: `        'Digite um valor menor ou igual à fatura.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L531: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L532: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L533: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L534: `    }`
+  - Fecha bloco de execu��o.
+- L535: ``
+  - Linha em branco para organizar blocos.
+- L536: `    delete this.pendingInvoicePayments[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L537: `    const success = this.dao.payCardInvoice(user.id, pending.cardId, amount);`
+  - Declara uma constante usada na l�gica.
+- L538: ``
+  - Linha em branco para organizar blocos.
+- L539: `    if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L540: `      const updatedCard = this.dao.getCardById(pending.cardId);`
+  - Declara uma constante usada na l�gica.
+- L541: `      const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);`
+  - Declara uma constante usada na l�gica.
+- L542: ``
+  - Linha em branco para organizar blocos.
+- L543: `      let resp = '✅ *FATURA PAGA!*\n\n' +`
+  - Declara vari�vel com valor que pode ser alterado.
+- L544: `        \`💳 Cartão: *${updatedCard.card_name}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L545: `        \`💰 Valor pago: ${this.reports.formatMoney(amount)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L546: `        \`🔓 Limite liberado: ${this.reports.formatMoney(amount)}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L547: `        '📊 *SITUAÇÃO ATUAL DO CARTÃO*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L548: `        \`   Limite total: ${this.reports.formatMoney(updatedCard.card_limit)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L549: `        \`   Usado: ${this.reports.formatMoney(updatedCard.current_balance)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L550: `        \`   Disponível: ${this.reports.formatMoney(updatedCard.available_limit)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L551: ``
+  - Linha em branco para organizar blocos.
+- L552: `      if (updatedCard.invoice_amount > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L553: `        resp += \`📅 *Fatura próximo mês:* ${this.reports.formatMoney(updatedCard.invoice_amount)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L554: `      } else {`
+  - Abre bloco de execu��o.
+- L555: `        resp += '✅ *Fatura totalmente quitada!*\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L556: `      }`
+  - Fecha bloco de execu��o.
+- L557: ``
+  - Linha em branco para organizar blocos.
+- L558: `      resp += \`💰 *Seu saldo atual:* ${this.reports.formatMoney(updatedUser.current_balance)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L559: `      resp += '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L560: ``
+  - Linha em branco para organizar blocos.
+- L561: `      await this.whatsapp.replyMessage(message, resp);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L562: `      await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L563: `      Logger.info(\`${user.name}: pagou fatura ${updatedCard.card_name} - R$ ${amount.toFixed(2)}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L564: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L565: `    } else {`
+  - Abre bloco de execu��o.
+- L566: `      const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L567: `      await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L568: `        ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L569: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L570: `      await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L571: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L572: `    }`
+  - Fecha bloco de execu��o.
+- L573: `  } else {`
+  - Abre bloco de execu��o.
+- L574: `    // ⭐ Valor invalido - avisar o usuario (antes caia silenciosamente)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L575: `    const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L576: `    await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L577: `      '❌ *Valor inválido!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L578: `      'Digite apenas o valor numérico que você pagou.\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L579: `      'Exemplo: 1300 ou 1.300,00\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L580: `      \`📊 Fatura atual: ${this.reports.formatMoney(pending.invoiceAmount)}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L581: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L582: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L583: `    await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L584: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L585: `  }`
+  - Fecha bloco de execu��o.
+- L586: `}`
+  - Fecha bloco de execu��o.
+- L587: `// 💳 VERIFICAR SE ESTÁ NO FLUXO DE CRIAÇÃO DE CARTÃO (3 ETAPAS)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L588: `if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L589: `  const pending = this.pendingCardCreation[user.id];`
+  - Declara uma constante usada na l�gica.
+- L590: `  const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L591: `  `
+  - Linha em branco para organizar blocos.
+- L592: `  // ETAPA 1: Aguardando nome do cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L593: `  if (pending.step === 'waiting_name') {`
+  - Verifica condi��o para decidir o fluxo.
+- L594: `    const cardName = text.trim();`
+  - Declara uma constante usada na l�gica.
+- L595: `    `
+  - Linha em branco para organizar blocos.
+- L596: `    // Validar tamanho do nome`
+  - Coment�rio explicativo j� existente no c�digo.
+- L597: `    if (cardName.length < 2 || cardName.length > 50) {`
+  - Verifica condi��o para decidir o fluxo.
+- L598: `      await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L599: `        '❌ *Nome inválido!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L600: `        'O nome deve ter entre 2 e 50 caracteres.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L601: `        '💡 Exemplo: "Nubank" ou "Cartão Principal"\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L602: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L603: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L604: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L605: `    }`
+  - Fecha bloco de execu��o.
+- L606: `    `
+  - Linha em branco para organizar blocos.
+- L607: `    // Verificar se já existe cartão com este nome`
+  - Coment�rio explicativo j� existente no c�digo.
+- L608: `    const existing = this.dao.getCardByName(user.id, cardName);`
+  - Declara uma constante usada na l�gica.
+- L609: `    if (existing) {`
+  - Verifica condi��o para decidir o fluxo.
+- L610: `      await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L611: `        '⚠️ *Você já tem um cartão com este nome!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L612: `        \`💳 Nome duplicado: *${cardName}*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L613: `        '💡 Escolha outro nome ou use \`/cartoes\` para ver seus cartões\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L614: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L615: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L616: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L617: `    }`
+  - Fecha bloco de execu��o.
+- L618: `    `
+  - Linha em branco para organizar blocos.
+- L619: `    // Avançar para próxima etapa`
+  - Coment�rio explicativo j� existente no c�digo.
+- L620: `    this.pendingCardCreation[user.id] = {`
+  - Abre bloco de execu��o.
+- L621: `      step: 'waiting_limit',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L622: `      cardName: cardName,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L623: `      timestamp: Date.now()`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L624: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L625: `    `
+  - Linha em branco para organizar blocos.
+- L626: `    await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L627: `      '💳 *CADASTRO DE CARTÃO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L628: `      \`✅ Nome: *${cardName}*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L629: `      '📊 *Agora digite o limite do cartão:*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L630: `      'Valor mínimo: R$ 100,00\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L631: `      'Exemplo: 5000\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L632: `      '⏱️ Você tem 3 minutos para responder\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L633: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L634: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L635: `    `
+  - Linha em branco para organizar blocos.
+- L636: `    this.cleanupPendingOperation(user.id, 'card_creation', TIMEOUTS.PENDING_CARD_CREATION);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L637: `    await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L638: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L639: `  }`
+  - Fecha bloco de execu��o.
+- L640: `  `
+  - Linha em branco para organizar blocos.
+- L641: `// 💳 AGUARDANDO LIMITE DO CARTÃO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L642: `if (pending.step === 'waiting_limit') {`
+  - Verifica condi��o para decidir o fluxo.
+- L643: `  const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L644: ``
+  - Linha em branco para organizar blocos.
+- L645: `  const cleanValue = text`
+  - Declara uma constante usada na l�gica.
+- L646: `    .replace(/[R$\s]/g, '')`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L647: `    .replace(/\./g, '')`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L648: `    .replace(',', '.');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L649: ``
+  - Linha em branco para organizar blocos.
+- L650: `  const limitValue = parseFloat(cleanValue);`
+  - Declara uma constante usada na l�gica.
+- L651: ``
+  - Linha em branco para organizar blocos.
+- L652: `  if (isNaN(limitValue) || limitValue < 100) {`
+  - Verifica condi��o para decidir o fluxo.
+- L653: `    await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L654: `      '❌ *Limite inválido!*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L655: `      'O limite mínimo é R$ 100,00\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L656: `      '💡 *Formatos aceitos:*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L657: `      '   • 5000\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L658: `      '   • R$ 5000\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L659: `      '   • 5.000\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L660: `      '   • 5.000,00\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L661: `      '   • R$ 5.000,00\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L662: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L663: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L664: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L665: `  }`
+  - Fecha bloco de execu��o.
+- L666: ``
+  - Linha em branco para organizar blocos.
+- L667: `  if (limitValue > 1000000) {`
+  - Verifica condi��o para decidir o fluxo.
+- L668: `    await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L669: `      '❌ *Limite muito alto!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L670: `      'O limite máximo é R$ 1.000.000,00\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L671: `      '💡 Digite um valor menor\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L672: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L673: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L674: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L675: `  }`
+  - Fecha bloco de execu��o.
+- L676: ``
+  - Linha em branco para organizar blocos.
+- L677: `  // Avançar para vencimento`
+  - Coment�rio explicativo j� existente no c�digo.
+- L678: `  this.pendingCardCreation[user.id] = {`
+  - Abre bloco de execu��o.
+- L679: `    step: 'waiting_due_day',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L680: `    cardName: pending.cardName,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L681: `    cardLimit: limitValue,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L682: `    timestamp: Date.now()`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L683: `  };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L684: ``
+  - Linha em branco para organizar blocos.
+- L685: `  await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L686: `    '💳 *CADASTRO DE CARTÃO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L687: `    \`✅ Nome: *${pending.cardName}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L688: `    \`✅ Limite: *${this.reports.formatMoney(limitValue)}*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L689: `    '📅 *Por último, digite o dia do vencimento da fatura:*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L690: `    'Número de 1 a 31\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L691: `    'Exemplo: 10 (para todo dia 10)\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L692: `    '⏱️ Você tem 3 minutos para responder\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L693: `    '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L694: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L695: ``
+  - Linha em branco para organizar blocos.
+- L696: `  this.cleanupPendingOperation(user.id, 'card_creation', TIMEOUTS.PENDING_CARD_CREATION);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L697: `  await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L698: `  return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L699: `}`
+  - Fecha bloco de execu��o.
+- L700: `  `
+  - Linha em branco para organizar blocos.
+- L701: `  // ETAPA 3: Aguardando dia do vencimento`
+  - Coment�rio explicativo j� existente no c�digo.
+- L702: `  if (pending.step === 'waiting_due_day') {`
+  - Verifica condi��o para decidir o fluxo.
+- L703: `    const dueDay = parseInt(text.trim());`
+  - Declara uma constante usada na l�gica.
+- L704: `    `
+  - Linha em branco para organizar blocos.
+- L705: `    if (isNaN(dueDay) || dueDay < 1 || dueDay > 31) {`
+  - Verifica condi��o para decidir o fluxo.
+- L706: `      await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L707: `        '❌ *Dia inválido!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L708: `        'Digite um número de 1 a 31\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L709: `        '💡 Exemplo: 10 (para vencimento todo dia 10)\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L710: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L711: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L712: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L713: `    }`
+  - Fecha bloco de execu��o.
+- L714: `    `
+  - Linha em branco para organizar blocos.
+- L715: `   // Criar o cartão`
+  - Coment�rio explicativo j� existente no c�digo.
+- L716: `const result = this.dao.createCard(user.id, pending.cardName, pending.cardLimit, dueDay);`
+  - Declara uma constante usada na l�gica.
+- L717: `delete this.pendingCardCreation[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L718: ``
+  - Linha em branco para organizar blocos.
+- L719: `if (result.success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L720: `  await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L721: `    '✅ *CARTÃO CADASTRADO COM SUCESSO!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L722: `    \`💳 Nome: *${result.cardName}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L723: `    \`📊 Limite: ${this.reports.formatMoney(result.limit)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L724: `    \`📅 Vencimento: Todo dia ${result.dueDay}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L725: `    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L726: `    '💡 *Como usar:*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L727: `    'Quando você registrar uma compra, o bot vai perguntar:\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L728: `    '• Digite o nome do cartão para pagar nele\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L729: `    '• Ou digitou "saldo" para pagar no saldo\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L730: `    '📌 Use \`/cartoes\` para ver todos os seus cartões\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L731: `    '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L732: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L733: `  `
+  - Linha em branco para organizar blocos.
+- L734: `  Logger.card(user, 'criou cartão', result.cardName || pending.cardName);  // ✅ Só um ;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L735: `} else {`
+  - Abre bloco de execu��o.
+- L736: `  await this.whatsapp.replyMessage(message, `
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L737: `    (result.message || '❌ *Erro ao criar cartão*') + '\n\n🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L738: `  );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L739: `}`
+  - Fecha bloco de execu��o.
+- L740: ``
+  - Linha em branco para organizar blocos.
+- L741: `await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L742: `return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L743: `  }`
+  - Fecha bloco de execu��o.
+- L744: `}`
+  - Fecha bloco de execu��o.
+- L745: ``
+  - Linha em branco para organizar blocos.
+- L746: ``
+  - Linha em branco para organizar blocos.
+- L747: `      const processed = this.nlp.processMessage(text);`
+  - Declara uma constante usada na l�gica.
+- L748: ``
+  - Linha em branco para organizar blocos.
+- L749: `      if (processed.type === 'command') {`
+  - Verifica condi��o para decidir o fluxo.
+- L750: `        await this.handleCommand(processed, user, message, isAdmin);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L751: `      } else if (processed.type === 'expense') {`
+  - Abre bloco de execu��o.
+- L752: `        await this.handleExpense(processed, user, message);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L753: `      } else if (processed.type === 'installment') {`
+  - Abre bloco de execu��o.
+- L754: `        await this.handleInstallment(processed, user, message);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L755: `      } else if (processed.type === 'unknown' && text.trim().startsWith('/')) {`
+  - Abre bloco de execu��o.
+- L756: `        const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L757: `        await this.whatsapp.replyMessage(`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L758: `          message,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L759: `          ErrorMessages.COMMAND_NOT_FOUND() + '\n\n🕑 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L760: `        );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L761: `      }`
+  - Fecha bloco de execu��o.
+- L762: ``
+  - Linha em branco para organizar blocos.
+- L763: `      await this.whatsapp.sendPresence(info.chatId, 'available');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L764: ``
+  - Linha em branco para organizar blocos.
+- L765: `    } catch (error) {`
+  - Abre bloco de execu��o.
+- L766: `      console.error('❌ Erro ao processar mensagem:', error);`
+  - Registra erro no log para diagn�stico.
+- L767: `      try {`
+  - Inicia bloco protegido contra exce��es.
+- L768: `        const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L769: `        await this.whatsapp.replyMessage(message, `
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L770: `          '❌ *Erro ao processar comando*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L771: `          '📌 Ocorreu um erro inesperado\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L772: `          '💡 Tente novamente ou use \`/ajuda\`\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L773: `          '🕑 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L774: `        );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L775: `      } catch (e) {`
+  - Abre bloco de execu��o.
+- L776: `        console.error('❌ Erro ao enviar mensagem de erro:', e);`
+  - Registra erro no log para diagn�stico.
+- L777: `      }`
+  - Fecha bloco de execu��o.
+- L778: `    }`
+  - Fecha bloco de execu��o.
+- L779: `  }`
+  - Fecha bloco de execu��o.
+- L780: ``
+  - Linha em branco para organizar blocos.
+- L781: `  async handleCommand(command, user, message, isAdmin) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L782: `    let response = '';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L783: `    const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L784: `    const info = this.whatsapp.getSenderInfo(message);`
+  - Declara uma constante usada na l�gica.
+- L785: `    const sender = info.sender;`
+  - Declara uma constante usada na l�gica.
+- L786: ``
+  - Linha em branco para organizar blocos.
+- L787: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L788: `      if (command.command === 'setBalance') {`
+  - Verifica condi��o para decidir o fluxo.
+- L789: `        if (command.amount && command.amount > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L790: `          this.dao.setInitialBalance(user.whatsapp_id, command.amount);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L791: `          const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);`
+  - Declara uma constante usada na l�gica.
+- L792: `          `
+  - Linha em branco para organizar blocos.
+- L793: `          response = '✅ *SALDO DEFINIDO COM SUCESSO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L794: `            \`💰 *Valor:* ${this.reports.formatMoney(command.amount)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L795: `            \`🕑 *Data/Hora:* ${timestamp.formatted}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L796: `            'Agora você pode registrar seus gastos!\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L797: `            'Use \`/ajuda\` para ver todos os comandos.';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L798: `          `
+  - Linha em branco para organizar blocos.
+- L799: `          console.log('💰 ' + user.name + ': saldo inicial ' + command.amount);`
+  - Registra informa��o de execu��o no log.
+- L800: `        } else {`
+  - Abre bloco de execu��o.
+- L801: `          response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L802: `        }`
+  - Fecha bloco de execu��o.
+- L803: `        `
+  - Linha em branco para organizar blocos.
+- L804: `        await this.whatsapp.replyMessage(message, response);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L805: `        return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L806: `      }`
+  - Fecha bloco de execu��o.
+- L807: `      `
+  - Linha em branco para organizar blocos.
+- L808: `      else if (command.command === 'addBalance') {`
+  - Verifica condi��o alternativa no fluxo.
+- L809: `        if (command.amount && command.amount > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L810: `          const success = this.dao.addBalance(user.whatsapp_id, command.amount);`
+  - Declara uma constante usada na l�gica.
+- L811: `          `
+  - Linha em branco para organizar blocos.
+- L812: `          if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L813: `            const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);`
+  - Declara uma constante usada na l�gica.
+- L814: `            this.dao.setLowBalanceWarned(updatedUser.id, false);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L815: `            `
+  - Linha em branco para organizar blocos.
+- L816: `            response = '✅ *SALDO ADICIONADO COM SUCESSO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L817: `              \`💵 *Valor adicionado:* ${this.reports.formatMoney(command.amount)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L818: `              \`🕑 *Data/Hora:* ${timestamp.formatted}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L819: `              '💰 *NOVO SALDO*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L820: `              \`   Principal: *${this.reports.formatMoney(updatedUser.current_balance)}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L821: `            `
+  - Linha em branco para organizar blocos.
+- L822: `            if (updatedUser.savings_balance > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L823: `              response += \`   Poupança: ${this.reports.formatMoney(updatedUser.savings_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L824: `            }`
+  - Fecha bloco de execu��o.
+- L825: `            if (updatedUser.emergency_fund > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L826: `              response += \`   Emergência: ${this.reports.formatMoney(updatedUser.emergency_fund)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L827: `            }`
+  - Fecha bloco de execu��o.
+- L828: `            `
+  - Linha em branco para organizar blocos.
+- L829: `            const total = updatedUser.current_balance + updatedUser.savings_balance + updatedUser.emergency_fund;`
+  - Declara uma constante usada na l�gica.
+- L830: `            response += \`   Total: ${this.reports.formatMoney(total)}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L831: `            `
+  - Linha em branco para organizar blocos.
+- L832: `            console.log('💰 ' + user.name + ': adicionou ' + command.amount);`
+  - Registra informa��o de execu��o no log.
+- L833: `          } else {`
+  - Abre bloco de execu��o.
+- L834: `            response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L835: `          }`
+  - Fecha bloco de execu��o.
+- L836: `        } else {`
+  - Abre bloco de execu��o.
+- L837: `          response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L838: `        }`
+  - Fecha bloco de execu��o.
+- L839: `        `
+  - Linha em branco para organizar blocos.
+- L840: `        await this.whatsapp.replyMessage(message, response);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L841: `        return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L842: `      }`
+  - Fecha bloco de execu��o.
+- L843: `      `
+  - Linha em branco para organizar blocos.
+- L844: `      else if (command.command === 'getBalance') {`
+  - Verifica condi��o alternativa no fluxo.
+- L845: `        const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);`
+  - Declara uma constante usada na l�gica.
+- L846: `        response = this.reports.generateBalanceReport(updatedUser);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L847: `      }`
+  - Fecha bloco de execu��o.
+- L848: `      `
+  - Linha em branco para organizar blocos.
+- L849: `      else if (command.command === 'getSavings') {`
+  - Verifica condi��o alternativa no fluxo.
+- L850: `        const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);`
+  - Declara uma constante usada na l�gica.
+- L851: `        response = '🐷 *POUPANÇA*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L852: `          \`💵 Saldo guardado: *${this.reports.formatMoney(updatedUser.savings_balance)}*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L853: `          'Use \`/guardar 100\` para guardar dinheiro\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L854: `          'Use \`/retirar 50\` para retirar\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L855: `          '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L856: `      }`
+  - Fecha bloco de execu��o.
+- L857: `      `
+  - Linha em branco para organizar blocos.
+- L858: `      else if (command.command === 'depositSavings') {`
+  - Verifica condi��o alternativa no fluxo.
+- L859: `        if (command.amount && command.amount > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L860: `          const success = this.dao.addToSavings(user.id, command.amount);`
+  - Declara uma constante usada na l�gica.
+- L861: `          `
+  - Linha em branco para organizar blocos.
+- L862: `          if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L863: `            const updatedUser = this.dao.getUserById(user.id);`
+  - Declara uma constante usada na l�gica.
+- L864: `            if (updatedUser) {`
+  - Verifica condi��o para decidir o fluxo.
+- L865: `              response = this.reports.generateSavingsConfirmation('deposit', command.amount, updatedUser);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L866: `              console.log('🐷 ' + user.name + ': guardou ' + command.amount);`
+  - Registra informa��o de execu��o no log.
+- L867: `            } else {`
+  - Abre bloco de execu��o.
+- L868: `              response = '❌ *Erro ao buscar dados atualizados*\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L869: `            }`
+  - Fecha bloco de execu��o.
+- L870: `          } else {`
+  - Abre bloco de execu��o.
+- L871: `            response = ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L872: `          }`
+  - Fecha bloco de execu��o.
+- L873: `        } else {`
+  - Abre bloco de execu��o.
+- L874: `          response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L875: `        }`
+  - Fecha bloco de execu��o.
+- L876: `        `
+  - Linha em branco para organizar blocos.
+- L877: `        await this.whatsapp.replyMessage(message, response);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L878: `        return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L879: `      }`
+  - Fecha bloco de execu��o.
+- L880: `      `
+  - Linha em branco para organizar blocos.
+- L881: `      else if (command.command === 'withdrawSavings') {`
+  - Verifica condi��o alternativa no fluxo.
+- L882: `        if (command.amount && command.amount > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L883: `          const success = this.dao.withdrawFromSavings(user.id, command.amount);`
+  - Declara uma constante usada na l�gica.
+- L884: `          `
+  - Linha em branco para organizar blocos.
+- L885: `          if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L886: `            const updatedUser = this.dao.getUserById(user.id);`
+  - Declara uma constante usada na l�gica.
+- L887: `            if (updatedUser) {`
+  - Verifica condi��o para decidir o fluxo.
+- L888: `              response = this.reports.generateSavingsConfirmation('withdraw', command.amount, updatedUser);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L889: `              console.log('🐷 ' + user.name + ': retirou ' + command.amount);`
+  - Registra informa��o de execu��o no log.
+- L890: `            } else {`
+  - Abre bloco de execu��o.
+- L891: `              response = '❌ *Erro ao buscar dados atualizados*\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L892: `            }`
+  - Fecha bloco de execu��o.
+- L893: `          } else {`
+  - Abre bloco de execu��o.
+- L894: `            response = ErrorMessages.INSUFFICIENT_BALANCE('Poupança') + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L895: `          }`
+  - Fecha bloco de execu��o.
+- L896: `        } else {`
+  - Abre bloco de execu��o.
+- L897: `          response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L898: `        }`
+  - Fecha bloco de execu��o.
+- L899: `        `
+  - Linha em branco para organizar blocos.
+- L900: `        await this.whatsapp.replyMessage(message, response);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L901: `        return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L902: `      }`
+  - Fecha bloco de execu��o.
+- L903: `      `
+  - Linha em branco para organizar blocos.
+- L904: `      else if (command.command === 'getEmergency') {`
+  - Verifica condi��o alternativa no fluxo.
+- L905: `        const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);`
+  - Declara uma constante usada na l�gica.
+- L906: `        response = '🚨 *RESERVA DE EMERGÊNCIA*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L907: `          \`💵 Saldo reservado: *${this.reports.formatMoney(updatedUser.emergency_fund)}*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L908: `          'Use \`/reservar 200\` para adicionar\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L909: `          'Use \`/usar 100\` para utilizar\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L910: `          '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L911: `      }`
+  - Fecha bloco de execu��o.
+- L912: `      `
+  - Linha em branco para organizar blocos.
+- L913: `      else if (command.command === 'depositEmergency') {`
+  - Verifica condi��o alternativa no fluxo.
+- L914: `        if (command.amount && command.amount > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L915: `          const success = this.dao.addToEmergencyFund(user.id, command.amount);`
+  - Declara uma constante usada na l�gica.
+- L916: `          `
+  - Linha em branco para organizar blocos.
+- L917: `          if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L918: `            const updatedUser = this.dao.getUserById(user.id);`
+  - Declara uma constante usada na l�gica.
+- L919: `            if (updatedUser) {`
+  - Verifica condi��o para decidir o fluxo.
+- L920: `              response = this.reports.generateEmergencyConfirmation('deposit', command.amount, updatedUser);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L921: `              console.log('🚨 ' + user.name + ': reservou ' + command.amount);`
+  - Registra informa��o de execu��o no log.
+- L922: `            } else {`
+  - Abre bloco de execu��o.
+- L923: `              response = '❌ *Erro ao buscar dados atualizados*\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L924: `            }`
+  - Fecha bloco de execu��o.
+- L925: `          } else {`
+  - Abre bloco de execu��o.
+- L926: `            response = ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L927: `          }`
+  - Fecha bloco de execu��o.
+- L928: `        } else {`
+  - Abre bloco de execu��o.
+- L929: `          response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L930: `        }`
+  - Fecha bloco de execu��o.
+- L931: `        `
+  - Linha em branco para organizar blocos.
+- L932: `        await this.whatsapp.replyMessage(message, response);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L933: `        return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L934: `      }`
+  - Fecha bloco de execu��o.
+- L935: `      `
+  - Linha em branco para organizar blocos.
+- L936: `      else if (command.command === 'withdrawEmergency') {`
+  - Verifica condi��o alternativa no fluxo.
+- L937: `        if (command.amount && command.amount > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L938: `          const success = this.dao.withdrawFromEmergencyFund(user.id, command.amount);`
+  - Declara uma constante usada na l�gica.
+- L939: `          `
+  - Linha em branco para organizar blocos.
+- L940: `          if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L941: `            const updatedUser = this.dao.getUserById(user.id);`
+  - Declara uma constante usada na l�gica.
+- L942: `            if (updatedUser) {`
+  - Verifica condi��o para decidir o fluxo.
+- L943: `              response = this.reports.generateEmergencyConfirmation('withdraw', command.amount, updatedUser);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L944: `              console.log('🚨 ' + user.name + ': usou reserva ' + command.amount);`
+  - Registra informa��o de execu��o no log.
+- L945: `            } else {`
+  - Abre bloco de execu��o.
+- L946: `              response = '❌ *Erro ao buscar dados atualizados*\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L947: `            }`
+  - Fecha bloco de execu��o.
+- L948: `          } else {`
+  - Abre bloco de execu��o.
+- L949: `            response = ErrorMessages.INSUFFICIENT_BALANCE('Reserva de emergência') + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L950: `          }`
+  - Fecha bloco de execu��o.
+- L951: `        } else {`
+  - Abre bloco de execu��o.
+- L952: `          response = ErrorMessages.INVALID_VALUE() + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L953: `        }`
+  - Fecha bloco de execu��o.
+- L954: `        `
+  - Linha em branco para organizar blocos.
+- L955: `        await this.whatsapp.replyMessage(message, response);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L956: `        return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L957: `      }`
+  - Fecha bloco de execu��o.
+- L958: `      `
+  - Linha em branco para organizar blocos.
+- L959: `      // ============ 💳 CRIAR NOVO CARTÃO (INICIAR FLUXO) ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L960: `else if (command.command === 'createCard') {`
+  - Verifica condi��o alternativa no fluxo.
+- L961: `  if (!this.pendingCardCreation) this.pendingCardCreation = {};`
+  - Verifica condi��o para decidir o fluxo.
+- L962: `  `
+  - Linha em branco para organizar blocos.
+- L963: `  this.pendingCardCreation[user.id] = {`
+  - Abre bloco de execu��o.
+- L964: `    step: 'waiting_name',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L965: `    timestamp: Date.now()`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L966: `  };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L967: `  `
+  - Linha em branco para organizar blocos.
+- L968: `  response = '💳 *CRIAR NOVO CARTÃO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L969: `    '📝 *Passo 1/3: Nome do cartão*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L970: `    'Digite um nome para identificar seu cartão:\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L971: `    '💡 Exemplos:\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L972: `    '• Nubank\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L973: `    '• Inter\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L974: `    '• C6 Bank\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L975: `    '• Cartão Principal\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L976: `    '⏱️ Você tem 3 minutos para responder\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L977: `    '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L978: `  `
+  - Linha em branco para organizar blocos.
+- L979: `  this.cleanupPendingOperation(user.id, 'card_creation', TIMEOUTS.PENDING_CARD_CREATION);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L980: `}`
+  - Fecha bloco de execu��o.
+- L981: ``
+  - Linha em branco para organizar blocos.
+- L982: `// ============ 💳 LISTAR TODOS OS CARTÕES ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L983: `else if (command.command === 'listCards') {`
+  - Verifica condi��o alternativa no fluxo.
+- L984: `  const cards = this.dao.getAllCardsByUserId(user.id);`
+  - Declara uma constante usada na l�gica.
+- L985: `  `
+  - Linha em branco para organizar blocos.
+- L986: `  if (!cards || cards.length === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L987: `    response = '💳 *VOCÊ NÃO TEM CARTÕES CADASTRADOS*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L988: `      'Use \`/cartao criar\` para cadastrar seu primeiro cartão!\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L989: `      '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L990: `  } else {`
+  - Abre bloco de execu��o.
+- L991: `    response = '💳 *SEUS CARTÕES*\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L992: `    `
+  - Linha em branco para organizar blocos.
+- L993: `    for (let i = 0; i < cards.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L994: `      const card = cards[i];`
+  - Declara uma constante usada na l�gica.
+- L995: `      const percentUsed = card.card_limit > 0 ? (card.current_balance / card.card_limit * 100).toFixed(1) : 0;`
+  - Declara uma constante usada na l�gica.
+- L996: `      `
+  - Linha em branco para organizar blocos.
+- L997: `      response += \`📇 *${card.card_name}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L998: `      response += \`   Limite: ${this.reports.formatMoney(card.card_limit)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L999: `      response += \`   Usado: ${this.reports.formatMoney(card.current_balance)} (${percentUsed}%)\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1000: `      response += \`   Disponível: ${this.reports.formatMoney(card.available_limit)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1001: `      response += \`   Fatura: ${this.reports.formatMoney(card.invoice_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1002: `      response += \`   Vencimento: Dia ${card.invoice_due_day}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1003: `    }`
+  - Fecha bloco de execu��o.
+- L1004: `    `
+  - Linha em branco para organizar blocos.
+- L1005: `    response += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1006: `    response += '💡 Use \`/cartao [nome]\` para ver detalhes\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1007: `    response += '💡 Use \`/pagar fatura [nome]\` para pagar\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1008: `    response += '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1009: `  }`
+  - Fecha bloco de execu��o.
+- L1010: `}`
+  - Fecha bloco de execu��o.
+- L1011: ``
+  - Linha em branco para organizar blocos.
+- L1012: `// ============ 💳 VER DETALHES DE UM CARTÃO ESPECÍFICO ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1013: `else if (command.command === 'getCardByName') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1014: `  if (!command.description) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1015: `    response = '❌ Digite o nome do cartão!\n\n💡 Exemplo: \`/cartao nubank\`\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1016: `  } else {`
+  - Abre bloco de execu��o.
+- L1017: `    const card = this.dao.findCardByPartialName(user.id, command.description);`
+  - Declara uma constante usada na l�gica.
+- L1018: `    `
+  - Linha em branco para organizar blocos.
+- L1019: `    if (!card) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1020: `      response = \`❌ Cartão "${command.description}" não encontrado\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1021: `        'Use \`/cartoes\` para ver todos os seus cartões\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1022: `        '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1023: `    } else {`
+  - Abre bloco de execu��o.
+- L1024: `      const percentUsed = card.card_limit > 0 ? (card.current_balance / card.card_limit * 100).toFixed(1) : 0;`
+  - Declara uma constante usada na l�gica.
+- L1025: `      `
+  - Linha em branco para organizar blocos.
+- L1026: `      response = \`💳 *${card.card_name.toUpperCase()}*\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1027: `      response += '📊 *LIMITES*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1028: `      response += \`   Total: ${this.reports.formatMoney(card.card_limit)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1029: `      response += \`   Usado: ${this.reports.formatMoney(card.current_balance)} (${percentUsed}%)\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1030: `      response += \`   Disponível: ${this.reports.formatMoney(card.available_limit)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1031: `      response += '💰 *FATURA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1032: `      response += \`   Valor atual: ${this.reports.formatMoney(card.invoice_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1033: `      response += \`   Vencimento: Todo dia ${card.invoice_due_day}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1034: `      `
+  - Linha em branco para organizar blocos.
+- L1035: `      if (card.last_payment_date) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1036: `        const lastPayment = new Date(card.last_payment_date);`
+  - Declara uma constante usada na l�gica.
+- L1037: `        response += '📅 *ÚLTIMO PAGAMENTO*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1038: `        response += \`   Valor: ${this.reports.formatMoney(card.last_payment_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1039: `        response += \`   Data: ${lastPayment.toLocaleDateString('pt-BR')}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1040: `      }`
+  - Fecha bloco de execu��o.
+- L1041: `      `
+  - Linha em branco para organizar blocos.
+- L1042: `      response += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1043: `      response += \`💡 Use \\`/pagar fatura ${card.card_name}\\` para pagar\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1044: `      response += '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1045: `    }`
+  - Fecha bloco de execu��o.
+- L1046: `  }`
+  - Fecha bloco de execu��o.
+- L1047: `}`
+  - Fecha bloco de execu��o.
+- L1048: ``
+  - Linha em branco para organizar blocos.
+- L1049: `// ============ 💳 PAGAR FATURA (MÚLTIPLOS CARTÕES) ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1050: `else if (command.command === 'payInvoiceCard') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1051: `  const cardName = command.description;`
+  - Declara uma constante usada na l�gica.
+- L1052: `  const card = this.dao.findCardByPartialName(user.id, cardName);`
+  - Declara uma constante usada na l�gica.
+- L1053: `  `
+  - Linha em branco para organizar blocos.
+- L1054: `  if (!card) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1055: `    response = \`❌ Cartão "${cardName}" não encontrado\n\nUse \\`/cartoes\\` para ver seus cartões\n\n🕐 \` + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1056: `  } else if (card.invoice_amount === 0) {`
+  - Abre bloco de execu��o.
+- L1057: `    response = \`✅ *FATURA ZERADA*\n\n💳 Cartão: *${card.card_name}*\n\nVocê não tem fatura para pagar!\n\n🕐 \` + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1058: `  } else {`
+  - Abre bloco de execu��o.
+- L1059: `    if (!this.pendingInvoicePayments) this.pendingInvoicePayments = {};`
+  - Verifica condi��o para decidir o fluxo.
+- L1060: `    `
+  - Linha em branco para organizar blocos.
+- L1061: `    this.pendingInvoicePayments[user.id] = {`
+  - Abre bloco de execu��o.
+- L1062: `      cardId: card.id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1063: `      cardName: card.card_name,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1064: `      invoiceAmount: card.invoice_amount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1065: `      timestamp: Date.now()`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1066: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1067: ``
+  - Linha em branco para organizar blocos.
+- L1068: `    response = '💳 *PAGAMENTO DE FATURA*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1069: `      \`📇 Cartão: *${card.card_name}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1070: `      \`📊 Fatura atual: ${this.reports.formatMoney(card.invoice_amount)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1071: `      \`💰 Seu saldo: ${this.reports.formatMoney(user.current_balance)}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1072: `      '💡 *Digite o valor que você pagou:*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1073: `      'Exemplo: 1300\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1074: `      '⏱️ Você tem 2 minutos para responder\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1075: `      '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1076: ``
+  - Linha em branco para organizar blocos.
+- L1077: `    this.cleanupPendingOperation(user.id, 'invoice', TIMEOUTS.PENDING_INVOICE);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1078: `  }`
+  - Fecha bloco de execu��o.
+- L1079: `}`
+  - Fecha bloco de execu��o.
+- L1080: ``
+  - Linha em branco para organizar blocos.
+- L1081: `// ============ 💳 DELETAR CARTÃO ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1082: `else if (command.command === 'deleteCard') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1083: `  if (!command.description) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1084: `    response = '❌ Digite o nome do cartão!\n\n💡 Exemplo: \`/deletar cartao nubank\`\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1085: `  } else {`
+  - Abre bloco de execu��o.
+- L1086: `    const card = this.dao.findCardByPartialName(user.id, command.description);`
+  - Declara uma constante usada na l�gica.
+- L1087: `    `
+  - Linha em branco para organizar blocos.
+- L1088: `    if (!card) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1089: `      response = \`❌ Cartão "${command.description}" não encontrado\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1090: `        'Use \`/cartoes\` para ver todos os seus cartões\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1091: `        '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1092: `    } else {`
+  - Abre bloco de execu��o.
+- L1093: `      // ✅ ORDEM CORRETA: (cardId, userId)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1094: `      const success = this.dao.deleteCard(card.id, user.id);`
+  - Declara uma constante usada na l�gica.
+- L1095: `      `
+  - Linha em branco para organizar blocos.
+- L1096: `      if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1097: `        response = '✅ *CARTÃO DELETADO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1098: `          \`💳 ${card.card_name} foi removido com sucesso!\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1099: `          '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1100: `        `
+  - Linha em branco para organizar blocos.
+- L1101: `        Logger.card(user, 'deletou cartão', card.card_name);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1102: `      } else {`
+  - Abre bloco de execu��o.
+- L1103: `        response = '❌ Erro ao deletar cartão\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1104: `      }`
+  - Fecha bloco de execu��o.
+- L1105: `    }`
+  - Fecha bloco de execu��o.
+- L1106: `  }`
+  - Fecha bloco de execu��o.
+- L1107: `}`
+  - Fecha bloco de execu��o.
+- L1108: ``
+  - Linha em branco para organizar blocos.
+- L1109: ``
+  - Linha em branco para organizar blocos.
+- L1110: `else if (command.command === 'resetCard') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1111: `  if (!command.description) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1112: `    response = '❌ Digite o nome do cartão!\n\n💡 Exemplo: \`/zerar cartao nubank\`\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1113: `  } else {`
+  - Abre bloco de execu��o.
+- L1114: `    const card = this.dao.findCardByPartialName(user.id, command.description);`
+  - Declara uma constante usada na l�gica.
+- L1115: `    `
+  - Linha em branco para organizar blocos.
+- L1116: `    if (!card) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1117: `      response = \`❌ Cartão "${command.description}" não encontrado\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1118: `        'Use \`/cartoes\` para ver todos os seus cartões\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1119: `        '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1120: `    } else {`
+  - Abre bloco de execu��o.
+- L1121: `      // ✅ ORDEM CORRETA: (cardId, userId)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1122: `      const success = this.dao.resetCard(card.id, user.id);`
+  - Declara uma constante usada na l�gica.
+- L1123: `      `
+  - Linha em branco para organizar blocos.
+- L1124: `      if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1125: `        response = '✅ *CARTÃO ZERADO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1126: `          \`💳 ${card.card_name}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1127: `          '• Saldo usado: R$ 0,00\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1128: `          '• Fatura: R$ 0,00\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1129: `          \`• Limite disponível: ${this.reports.formatMoney(card.card_limit)}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1130: `          '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1131: `        `
+  - Linha em branco para organizar blocos.
+- L1132: `        Logger.card(user, 'zerou cartão', card.card_name);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1133: `      } else {`
+  - Abre bloco de execu��o.
+- L1134: `        response = '❌ Erro ao zerar cartão\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1135: `      }`
+  - Fecha bloco de execu��o.
+- L1136: `    }`
+  - Fecha bloco de execu��o.
+- L1137: `  }`
+  - Fecha bloco de execu��o.
+- L1138: `}`
+  - Fecha bloco de execu��o.
+- L1139: ``
+  - Linha em branco para organizar blocos.
+- L1140: `// ============ 📅 VENCIMENTOS ============`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1141: `else if (command.command === 'vencimentos') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1142: `  const cards = this.dao.getAllCardsByUserId(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1143: `  `
+  - Linha em branco para organizar blocos.
+- L1144: `  if (!cards || cards.length === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1145: `    response = '💳 Você não tem cartões cadastrados\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1146: `  } else {`
+  - Abre bloco de execu��o.
+- L1147: `    response = '📅 *VENCIMENTOS DOS CARTÕES*\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1148: `    `
+  - Linha em branco para organizar blocos.
+- L1149: `    // Ordenar por dia de vencimento`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1150: `    cards.sort((a, b) => a.invoice_due_day - b.invoice_due_day);`
+  - Define fun��o an�nima/arrow function.
+- L1151: `    `
+  - Linha em branco para organizar blocos.
+- L1152: `    for (let i = 0; i < cards.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L1153: `      const card = cards[i];`
+  - Declara uma constante usada na l�gica.
+- L1154: `      response += \`💳 *${card.card_name}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1155: `      response += \`   Vencimento: Todo dia ${card.invoice_due_day}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1156: `      response += \`   Fatura atual: ${this.reports.formatMoney(card.invoice_amount)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1157: `    }`
+  - Fecha bloco de execu��o.
+- L1158: `    `
+  - Linha em branco para organizar blocos.
+- L1159: `    response += '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1160: `  }`
+  - Fecha bloco de execu��o.
+- L1161: `}`
+  - Fecha bloco de execu��o.
+- L1162: `      `
+  - Linha em branco para organizar blocos.
+- L1163: `      // 💳 ATUALIZAR LIMITE DE CARTÃO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1164: `else if (command.command === 'setCardLimit') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1165: `  if (command.amount && command.amount > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1166: `    const cards = this.dao.getAllCardsByUserId(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1167: `    if (!cards || cards.length === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1168: `      response = '❌ *Você não tem cartões cadastrados*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1169: `        'Use \`/cartao criar\` para cadastrar seu primeiro cartão!\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1170: `        '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1171: `    } else if (cards.length === 1) {`
+  - Abre bloco de execu��o.
+- L1172: `      const success = this.dao.updateCardLimit(cards[0].id, command.amount);`
+  - Declara uma constante usada na l�gica.
+- L1173: `      if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1174: `        const updatedCard = this.dao.getCardById(cards[0].id);`
+  - Declara uma constante usada na l�gica.
+- L1175: `        response = '✅ *LIMITE ATUALIZADO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1176: `          \`💳 Cartão: *${updatedCard.card_name}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1177: `          \`💰 Novo limite: ${this.reports.formatMoney(command.amount)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1178: `          \`💵 Usado: ${this.reports.formatMoney(updatedCard.current_balance)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1179: `          \`✅ Disponível: ${this.reports.formatMoney(updatedCard.available_limit)}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1180: `          '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1181: `        Logger.card(user, 'atualizou limite para', command.amount);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1182: `      } else {`
+  - Abre bloco de execu��o.
+- L1183: `        response = '❌ Erro ao atualizar limite\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1184: `      }`
+  - Fecha bloco de execu��o.
+- L1185: `    } else {`
+  - Abre bloco de execu��o.
+- L1186: `      response = '💳 Você tem mais de um cartão.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1187: `        'Use \`/cartoes\` para ver a lista e depois \`/cartao [nome]\` para ver detalhes.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1188: `        '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1189: `    }`
+  - Fecha bloco de execu��o.
+- L1190: `  } else {`
+  - Abre bloco de execu��o.
+- L1191: `    response = ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1192: `  }`
+  - Fecha bloco de execu��o.
+- L1193: `}`
+  - Fecha bloco de execu��o.
+- L1194: ``
+  - Linha em branco para organizar blocos.
+- L1195: `else if (command.command === 'getCard') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1196: `  const cards = this.dao.getAllCardsByUserId(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1197: `  if (!cards || cards.length === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1198: `    response = '💳 *VOCÊ NÃO TEM CARTÕES CADASTRADOS*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1199: `      'Use \`/cartao criar\` para cadastrar seu primeiro cartão!\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1200: `      '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1201: `  } else if (cards.length === 1) {`
+  - Abre bloco de execu��o.
+- L1202: `    response = this.reports.generateCardReport(cards[0]);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1203: `  } else {`
+  - Abre bloco de execu��o.
+- L1204: `    response = '💳 Você tem mais de um cartão.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1205: `      'Use \`/cartoes\` para ver todos ou \`/cartao [nome]\` para detalhes de um específico.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1206: `      '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1207: `  }`
+  - Fecha bloco de execu��o.
+- L1208: `}`
+  - Fecha bloco de execu��o.
+- L1209: `      `
+  - Linha em branco para organizar blocos.
+- L1210: `      else if (command.command === 'reportWeekly') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1211: `        response = this.reports.generateWeeklyReport(user.id);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1212: `      }`
+  - Fecha bloco de execu��o.
+- L1213: `      `
+  - Linha em branco para organizar blocos.
+- L1214: `      else if (command.command === 'reportMonthly') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1215: `        response = this.reports.generateMonthlyReport(user.id);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1216: `      }`
+  - Fecha bloco de execu��o.
+- L1217: ``
+  - Linha em branco para organizar blocos.
+- L1218: `      else if (command.command === 'reportChart') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1219: `        const period = command.description === 'week' ? 'week' : 'month';`
+  - Declara uma constante usada na l�gica.
+- L1220: `        response = this.generateVisualChartMessage(user.id, period);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1221: `      }`
+  - Fecha bloco de execu��o.
+- L1222: ``
+  - Linha em branco para organizar blocos.
+- L1223: `      else if (command.command === 'goalsList') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1224: `        response = this.generateGoalsMessage(user.id);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1225: `      }`
+  - Fecha bloco de execu��o.
+- L1226: ``
+  - Linha em branco para organizar blocos.
+- L1227: `      else if (command.command === 'goalsCreate') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1228: `        const parsed = this.parseGoalCreateInput(command.description);`
+  - Declara uma constante usada na l�gica.
+- L1229: `        if (!parsed) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1230: `          response = '❌ *Formato inválido*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1231: `            'Use: \`/meta criar 5000 viagem\`\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1232: `            '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1233: `        } else {`
+  - Abre bloco de execu��o.
+- L1234: `          const created = this.dao.createSavingsGoal(user.id, parsed.name, parsed.amount);`
+  - Declara uma constante usada na l�gica.
+- L1235: `          if (!created.success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1236: `            response = '❌ *Erro ao criar meta*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1237: `              \`📌 ${created.error}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1238: `              '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1239: `          } else {`
+  - Abre bloco de execu��o.
+- L1240: `            response = '✅ *META CRIADA*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1241: `              \`🎯 ${parsed.name}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1242: `              \`💰 Alvo: ${this.reports.formatMoney(parsed.amount)}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1243: `              'Use \`/meta\` para acompanhar o progresso.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1244: `              '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1245: `          }`
+  - Fecha bloco de execu��o.
+- L1246: `        }`
+  - Fecha bloco de execu��o.
+- L1247: `      }`
+  - Fecha bloco de execu��o.
+- L1248: ``
+  - Linha em branco para organizar blocos.
+- L1249: `      else if (command.command === 'goalsDelete') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1250: `        const goalId = parseInt(command.amount, 10);`
+  - Declara uma constante usada na l�gica.
+- L1251: `        if (!goalId) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1252: `          response = '❌ *ID inválido*\n\nUse \`/meta remover [id]\`\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1253: `        } else {`
+  - Abre bloco de execu��o.
+- L1254: `          const removed = this.dao.deleteSavingsGoal(user.id, goalId);`
+  - Declara uma constante usada na l�gica.
+- L1255: `          response = removed`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1256: `            ? \`✅ *META #${goalId} REMOVIDA*\n\n🕑 ${timestamp.formatted}\``
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1257: `            : \`❌ *Meta #${goalId} não encontrada*\n\n🕑 ${timestamp.formatted}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1258: `        }`
+  - Fecha bloco de execu��o.
+- L1259: `      }`
+  - Fecha bloco de execu��o.
+- L1260: ``
+  - Linha em branco para organizar blocos.
+- L1261: `      else if (command.command === 'goalsComplete') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1262: `        const goalId = parseInt(command.amount, 10);`
+  - Declara uma constante usada na l�gica.
+- L1263: `        if (!goalId) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1264: `          response = '❌ *ID inválido*\n\nUse \`/meta concluir [id]\`\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1265: `        } else {`
+  - Abre bloco de execu��o.
+- L1266: `          const completed = this.dao.completeSavingsGoal(user.id, goalId);`
+  - Declara uma constante usada na l�gica.
+- L1267: `          response = completed`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1268: `            ? \`✅ *META #${goalId} CONCLUÍDA*\n\nParabéns pelo resultado.\n\n🕑 ${timestamp.formatted}\``
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1269: `            : \`❌ *Meta #${goalId} não encontrada*\n\n🕑 ${timestamp.formatted}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1270: `        }`
+  - Fecha bloco de execu��o.
+- L1271: `      }`
+  - Fecha bloco de execu��o.
+- L1272: ``
+  - Linha em branco para organizar blocos.
+- L1273: `      else if (command.command === 'exportExcel' || command.command === 'exportPdf' || command.command === 'exportAll') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1274: `        const wantsExcel = command.command === 'exportExcel' || command.command === 'exportAll';`
+  - Declara uma constante usada na l�gica.
+- L1275: `        const wantsPdf = command.command === 'exportPdf' || command.command === 'exportAll';`
+  - Declara uma constante usada na l�gica.
+- L1276: `        const sentFiles = [];`
+  - Declara uma constante usada na l�gica.
+- L1277: ``
+  - Linha em branco para organizar blocos.
+- L1278: `        if (wantsExcel) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1279: `          const excel = await this.exportService.exportExcel(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1280: `          if (excel.success && this.whatsapp.sendDocument) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1281: `            await this.whatsapp.sendDocument(info.chatId, excel.filePath, excel.fileName, '📊 Exportação Excel');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1282: `            sentFiles.push('Excel');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1283: `          } else if (!excel.success) {`
+  - Abre bloco de execu��o.
+- L1284: `            response = '❌ *Falha ao gerar Excel*\n\n' + excel.error + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1285: `          }`
+  - Fecha bloco de execu��o.
+- L1286: `        }`
+  - Fecha bloco de execu��o.
+- L1287: ``
+  - Linha em branco para organizar blocos.
+- L1288: `        if (!response && wantsPdf) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1289: `          const pdf = await this.exportService.exportPdf(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1290: `          if (pdf.success && this.whatsapp.sendDocument) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1291: `            await this.whatsapp.sendDocument(info.chatId, pdf.filePath, pdf.fileName, '📄 Exportação PDF');`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1292: `            sentFiles.push('PDF');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1293: `          } else if (!pdf.success) {`
+  - Abre bloco de execu��o.
+- L1294: `            response = '❌ *Falha ao gerar PDF*\n\n' + pdf.error + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1295: `          }`
+  - Fecha bloco de execu��o.
+- L1296: `        }`
+  - Fecha bloco de execu��o.
+- L1297: ``
+  - Linha em branco para organizar blocos.
+- L1298: `        if (!response) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1299: `          response = '✅ *EXPORTAÇÃO CONCLUÍDA*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1300: `            \`Arquivos enviados: ${sentFiles.join(', ') || 'nenhum'}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1301: `            '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1302: `        }`
+  - Fecha bloco de execu��o.
+- L1303: `      }`
+  - Fecha bloco de execu��o.
+- L1304: ``
+  - Linha em branco para organizar blocos.
+- L1305: `      else if (command.command === 'dashboard') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1306: `        const dashboardEnabled = String(process.env.DASHBOARD_ENABLED || '').toLowerCase() === 'true';`
+  - Declara uma constante usada na l�gica.
+- L1307: `        const link = this.getDashboardUrl();`
+  - Declara uma constante usada na l�gica.
+- L1308: `        if (!dashboardEnabled) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1309: `          response = '⚠️ *DASHBOARD DESABILITADO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1310: `            'Defina \`DASHBOARD_ENABLED=true\` no .env e reinicie o bot.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1311: `            '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1312: `        } else {`
+  - Abre bloco de execu��o.
+- L1313: `          const tokenHint = process.env.DASHBOARD_TOKEN ? '\n🔐 Token ativo: adicione \`?token=SEU_TOKEN\` no link.' : '';`
+  - Declara uma constante usada na l�gica.
+- L1314: `          response = '📊 *DASHBOARD WEB*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1315: `            \`Acesse: ${link}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1316: `            'Modo: leitura (read-only)\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1317: `            tokenHint +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1318: `            '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1319: `        }`
+  - Fecha bloco de execu��o.
+- L1320: `      }`
+  - Fecha bloco de execu��o.
+- L1321: ``
+  - Linha em branco para organizar blocos.
+- L1322: `      else if (command.command === 'forecast') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1323: `        response = this.forecastService.generateForecastMessage(user.id);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1324: `      }`
+  - Fecha bloco de execu��o.
+- L1325: ``
+  - Linha em branco para organizar blocos.
+- L1326: `      else if (command.command === 'syncStatus') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1327: `        if (!isAdmin) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1328: `          response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1329: `        } else if (!this.dao.cloudSyncService) {`
+  - Abre bloco de execu��o.
+- L1330: `          response = 'ℹ️ *SYNC POSTGRESQL*\n\nSincronização não configurada.\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1331: `        } else {`
+  - Abre bloco de execu��o.
+- L1332: `          const status = this.dao.cloudSyncService.getStatus();`
+  - Declara uma constante usada na l�gica.
+- L1333: `          response = '☁️ *STATUS DO SYNC (POSTGRESQL)*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1334: `            \`Ativo: ${status.enabled ? 'sim' : 'não'}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1335: `            \`Em execução: ${status.inProgress ? 'sim' : 'não'}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1336: `            \`Pendente: ${status.pending ? 'sim' : 'não'}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1337: `            \`Último sync: ${status.lastSyncAt || 'nunca'}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1338: `            \`Último status: ${status.lastStatus || 'n/a'}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1339: `            \`Último erro: ${status.lastError || 'nenhum'}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1340: `            '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1341: `        }`
+  - Fecha bloco de execu��o.
+- L1342: `      }`
+  - Fecha bloco de execu��o.
+- L1343: ``
+  - Linha em branco para organizar blocos.
+- L1344: `      else if (command.command === 'syncNow') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1345: `        if (!isAdmin) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1346: `          response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1347: `        } else if (!this.dao.cloudSyncService) {`
+  - Abre bloco de execu��o.
+- L1348: `          response = 'ℹ️ *SYNC POSTGRESQL*\n\nSincronização não configurada.\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1349: `        } else {`
+  - Abre bloco de execu��o.
+- L1350: `          const syncResult = await this.dao.cloudSyncService.syncNow();`
+  - Declara uma constante usada na l�gica.
+- L1351: `          response = syncResult.success`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1352: `            ? \`✅ *SYNC CONCLUÍDO*\n\n☁️ PostgreSQL atualizado em ${syncResult.syncedAt}\n\n🕑 ${timestamp.formatted}\``
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1353: `            : \`❌ *Falha no sync*\n\n📌 ${syncResult.error}\n\n🕑 ${timestamp.formatted}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1354: `        }`
+  - Fecha bloco de execu��o.
+- L1355: `      }`
+  - Fecha bloco de execu��o.
+- L1356: `      `
+  - Linha em branco para organizar blocos.
+- L1357: `      else if (command.command === 'getInstallments') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1358: `        response = this.reports.generateInstallmentsList(user.id);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1359: `      }`
+  - Fecha bloco de execu��o.
+- L1360: `      `
+  - Linha em branco para organizar blocos.
+- L1361: `      else if (command.command === 'payInstallment') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1362: `        if (!command.description) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1363: `          response = ErrorMessages.INVALID_VALUE() + '\n\n💡 Use: \`/pagar [nome do produto]\`\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1364: `        } else {`
+  - Abre bloco de execu��o.
+- L1365: `          const installment = this.dao.findInstallmentByDescription(user.id, command.description);`
+  - Declara uma constante usada na l�gica.
+- L1366: `          `
+  - Linha em branco para organizar blocos.
+- L1367: `          if (!installment) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1368: `            response = ErrorMessages.NO_DATA_FOUND('parcelamento com este nome') + '\n\n💡 Use \`/parcelamentos\` para ver a lista\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1369: `          } else {`
+  - Abre bloco de execu��o.
+- L1370: `            const nextPayment = this.dao.getNextPendingPayment(installment.id);`
+  - Declara uma constante usada na l�gica.
+- L1371: `            `
+  - Linha em branco para organizar blocos.
+- L1372: `            if (!nextPayment) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1373: `              response = '✅ *PARCELAMENTO QUITADO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1374: `                \`📦 ${installment.description}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1375: `                'Este parcelamento já foi totalmente pago!\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1376: `                '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1377: `            } else {`
+  - Abre bloco de execu��o.
+- L1378: `              const success = this.dao.payInstallment(nextPayment.id, user.id);`
+  - Declara uma constante usada na l�gica.
+- L1379: `              `
+  - Linha em branco para organizar blocos.
+- L1380: `              if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1381: `                const updatedUser = this.dao.getUserById(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1382: `                const updatedPayment = this.dao.getInstallmentPayments(installment.id)`
+  - Declara uma constante usada na l�gica.
+- L1383: `                  .find(p => p.id === nextPayment.id);`
+  - Define fun��o an�nima/arrow function.
+- L1384: `                `
+  - Linha em branco para organizar blocos.
+- L1385: `                response = this.reports.generatePaymentConfirmation(installment, updatedPayment, updatedUser);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1386: `                console.log('💳 ' + user.name + ': pagou parcela ' + nextPayment.installment_number + '/' + installment.total_installments);`
+  - Registra informa��o de execu��o no log.
+- L1387: `              } else {`
+  - Abre bloco de execu��o.
+- L1388: `                response = ErrorMessages.INSUFFICIENT_BALANCE('Saldo') + '\n\n💡 Use \`/saldo\` para verificar\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1389: `              }`
+  - Fecha bloco de execu��o.
+- L1390: `            }`
+  - Fecha bloco de execu��o.
+- L1391: `          }`
+  - Fecha bloco de execu��o.
+- L1392: `        }`
+  - Fecha bloco de execu��o.
+- L1393: `      }`
+  - Fecha bloco de execu��o.
+- L1394: `      `
+  - Linha em branco para organizar blocos.
+- L1395: `      else if (command.command === 'getReminders' || command.command === 'getDuePayments') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1396: `        response = this.reports.generateRemindersList(user.id);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1397: `      }`
+  - Fecha bloco de execu��o.
+- L1398: `      `
+  - Linha em branco para organizar blocos.
+- L1399: `      else if (command.command === 'resetBalance') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1400: `  const pending = this.pendingResets[user.id];`
+  - Declara uma constante usada na l�gica.
+- L1401: `  const now = Date.now();`
+  - Declara uma constante usada na l�gica.
+- L1402: `  `
+  - Linha em branco para organizar blocos.
+- L1403: `  if (pending && pending.type === 'balance' && (now - pending.timestamp) < 120000) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1404: `    delete this.pendingResets[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1405: `    const success = this.dao.resetBalance(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1406: `    `
+  - Linha em branco para organizar blocos.
+- L1407: `    if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1408: `      response = this.reports.generateResetConfirmation('balance');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1409: `      console.log('☢️ ' + user.name + ': zerou saldo principal');`
+  - Registra informa��o de execu��o no log.
+- L1410: `    } else {`
+  - Abre bloco de execu��o.
+- L1411: `      response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1412: `    }`
+  - Fecha bloco de execu��o.
+- L1413: `  } else {`
+  - Abre bloco de execu��o.
+- L1414: `    this.pendingResets[user.id] = { type: 'balance', timestamp: now };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1415: `    response = this.reports.generateResetWarning('balance');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1416: `    `
+  - Linha em branco para organizar blocos.
+- L1417: `    const self = this;`
+  - Declara uma constante usada na l�gica.
+- L1418: `    setTimeout(function() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1419: `      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'balance') {`
+  - Verifica condi��o para decidir o fluxo.
+- L1420: `        delete self.pendingResets[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1421: `      }`
+  - Fecha bloco de execu��o.
+- L1422: `    }, 120000);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1423: `  }`
+  - Fecha bloco de execu��o.
+- L1424: `}`
+  - Fecha bloco de execu��o.
+- L1425: `      `
+  - Linha em branco para organizar blocos.
+- L1426: `      else if (command.command === 'resetSavings') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1427: `  const pending = this.pendingResets[user.id];`
+  - Declara uma constante usada na l�gica.
+- L1428: `  const now = Date.now();`
+  - Declara uma constante usada na l�gica.
+- L1429: `  `
+  - Linha em branco para organizar blocos.
+- L1430: `  if (pending && pending.type === 'savings' && (now - pending.timestamp) < 120000) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1431: `    delete this.pendingResets[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1432: `    const success = this.dao.resetSavings(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1433: `    `
+  - Linha em branco para organizar blocos.
+- L1434: `    if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1435: `      response = this.reports.generateResetConfirmation('savings');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1436: `      console.log('☢️ ' + user.name + ': zerou poupança');`
+  - Registra informa��o de execu��o no log.
+- L1437: `    } else {`
+  - Abre bloco de execu��o.
+- L1438: `      response = ErrorMessages.NO_DATA_FOUND('poupança') + '\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1439: `    }`
+  - Fecha bloco de execu��o.
+- L1440: `  } else {`
+  - Abre bloco de execu��o.
+- L1441: `    this.pendingResets[user.id] = { type: 'savings', timestamp: now };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1442: `    response = this.reports.generateResetWarning('savings');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1443: `    `
+  - Linha em branco para organizar blocos.
+- L1444: `    const self = this;`
+  - Declara uma constante usada na l�gica.
+- L1445: `    setTimeout(function() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1446: `      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'savings') {`
+  - Verifica condi��o para decidir o fluxo.
+- L1447: `        delete self.pendingResets[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1448: `      }`
+  - Fecha bloco de execu��o.
+- L1449: `    }, 120000);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1450: `  }`
+  - Fecha bloco de execu��o.
+- L1451: `}`
+  - Fecha bloco de execu��o.
+- L1452: `      `
+  - Linha em branco para organizar blocos.
+- L1453: `      else if (command.command === 'resetEmergency') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1454: `  const pending = this.pendingResets[user.id];`
+  - Declara uma constante usada na l�gica.
+- L1455: `  const now = Date.now();`
+  - Declara uma constante usada na l�gica.
+- L1456: `  `
+  - Linha em branco para organizar blocos.
+- L1457: `  if (pending && pending.type === 'emergency' && (now - pending.timestamp) < 120000) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1458: `    delete this.pendingResets[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1459: `    const success = this.dao.resetEmergencyFund(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1460: `    `
+  - Linha em branco para organizar blocos.
+- L1461: `    if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1462: `      response = this.reports.generateResetConfirmation('emergency');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1463: `      console.log('☢️ ' + user.name + ': zerou reserva de emergência');`
+  - Registra informa��o de execu��o no log.
+- L1464: `    } else {`
+  - Abre bloco de execu��o.
+- L1465: `      response = ErrorMessages.NO_DATA_FOUND('reserva de emergência') + '\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1466: `    }`
+  - Fecha bloco de execu��o.
+- L1467: `  } else {`
+  - Abre bloco de execu��o.
+- L1468: `    this.pendingResets[user.id] = { type: 'emergency', timestamp: now };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1469: `    response = this.reports.generateResetWarning('emergency');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1470: `    `
+  - Linha em branco para organizar blocos.
+- L1471: `    const self = this;`
+  - Declara uma constante usada na l�gica.
+- L1472: `    setTimeout(function() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1473: `      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'emergency') {`
+  - Verifica condi��o para decidir o fluxo.
+- L1474: `        delete self.pendingResets[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1475: `      }`
+  - Fecha bloco de execu��o.
+- L1476: `    }, 120000);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1477: `  }`
+  - Fecha bloco de execu��o.
+- L1478: `}`
+  - Fecha bloco de execu��o.
+- L1479: `      `
+  - Linha em branco para organizar blocos.
+- L1480: `      else if (command.command === 'resetInstallments') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1481: `  const pending = this.pendingResets[user.id];`
+  - Declara uma constante usada na l�gica.
+- L1482: `  const now = Date.now();`
+  - Declara uma constante usada na l�gica.
+- L1483: `  `
+  - Linha em branco para organizar blocos.
+- L1484: `  if (pending && pending.type === 'installments' && (now - pending.timestamp) < 120000) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1485: `    delete this.pendingResets[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1486: `    const success = this.dao.resetInstallments(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1487: `    `
+  - Linha em branco para organizar blocos.
+- L1488: `    if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1489: `      response = this.reports.generateResetConfirmation('installments');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1490: `      console.log('☢️ ' + user.name + ': zerou parcelamentos');`
+  - Registra informa��o de execu��o no log.
+- L1491: `    } else {`
+  - Abre bloco de execu��o.
+- L1492: `      response = ErrorMessages.NO_DATA_FOUND('parcelamentos') + '\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1493: `    }`
+  - Fecha bloco de execu��o.
+- L1494: `  } else {`
+  - Abre bloco de execu��o.
+- L1495: `    this.pendingResets[user.id] = { type: 'installments', timestamp: now };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1496: `    response = this.reports.generateResetWarning('installments');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1497: `    `
+  - Linha em branco para organizar blocos.
+- L1498: `    const self = this;`
+  - Declara uma constante usada na l�gica.
+- L1499: `    setTimeout(function() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1500: `      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'installments') {`
+  - Verifica condi��o para decidir o fluxo.
+- L1501: `        delete self.pendingResets[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1502: `      }`
+  - Fecha bloco de execu��o.
+- L1503: `    }, 120000);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1504: `  }`
+  - Fecha bloco de execu��o.
+- L1505: `}`
+  - Fecha bloco de execu��o.
+- L1506: `      `
+  - Linha em branco para organizar blocos.
+- L1507: `      else if (command.command === 'resetEverything') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1508: `  const pending = this.pendingResets[user.id];`
+  - Declara uma constante usada na l�gica.
+- L1509: `  const now = Date.now();`
+  - Declara uma constante usada na l�gica.
+- L1510: `  `
+  - Linha em branco para organizar blocos.
+- L1511: `  if (pending && pending.type === 'everything' && (now - pending.timestamp) < 120000) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1512: `    delete this.pendingResets[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1513: `    const success = this.dao.resetEverything(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1514: `    `
+  - Linha em branco para organizar blocos.
+- L1515: `    if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1516: `      response = this.reports.generateResetConfirmation('everything');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1517: `      console.log('☢️☢️☢️ ' + user.name + ': ZEROU TODO O SISTEMA');`
+  - Registra informa��o de execu��o no log.
+- L1518: `    } else {`
+  - Abre bloco de execu��o.
+- L1519: `      response = ErrorMessages.OPERATION_NOT_ALLOWED() + '\n\n🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1520: `    }`
+  - Fecha bloco de execu��o.
+- L1521: `  } else {`
+  - Abre bloco de execu��o.
+- L1522: `    this.pendingResets[user.id] = { type: 'everything', timestamp: now };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1523: `    response = this.reports.generateResetWarning('everything');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1524: `    `
+  - Linha em branco para organizar blocos.
+- L1525: `    const self = this;`
+  - Declara uma constante usada na l�gica.
+- L1526: `    setTimeout(function() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L1527: `      if (self.pendingResets[user.id] && self.pendingResets[user.id].type === 'everything') {`
+  - Verifica condi��o para decidir o fluxo.
+- L1528: `        delete self.pendingResets[user.id];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1529: `      }`
+  - Fecha bloco de execu��o.
+- L1530: `    }, 120000);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1531: `  }`
+  - Fecha bloco de execu��o.
+- L1532: `}`
+  - Fecha bloco de execu��o.
+- L1533: `      `
+  - Linha em branco para organizar blocos.
+- L1534: `      else if (command.command === 'help') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1535: `  // ⭐ ADICIONAR COMANDOS ADMIN NO /AJUDA`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1536: `  if (isAdmin) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1537: `    response = this.reports.generateHelpMessage() + `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1538: `               '\n\n═══════════════════════════════════════\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1539: `               '🔧 *COMANDOS ADMINISTRATIVOS*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1540: `               'Você tem acesso a comandos especiais:\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1541: `               '*!status*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1542: `               '└ Ver status da memória do bot\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1543: `               '*!limpar*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1544: `               '└ Limpar apenas sua memória\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1545: `               '*!limpartudo*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1546: `               '└ Limpar TODA a memória do bot\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1547: `               '*!ajuda*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1548: `               '└ Ver comandos administrativos\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1549: `               '═══════════════════════════════════════\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1550: `               '⚠️ Apenas você (admin) pode usar estes comandos.';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1551: `  } else {`
+  - Abre bloco de execu��o.
+- L1552: `    response = this.reports.generateHelpMessage();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1553: `  }`
+  - Fecha bloco de execu��o.
+- L1554: `}`
+  - Fecha bloco de execu��o.
+- L1555: `      `
+  - Linha em branco para organizar blocos.
+- L1556: `      else if (command.command === 'start') {`
+  - Verifica condi��o alternativa no fluxo.
+- L1557: `        response = this.reports.generateWelcomeMessage(user.name);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1558: `        `
+  - Linha em branco para organizar blocos.
+- L1559: `        // ⭐ SE FOR ADMIN, MOSTRAR INFO SOBRE COMANDOS ESPECIAIS`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1560: `        if (isAdmin) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1561: `          response += '\n\n━━━━━━━━━━━━━━━━━━━\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1562: `                      '🔧 *PAINEL ADMINISTRATIVO ATIVO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1563: `                      'Você tem acesso a comandos especiais de gerenciamento.\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1564: `                      'Digite *!ajuda* para ver os comandos admin.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1565: `                      '━━━━━━━━━━━━━━━━━━━';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1566: `        }`
+  - Fecha bloco de execu��o.
+- L1567: `      }`
+  - Fecha bloco de execu��o.
+- L1568: `      `
+  - Linha em branco para organizar blocos.
+- L1569: `      else {`
+  - Executa caminho alternativo quando condi��o anterior falha.
+- L1570: `        response = ErrorMessages.COMMAND_NOT_FOUND() + '\n\n🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1571: `      }`
+  - Fecha bloco de execu��o.
+- L1572: ``
+  - Linha em branco para organizar blocos.
+- L1573: `    } catch (error) {`
+  - Abre bloco de execu��o.
+- L1574: `      console.error('❌ Erro no comando:', error);`
+  - Registra erro no log para diagn�stico.
+- L1575: `      response = '❌ *Erro ao executar comando*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1576: `        \`📌 ${error.message}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1577: `        '💡 Tente novamente ou use \`/ajuda\`\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1578: `        '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1579: `    }`
+  - Fecha bloco de execu��o.
+- L1580: ``
+  - Linha em branco para organizar blocos.
+- L1581: `    if (!response || response.trim() === '') {`
+  - Verifica condi��o para decidir o fluxo.
+- L1582: `      response = '⚠️ *Comando processado sem confirmação*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1583: `        \`📌 Comando: ${command.command}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1584: `        '💡 Use \`/ajuda\` para ver comandos disponíveis\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1585: `        '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1586: `      console.error('⚠️ AVISO: Comando sem resposta - ' + command.command);`
+  - Registra erro no log para diagn�stico.
+- L1587: `    }`
+  - Fecha bloco de execu��o.
+- L1588: ``
+  - Linha em branco para organizar blocos.
+- L1589: `    await this.whatsapp.replyMessage(message, response);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1590: `  }`
+  - Fecha bloco de execu��o.
+- L1591: ``
+  - Linha em branco para organizar blocos.
+- L1592: `  async handleExpense(expense, user, message) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L1593: `  const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L1594: `  const info = this.whatsapp.getSenderInfo(message);`
+  - Declara uma constante usada na l�gica.
+- L1595: `  const chatId = info.chatId;`
+  - Declara uma constante usada na l�gica.
+- L1596: ``
+  - Linha em branco para organizar blocos.
+- L1597: `  try {`
+  - Inicia bloco protegido contra exce��es.
+- L1598: `    if (!this.nlp.isValidAmount(expense.amount)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1599: `      await this.whatsapp.replyMessage(message, ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1600: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L1601: `    }`
+  - Fecha bloco de execu��o.
+- L1602: ``
+  - Linha em branco para organizar blocos.
+- L1603: `    if (user.initial_balance === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1604: `      await this.whatsapp.replyMessage(message, ErrorMessages.INITIAL_BALANCE_REQUIRED() + '\n\n🕐 ' + timestamp.formatted);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1605: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L1606: `    }`
+  - Fecha bloco de execu��o.
+- L1607: ``
+  - Linha em branco para organizar blocos.
+- L1608: `    // 💳 VERIFICAR SE USUÁRIO TEM CARTÃO CADASTRADO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1609: `    const cards = this.dao.getAllCardsByUserId(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1610: ``
+  - Linha em branco para organizar blocos.
+- L1611: `    if (cards && cards.length > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1612: `      // TEM CARTÃO - PERGUNTAR ONDE FOI A COMPRA`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1613: `      if (!this.pendingPurchases) this.pendingPurchases = {};`
+  - Verifica condi��o para decidir o fluxo.
+- L1614: ``
+  - Linha em branco para organizar blocos.
+- L1615: `      this.pendingPurchases[user.id] = {`
+  - Abre bloco de execu��o.
+- L1616: `        expense: expense,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1617: `        timestamp: Date.now(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1618: `        messageInfo: info`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1619: `      };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1620: ``
+  - Linha em branco para organizar blocos.
+- L1621: `      // Listar nomes dos cartoes disponiveis`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1622: `      let cardList = '';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L1623: `      for (let i = 0; i < cards.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L1624: `        cardList += \`• *${cards[i].card_name}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1625: `      }`
+  - Fecha bloco de execu��o.
+- L1626: ``
+  - Linha em branco para organizar blocos.
+- L1627: `      await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1628: `        '💳 *FORMA DE PAGAMENTO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1629: `        \`💰 Valor: ${this.reports.formatMoney(expense.amount)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1630: `        \`📝 Descrição: ${expense.description}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1631: `        'Responda com o *nome do cartão* para pagar no cartão, ou *saldo* para pagar com o saldo.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1632: `        '💳 *Seus cartões:*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1633: `        cardList + '\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1634: `        '⏱️ Você tem 2 minutos para responder\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1635: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1636: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1637: ``
+  - Linha em branco para organizar blocos.
+- L1638: `      // Limpar após 2 minutos`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1639: `      this.cleanupPendingOperation(user.id, 'purchase', TIMEOUTS.PENDING_PURCHASE);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1640: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L1641: `    }`
+  - Fecha bloco de execu��o.
+- L1642: `    `
+  - Linha em branco para organizar blocos.
+- L1643: `    // NÃO TEM CARTÃO - REGISTRAR NO SALDO DIRETO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1644: `    await this.registerExpenseInBalance(expense, user, message, info, chatId, timestamp);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1645: ``
+  - Linha em branco para organizar blocos.
+- L1646: `  } catch (error) {`
+  - Abre bloco de execu��o.
+- L1647: `    console.error('❌ Erro ao registrar gasto:', error);`
+  - Registra erro no log para diagn�stico.
+- L1648: `    await this.whatsapp.replyMessage(message, `
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1649: `      '❌ *Erro ao registrar gasto*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1650: `      \`📌 ${error.message}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1651: `      '💡 Tente novamente ou use \`/ajuda\`\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1652: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1653: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1654: `  }`
+  - Fecha bloco de execu��o.
+- L1655: `}`
+  - Fecha bloco de execu��o.
+- L1656: ``
+  - Linha em branco para organizar blocos.
+- L1657: `// 💳 REGISTRAR GASTO NO CARTÃO (função auxiliar)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1658: `async registerExpenseInCard(expense, user, message, info, chatId, card) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L1659: `  const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L1660: `  const categoryId = this.dao.identifyCategory(expense.description);`
+  - Declara uma constante usada na l�gica.
+- L1661: `  const category = this.dao.getCategoryById(categoryId);`
+  - Declara uma constante usada na l�gica.
+- L1662: ``
+  - Linha em branco para organizar blocos.
+- L1663: `  if (!card) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1664: `    await this.whatsapp.replyMessage(message, '❌ Erro: Cartão não encontrado\n\n🕐 ' + timestamp.formatted);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1665: `    return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L1666: `  }`
+  - Fecha bloco de execu��o.
+- L1667: ``
+  - Linha em branco para organizar blocos.
+- L1668: `  const success = this.dao.addCardPurchase(user.id, card.id, expense.amount, expense.description, categoryId, chatId, info.messageId);`
+  - Declara uma constante usada na l�gica.
+- L1669: ``
+  - Linha em branco para organizar blocos.
+- L1670: `  if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1671: `    const updatedCard = this.dao.getCardById(card.id);`
+  - Declara uma constante usada na l�gica.
+- L1672: `    const confirmation = this.reports.generateCardPurchaseConfirmation(expense, updatedCard, category);`
+  - Declara uma constante usada na l�gica.
+- L1673: `    await this.whatsapp.replyMessage(message, confirmation);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1674: ``
+  - Linha em branco para organizar blocos.
+- L1675: `    console.log('💳 ' + user.name + ': ' + this.reports.formatMoney(expense.amount) + ' no cartão ' + card.card_name + ' - ' + expense.description);`
+  - Registra informa��o de execu��o no log.
+- L1676: ``
+  - Linha em branco para organizar blocos.
+- L1677: `    // Avisar se limite estourou`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1678: `    if (updatedCard.available_limit < 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1679: `      await this.whatsapp.sendMessage(chatId,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1680: `        '🚨 *ATENÇÃO! LIMITE ESTOURADO!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1681: `        \`Você ultrapassou o limite do cartão em ${this.reports.formatMoney(Math.abs(updatedCard.available_limit))}!\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1682: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1683: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1684: `    }`
+  - Fecha bloco de execu��o.
+- L1685: `  } else {`
+  - Abre bloco de execu��o.
+- L1686: `    await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1687: `      '❌ *Erro ao registrar compra no cartão*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1688: `      '💡 Verifique se o cartão existe e tente novamente.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1689: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1690: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1691: `  }`
+  - Fecha bloco de execu��o.
+- L1692: `}`
+  - Fecha bloco de execu��o.
+- L1693: `// 💰 REGISTRAR GASTO NO SALDO (função auxiliar)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1694: `async registerExpenseInBalance(expense, user, message, info, chatId, timestamp) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L1695: `  const categoryId = this.dao.identifyCategory(expense.description);`
+  - Declara uma constante usada na l�gica.
+- L1696: `  const category = this.dao.getCategoryById(categoryId);`
+  - Declara uma constante usada na l�gica.
+- L1697: ``
+  - Linha em branco para organizar blocos.
+- L1698: `  const savedExpense = this.dao.createExpense({`
+  - Declara uma constante usada na l�gica.
+- L1699: `    userId: user.id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1700: `    amount: expense.amount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1701: `    description: expense.description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1702: `    categoryId: categoryId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1703: `    chatId: chatId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1704: `    messageId: info.messageId`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1705: `    `
+  - Linha em branco para organizar blocos.
+- L1706: `  });`
+  - Fecha bloco de execu��o.
+- L1707: `  `
+  - Linha em branco para organizar blocos.
+- L1708: `  `
+  - Linha em branco para organizar blocos.
+- L1709: ``
+  - Linha em branco para organizar blocos.
+- L1710: `  const updatedUser = this.dao.getUserByWhatsAppId(user.whatsapp_id);`
+  - Declara uma constante usada na l�gica.
+- L1711: `  const confirmation = this.reports.generateExpenseConfirmation(savedExpense, updatedUser, category);`
+  - Declara uma constante usada na l�gica.
+- L1712: `  await this.whatsapp.replyMessage(message, confirmation);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1713: ``
+  - Linha em branco para organizar blocos.
+- L1714: `  Logger.expense(user, expense.amount, expense.description, category.name);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1715: ``
+  - Linha em branco para organizar blocos.
+- L1716: `  const totalMoney = updatedUser.current_balance + updatedUser.savings_balance + updatedUser.emergency_fund;`
+  - Declara uma constante usada na l�gica.
+- L1717: `  const percentageRemaining = updatedUser.initial_balance > 0 `
+  - Declara uma constante usada na l�gica.
+- L1718: `    ? (totalMoney / updatedUser.initial_balance) * 100 `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1719: `    : 100;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1720: ``
+  - Linha em branco para organizar blocos.
+- L1721: `  if (updatedUser.current_balance < 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1722: `    await this.whatsapp.sendMessage(chatId, `
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1723: `      '🚨 *ATENÇÃO!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1724: `      'Seu saldo está negativo!\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1725: `      'Você está gastando mais do que tem.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1726: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1727: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1728: `  } `
+  - Fecha bloco de execu��o.
+- L1729: `  else if (percentageRemaining <= 30 && !updatedUser.low_balance_warned) {`
+  - Verifica condi��o alternativa no fluxo.
+- L1730: `    this.dao.setLowBalanceWarned(updatedUser.id, true);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1731: `    await this.whatsapp.sendMessage(chatId, `
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1732: `      '⚠️ *AVISO DE SALDO BAIXO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1733: `      'Você já gastou 70% do seu dinheiro!\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1734: `      \`Restam apenas ${percentageRemaining.toFixed(0)}% do total.\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1735: `      '💡 *Dica:* Considere reduzir gastos ou adicionar mais saldo.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1736: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1737: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1738: `  }`
+  - Fecha bloco de execu��o.
+- L1739: `}`
+  - Fecha bloco de execu��o.
+- L1740: ``
+  - Linha em branco para organizar blocos.
+- L1741: `  async handleInstallment(installment, user, message) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L1742: `  const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L1743: `  const info = this.whatsapp.getSenderInfo(message);`
+  - Declara uma constante usada na l�gica.
+- L1744: `  const chatId = info.chatId;`
+  - Declara uma constante usada na l�gica.
+- L1745: ``
+  - Linha em branco para organizar blocos.
+- L1746: `  try {`
+  - Inicia bloco protegido contra exce��es.
+- L1747: `    if (!this.nlp.isValidAmount(installment.totalAmount)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1748: `      await this.whatsapp.replyMessage(message, ErrorMessages.INVALID_VALUE() + '\n\n🕐 ' + timestamp.formatted);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1749: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L1750: `    }`
+  - Fecha bloco de execu��o.
+- L1751: ``
+  - Linha em branco para organizar blocos.
+- L1752: `    if (user.initial_balance === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1753: `      await this.whatsapp.replyMessage(message, ErrorMessages.INITIAL_BALANCE_REQUIRED() + '\n\n🕐 ' + timestamp.formatted);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1754: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L1755: `    }`
+  - Fecha bloco de execu��o.
+- L1756: ``
+  - Linha em branco para organizar blocos.
+- L1757: `    // 💳 VERIFICAR SE TEM CARTÃO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1758: `    const cards = this.dao.getAllCardsByUserId(user.id);`
+  - Declara uma constante usada na l�gica.
+- L1759: ``
+  - Linha em branco para organizar blocos.
+- L1760: `    if (cards && cards.length > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1761: `      // TEM CARTÃO - PERGUNTAR`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1762: `      if (!this.pendingInstallments) this.pendingInstallments = {};`
+  - Verifica condi��o para decidir o fluxo.
+- L1763: ``
+  - Linha em branco para organizar blocos.
+- L1764: `      this.pendingInstallments[user.id] = {`
+  - Abre bloco de execu��o.
+- L1765: `        installment: installment,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1766: `        timestamp: Date.now(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1767: `        messageInfo: info`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1768: `      };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1769: ``
+  - Linha em branco para organizar blocos.
+- L1770: `      // Listar nomes dos cartoes`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1771: `      let cardList = '';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L1772: `      for (let i = 0; i < cards.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L1773: `        cardList += \`• *${cards[i].card_name}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1774: `      }`
+  - Fecha bloco de execu��o.
+- L1775: ``
+  - Linha em branco para organizar blocos.
+- L1776: `      await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1777: `        '💳 *PARCELAMENTO - FORMA DE PAGAMENTO*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1778: `        \`📦 Produto: ${installment.description}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1779: `        \`💰 Total: ${this.reports.formatMoney(installment.totalAmount)}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1780: `        \`📊 Parcelas: ${installment.installments}x de ${this.reports.formatMoney(installment.installmentAmount)}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1781: `        'Responda com o *nome do cartão* para parcelar no cartão, ou *saldo* para parcelar no saldo.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1782: `        '💳 *Seus cartões:*\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1783: `        cardList + '\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1784: `        '⏱️ Você tem 2 minutos para responder\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1785: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1786: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1787: ``
+  - Linha em branco para organizar blocos.
+- L1788: `      // Limpar após 2 minutos usando a função centralizada`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1789: `      this.cleanupPendingOperation(user.id, 'installment', TIMEOUTS.PENDING_INSTALLMENT);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1790: `      return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L1791: `    }`
+  - Fecha bloco de execu��o.
+- L1792: `    `
+  - Linha em branco para organizar blocos.
+- L1793: `    // NÃO TEM CARTÃO - REGISTRAR NORMALMENTE`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1794: `    await this.registerInstallmentNormal(installment, user, message, info, chatId, timestamp);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1795: ``
+  - Linha em branco para organizar blocos.
+- L1796: `  } catch (error) {`
+  - Abre bloco de execu��o.
+- L1797: `    console.error('❌ Erro ao registrar parcelamento:', error);`
+  - Registra erro no log para diagn�stico.
+- L1798: `    await this.whatsapp.replyMessage(message, `
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1799: `      '❌ *Erro ao registrar parcelamento*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1800: `      \`📌 ${error.message}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1801: `      '💡 Tente novamente ou use \`/ajuda\`\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1802: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1803: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1804: `  }`
+  - Fecha bloco de execu��o.
+- L1805: `}`
+  - Fecha bloco de execu��o.
+- L1806: ``
+  - Linha em branco para organizar blocos.
+- L1807: `// 📦 REGISTRAR PARCELAMENTO NORMAL (função auxiliar)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1808: `async registerInstallmentNormal(installment, user, message, info, chatId, timestamp) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L1809: `  const categoryId = this.dao.identifyCategory(installment.description);`
+  - Declara uma constante usada na l�gica.
+- L1810: `  const category = this.dao.getCategoryById(categoryId);`
+  - Declara uma constante usada na l�gica.
+- L1811: ``
+  - Linha em branco para organizar blocos.
+- L1812: `  const firstDueDate = new Date();`
+  - Declara uma constante usada na l�gica.
+- L1813: `  firstDueDate.setMonth(firstDueDate.getMonth() + 1);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1814: `  firstDueDate.setDate(5);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1815: ``
+  - Linha em branco para organizar blocos.
+- L1816: `  const savedInstallment = this.dao.createInstallment({`
+  - Declara uma constante usada na l�gica.
+- L1817: `    userId: user.id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1818: `    description: installment.description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1819: `    totalAmount: installment.totalAmount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1820: `    installmentAmount: installment.installmentAmount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1821: `    totalInstallments: installment.installments,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1822: `    categoryId: categoryId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1823: `    chatId: chatId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1824: `    firstDueDate: firstDueDate`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1825: `  });`
+  - Fecha bloco de execu��o.
+- L1826: ``
+  - Linha em branco para organizar blocos.
+- L1827: `  const confirmation = this.reports.generateInstallmentConfirmation(savedInstallment, category);`
+  - Declara uma constante usada na l�gica.
+- L1828: `  await this.whatsapp.replyMessage(message, confirmation);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1829: ``
+  - Linha em branco para organizar blocos.
+- L1830: `  console.log('📦 ' + user.name + ': parcelou ' + this.reports.formatMoney(installment.totalAmount) + ' em ' + installment.installments + 'x - ' + installment.description);`
+  - Registra informa��o de execu��o no log.
+- L1831: `}`
+  - Fecha bloco de execu��o.
+- L1832: ``
+  - Linha em branco para organizar blocos.
+- L1833: `// 💳 REGISTRAR PARCELAMENTO NO CARTÃO (função auxiliar)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1834: `async registerInstallmentInCard(installment, user, message, info, chatId, card) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L1835: `  const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L1836: `  const categoryId = this.dao.identifyCategory(installment.description);`
+  - Declara uma constante usada na l�gica.
+- L1837: `  const category = this.dao.getCategoryById(categoryId);`
+  - Declara uma constante usada na l�gica.
+- L1838: ``
+  - Linha em branco para organizar blocos.
+- L1839: `  const firstDueDate = new Date();`
+  - Declara uma constante usada na l�gica.
+- L1840: `  firstDueDate.setMonth(firstDueDate.getMonth() + 1);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1841: `  firstDueDate.setDate(5);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1842: ``
+  - Linha em branco para organizar blocos.
+- L1843: `  const savedInstallment = this.dao.createInstallment({`
+  - Declara uma constante usada na l�gica.
+- L1844: `    userId: user.id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1845: `    description: installment.description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1846: `    totalAmount: installment.totalAmount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1847: `    installmentAmount: installment.installmentAmount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1848: `    totalInstallments: installment.installments,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1849: `    categoryId: categoryId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1850: `    chatId: chatId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1851: `    firstDueDate: firstDueDate`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1852: `  });`
+  - Fecha bloco de execu��o.
+- L1853: ``
+  - Linha em branco para organizar blocos.
+- L1854: `  // 💳 ADICIONAR AO CARTÃO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L1855: `  const success = this.dao.addCardInstallment(user.id, card.id, savedInstallment.id, installment.totalAmount);`
+  - Declara uma constante usada na l�gica.
+- L1856: ``
+  - Linha em branco para organizar blocos.
+- L1857: `  if (success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1858: `    const updatedCard = this.dao.getCardById(card.id);`
+  - Declara uma constante usada na l�gica.
+- L1859: `    const confirmation = this.reports.generateCardInstallmentConfirmation(savedInstallment, updatedCard, category);`
+  - Declara uma constante usada na l�gica.
+- L1860: `    await this.whatsapp.replyMessage(message, confirmation);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1861: ``
+  - Linha em branco para organizar blocos.
+- L1862: `    console.log('💳📦 ' + user.name + ': parcelou no cartão ' + card.card_name + ' ' + this.reports.formatMoney(installment.totalAmount) + ' em ' + installment.installments + 'x');`
+  - Registra informa��o de execu��o no log.
+- L1863: ``
+  - Linha em branco para organizar blocos.
+- L1864: `    if (updatedCard.available_limit < 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L1865: `      await this.whatsapp.sendMessage(chatId,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1866: `        '🚨 *ATENÇÃO! LIMITE ESTOURADO!*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1867: `        \`Você ultrapassou o limite do cartão!\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1868: `        '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1869: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1870: `    }`
+  - Fecha bloco de execu��o.
+- L1871: `  } else {`
+  - Abre bloco de execu��o.
+- L1872: `    await this.whatsapp.replyMessage(message,`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L1873: `      '❌ *Erro ao registrar parcelamento no cartão*\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1874: `      '💡 Verifique o limite disponível do cartão.\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1875: `      '🕐 ' + timestamp.formatted`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1876: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L1877: `  }`
+  - Fecha bloco de execu��o.
+- L1878: `}`
+  - Fecha bloco de execu��o.
+- L1879: `}`
+  - Fecha bloco de execu��o.
+- L1880: ``
+  - Linha em branco para organizar blocos.
+- L1881: `module.exports = MessageHandler;`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L1882: ``
+  - Linha em branco para organizar blocos.
+
+## src/services/dashboardServer.js
+
+- L1: `const express = require('express');`
+  - Importa um m�dulo para uso neste arquivo.
+- L2: `const ForecastService = require('./forecastService');`
+  - Importa um m�dulo para uso neste arquivo.
+- L3: ``
+  - Linha em branco para organizar blocos.
+- L4: `class DashboardServer {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L5: `  constructor(dao, reports) {`
+  - Inicializa estado da classe e depend�ncias.
+- L6: `    this.dao = dao;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L7: `    this.reports = reports;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L8: `    this.forecast = new ForecastService(dao, reports);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L9: `    this.app = express();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L10: ``
+  - Linha em branco para organizar blocos.
+- L11: `    this.port = parseInt(process.env.DASHBOARD_PORT || '3030', 10);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L12: `    this.enabled = String(process.env.DASHBOARD_ENABLED || '').toLowerCase() === 'true';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L13: `    this.token = process.env.DASHBOARD_TOKEN || '';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L14: `    this.baseUrl = process.env.DASHBOARD_BASE_URL || \`http://localhost:${this.port}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L15: ``
+  - Linha em branco para organizar blocos.
+- L16: `    this.server = null;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L17: `  }`
+  - Fecha bloco de execu��o.
+- L18: ``
+  - Linha em branco para organizar blocos.
+- L19: `  isAuthorized(req) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L20: `    if (!this.token) return true;`
+  - Verifica condi��o para decidir o fluxo.
+- L21: `    const headerToken = req.headers['x-dashboard-token'];`
+  - Declara uma constante usada na l�gica.
+- L22: `    const queryToken = req.query.token;`
+  - Declara uma constante usada na l�gica.
+- L23: `    return headerToken === this.token || queryToken === this.token;`
+  - Retorna valor da fun��o/m�todo.
+- L24: `  }`
+  - Fecha bloco de execu��o.
+- L25: ``
+  - Linha em branco para organizar blocos.
+- L26: `  getUserFromQuery(req) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L27: `    if (req.query.userId) {`
+  - Verifica condi��o para decidir o fluxo.
+- L28: `      return this.dao.getUserById(parseInt(req.query.userId, 10));`
+  - Retorna valor da fun��o/m�todo.
+- L29: `    }`
+  - Fecha bloco de execu��o.
+- L30: ``
+  - Linha em branco para organizar blocos.
+- L31: `    if (req.query.whatsapp) {`
+  - Verifica condi��o para decidir o fluxo.
+- L32: `      return this.dao.getUserByWhatsAppId(String(req.query.whatsapp));`
+  - Retorna valor da fun��o/m�todo.
+- L33: `    }`
+  - Fecha bloco de execu��o.
+- L34: ``
+  - Linha em branco para organizar blocos.
+- L35: `    const users = this.dao.getAllUsers();`
+  - Declara uma constante usada na l�gica.
+- L36: `    return users[0] || null;`
+  - Retorna valor da fun��o/m�todo.
+- L37: `  }`
+  - Fecha bloco de execu��o.
+- L38: ``
+  - Linha em branco para organizar blocos.
+- L39: `  buildAsciiBars(categoryRows) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L40: `    const total = categoryRows.reduce((sum, c) => sum + Number(c.total || 0), 0);`
+  - Declara uma constante usada na l�gica.
+- L41: `    if (total <= 0) return [];`
+  - Verifica condi��o para decidir o fluxo.
+- L42: ``
+  - Linha em branco para organizar blocos.
+- L43: `    return categoryRows.slice(0, 8).map((c) => {`
+  - Retorna valor da fun��o/m�todo.
+- L44: `      const value = Number(c.total || 0);`
+  - Declara uma constante usada na l�gica.
+- L45: `      const percent = Math.round((value / total) * 100);`
+  - Declara uma constante usada na l�gica.
+- L46: `      const filled = Math.max(1, Math.round(percent / 5));`
+  - Declara uma constante usada na l�gica.
+- L47: `      return {`
+  - Retorna valor da fun��o/m�todo.
+- L48: `        category: c.category,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L49: `        total: value,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L50: `        percent,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L51: `        bar: \`${'█'.repeat(filled)}${'░'.repeat(Math.max(0, 20 - filled))}\``
+  - Executa uma instru��o da l�gica de neg�cio.
+- L52: `      };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L53: `    });`
+  - Fecha bloco de execu��o.
+- L54: `  }`
+  - Fecha bloco de execu��o.
+- L55: ``
+  - Linha em branco para organizar blocos.
+- L56: `  setupRoutes() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L57: `    this.app.get('/health', (_req, res) => {`
+  - Define fun��o an�nima/arrow function.
+- L58: `      res.json({ ok: true, dashboard: true, timestamp: new Date().toISOString() });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L59: `    });`
+  - Fecha bloco de execu��o.
+- L60: ``
+  - Linha em branco para organizar blocos.
+- L61: `    this.app.use(['/api', '/dashboard'], (req, res, next) => {`
+  - Define fun��o an�nima/arrow function.
+- L62: `      if (!this.isAuthorized(req)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L63: `        return res.status(401).json({ error: 'Nao autorizado. Informe token.' });`
+  - Retorna valor da fun��o/m�todo.
+- L64: `      }`
+  - Fecha bloco de execu��o.
+- L65: `      return next();`
+  - Retorna valor da fun��o/m�todo.
+- L66: `    });`
+  - Fecha bloco de execu��o.
+- L67: ``
+  - Linha em branco para organizar blocos.
+- L68: `    this.app.get('/api/users', (_req, res) => {`
+  - Define fun��o an�nima/arrow function.
+- L69: `      const users = this.dao.getAllUsers().map((u) => ({`
+  - Declara uma constante usada na l�gica.
+- L70: `        id: u.id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L71: `        name: u.name,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L72: `        whatsapp_id: u.whatsapp_id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L73: `      }));`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L74: `      res.json({ users });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L75: `    });`
+  - Fecha bloco de execu��o.
+- L76: ``
+  - Linha em branco para organizar blocos.
+- L77: `    this.app.get('/api/overview', (req, res) => {`
+  - Define fun��o an�nima/arrow function.
+- L78: `      const user = this.getUserFromQuery(req);`
+  - Declara uma constante usada na l�gica.
+- L79: `      if (!user) return res.status(404).json({ error: 'Usuario nao encontrado.' });`
+  - Verifica condi��o para decidir o fluxo.
+- L80: ``
+  - Linha em branco para organizar blocos.
+- L81: `      const now = new Date();`
+  - Declara uma constante usada na l�gica.
+- L82: `      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);`
+  - Declara uma constante usada na l�gica.
+- L83: `      const expensesMonth = this.dao.getExpensesByUser(user.id, {`
+  - Declara uma constante usada na l�gica.
+- L84: `        startDate: monthStart.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L85: `        endDate: now.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L86: `        transactionType: 'expense'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L87: `      });`
+  - Fecha bloco de execu��o.
+- L88: ``
+  - Linha em branco para organizar blocos.
+- L89: `      const totalMonth = expensesMonth.reduce((sum, e) => sum + Number(e.amount || 0), 0);`
+  - Declara uma constante usada na l�gica.
+- L90: `      const cards = this.dao.getAllCardsByUserId(user.id);`
+  - Declara uma constante usada na l�gica.
+- L91: `      const installments = this.dao.getInstallmentsByUser(user.id);`
+  - Declara uma constante usada na l�gica.
+- L92: `      const goals = this.dao.getSavingsGoalsByUser(user.id);`
+  - Declara uma constante usada na l�gica.
+- L93: ``
+  - Linha em branco para organizar blocos.
+- L94: `      res.json({`
+  - Abre bloco de execu��o.
+- L95: `        user: {`
+  - Abre bloco de execu��o.
+- L96: `          id: user.id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L97: `          name: user.name,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L98: `          whatsapp_id: user.whatsapp_id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L99: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L100: `        balances: {`
+  - Abre bloco de execu��o.
+- L101: `          current: Number(user.current_balance || 0),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L102: `          savings: Number(user.savings_balance || 0),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L103: `          emergency: Number(user.emergency_fund || 0),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L104: `          total: Number((user.current_balance || 0) + (user.savings_balance || 0) + (user.emergency_fund || 0))`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L105: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L106: `        month: {`
+  - Abre bloco de execu��o.
+- L107: `          spent: totalMonth,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L108: `          transactions: expensesMonth.length`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L109: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L110: `        cards: {`
+  - Abre bloco de execu��o.
+- L111: `          total: cards.length,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L112: `          used: cards.reduce((sum, c) => sum + Number(c.current_balance || 0), 0),`
+  - Define fun��o an�nima/arrow function.
+- L113: `          limits: cards.reduce((sum, c) => sum + Number(c.card_limit || 0), 0)`
+  - Define fun��o an�nima/arrow function.
+- L114: `        },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L115: `        installments: installments.length,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L116: `        goals: goals.length,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L117: `        generatedAt: new Date().toISOString()`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L118: `      });`
+  - Fecha bloco de execu��o.
+- L119: `    });`
+  - Fecha bloco de execu��o.
+- L120: ``
+  - Linha em branco para organizar blocos.
+- L121: `    this.app.get('/api/expenses/trend', (req, res) => {`
+  - Define fun��o an�nima/arrow function.
+- L122: `      const user = this.getUserFromQuery(req);`
+  - Declara uma constante usada na l�gica.
+- L123: `      if (!user) return res.status(404).json({ error: 'Usuario nao encontrado.' });`
+  - Verifica condi��o para decidir o fluxo.
+- L124: ``
+  - Linha em branco para organizar blocos.
+- L125: `      const days = Math.max(7, Math.min(180, parseInt(req.query.days || '30', 10)));`
+  - Declara uma constante usada na l�gica.
+- L126: `      const end = new Date();`
+  - Declara uma constante usada na l�gica.
+- L127: `      const start = new Date(end);`
+  - Declara uma constante usada na l�gica.
+- L128: `      start.setDate(start.getDate() - days + 1);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L129: ``
+  - Linha em branco para organizar blocos.
+- L130: `      const trend = this.dao.getExpenseTrendByDay(user.id, start.toISOString(), end.toISOString());`
+  - Declara uma constante usada na l�gica.
+- L131: `      res.json({`
+  - Abre bloco de execu��o.
+- L132: `        userId: user.id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L133: `        start: start.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L134: `        end: end.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L135: `        points: trend`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L136: `      });`
+  - Fecha bloco de execu��o.
+- L137: `    });`
+  - Fecha bloco de execu��o.
+- L138: ``
+  - Linha em branco para organizar blocos.
+- L139: `    this.app.get('/api/expenses/categories', (req, res) => {`
+  - Define fun��o an�nima/arrow function.
+- L140: `      const user = this.getUserFromQuery(req);`
+  - Declara uma constante usada na l�gica.
+- L141: `      if (!user) return res.status(404).json({ error: 'Usuario nao encontrado.' });`
+  - Verifica condi��o para decidir o fluxo.
+- L142: ``
+  - Linha em branco para organizar blocos.
+- L143: `      const period = String(req.query.period || 'month').toLowerCase();`
+  - Declara uma constante usada na l�gica.
+- L144: `      const end = new Date();`
+  - Declara uma constante usada na l�gica.
+- L145: `      const start = new Date(end);`
+  - Declara uma constante usada na l�gica.
+- L146: `      if (period === 'week') {`
+  - Verifica condi��o para decidir o fluxo.
+- L147: `        start.setDate(start.getDate() - 7);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L148: `      } else {`
+  - Abre bloco de execu��o.
+- L149: `        start.setDate(1);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L150: `      }`
+  - Fecha bloco de execu��o.
+- L151: ``
+  - Linha em branco para organizar blocos.
+- L152: `      const categories = this.dao.getExpensesByCategory(user.id, start.toISOString(), end.toISOString());`
+  - Declara uma constante usada na l�gica.
+- L153: `      const bars = this.buildAsciiBars(categories);`
+  - Declara uma constante usada na l�gica.
+- L154: ``
+  - Linha em branco para organizar blocos.
+- L155: `      res.json({`
+  - Abre bloco de execu��o.
+- L156: `        userId: user.id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L157: `        period,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L158: `        categories,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L159: `        bars`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L160: `      });`
+  - Fecha bloco de execu��o.
+- L161: `    });`
+  - Fecha bloco de execu��o.
+- L162: ``
+  - Linha em branco para organizar blocos.
+- L163: `    this.app.get('/api/goals', (req, res) => {`
+  - Define fun��o an�nima/arrow function.
+- L164: `      const user = this.getUserFromQuery(req);`
+  - Declara uma constante usada na l�gica.
+- L165: `      if (!user) return res.status(404).json({ error: 'Usuario nao encontrado.' });`
+  - Verifica condi��o para decidir o fluxo.
+- L166: `      res.json({ userId: user.id, goals: this.dao.getSavingsGoalsByUser(user.id) });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L167: `    });`
+  - Fecha bloco de execu��o.
+- L168: ``
+  - Linha em branco para organizar blocos.
+- L169: `    this.app.get('/api/forecast', (req, res) => {`
+  - Define fun��o an�nima/arrow function.
+- L170: `      const user = this.getUserFromQuery(req);`
+  - Declara uma constante usada na l�gica.
+- L171: `      if (!user) return res.status(404).json({ error: 'Usuario nao encontrado.' });`
+  - Verifica condi��o para decidir o fluxo.
+- L172: `      res.json(this.forecast.generateForecast(user.id));`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L173: `    });`
+  - Fecha bloco de execu��o.
+- L174: ``
+  - Linha em branco para organizar blocos.
+- L175: `    this.app.get('/dashboard', (_req, res) => {`
+  - Define fun��o an�nima/arrow function.
+- L176: `      res.type('html').send(\`<!doctype html>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L177: `<html lang="pt-BR">`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L178: `<head>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L179: `  <meta charset="utf-8"/>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L180: `  <meta name="viewport" content="width=device-width, initial-scale=1"/>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L181: `  <title>Finance Dashboard</title>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L182: `  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L183: `  <style>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L184: `    body{font-family:Segoe UI,Arial,sans-serif;background:#0b1220;color:#e7eefb;margin:0}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L185: `    .wrap{max-width:1100px;margin:0 auto;padding:20px}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L186: `    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L187: `    .card{background:#111b2e;border:1px solid #23314d;border-radius:12px;padding:14px}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L188: `    h1{margin:0 0 16px;font-size:24px}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L189: `    h3{margin:0 0 8px;font-size:14px;color:#a8c1ff;font-weight:600}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L190: `    .v{font-size:20px;font-weight:700}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L191: `    .row{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L192: `    select,button,input{background:#0f1a2c;color:#fff;border:1px solid #334a77;border-radius:8px;padding:8px}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L193: `    canvas{background:#0f1a2c;border-radius:12px;border:1px solid #23314d;padding:8px}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L194: `    .hint{opacity:.8;font-size:12px}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L195: `  </style>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L196: `</head>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L197: `<body>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L198: `<div class="wrap">`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L199: `  <h1>Dashboard Financeiro (Read-only)</h1>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L200: `  <div class="row">`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L201: `    <select id="userSelect"></select>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L202: `    <button onclick="loadAll()">Atualizar</button>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L203: `  </div>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L204: `  <div class="grid" id="cards"></div>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L205: `  <div class="row">`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L206: `    <canvas id="trend" width="500" height="260"></canvas>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L207: `    <canvas id="cats" width="500" height="260"></canvas>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L208: `  </div>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L209: `  <div class="hint">Visualizacao apenas leitura. API protegida por token quando configurado.</div>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L210: `</div>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L211: `<script>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L212: `let trendChart; let catChart;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L213: `const qs = new URLSearchParams(location.search);`
+  - Declara uma constante usada na l�gica.
+- L214: `const token = qs.get('token') || '';`
+  - Declara uma constante usada na l�gica.
+- L215: `function api(path){`
+  - Abre bloco de execu��o.
+- L216: `  const sep = path.includes('?') ? '&' : '?';`
+  - Declara uma constante usada na l�gica.
+- L217: `  const t = token ? sep + 'token=' + encodeURIComponent(token) : '';`
+  - Declara uma constante usada na l�gica.
+- L218: `  return fetch(path + t).then(r=>r.json());`
+  - Retorna valor da fun��o/m�todo.
+- L219: `}`
+  - Fecha bloco de execu��o.
+- L220: `async function loadUsers(){`
+  - Define fun��o ass�ncrona com suporte a await.
+- L221: `  const data = await api('/api/users');`
+  - Declara uma constante usada na l�gica.
+- L222: `  const s = document.getElementById('userSelect');`
+  - Declara uma constante usada na l�gica.
+- L223: `  s.innerHTML='';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L224: `  (data.users||[]).forEach(u=>{`
+  - Define fun��o an�nima/arrow function.
+- L225: `    const o=document.createElement('option');`
+  - Declara uma constante usada na l�gica.
+- L226: `    o.value=u.id;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L227: `    o.textContent=u.name + ' (#' + u.id + ')';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L228: `    s.appendChild(o);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L229: `  });`
+  - Fecha bloco de execu��o.
+- L230: `}`
+  - Fecha bloco de execu��o.
+- L231: `function currentUser(){ return document.getElementById('userSelect').value; }`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L232: `function formatValue(k,v){`
+  - Abre bloco de execu��o.
+- L233: `  if(typeof v!=='number') return v;`
+  - Verifica condi��o para decidir o fluxo.
+- L234: `  const isMoney = k.includes('Saldo')||k.includes('Total')||k.includes('Gasto')||k.includes('Poupanca')||k.includes('Emergencia');`
+  - Declara uma constante usada na l�gica.
+- L235: `  return v.toLocaleString('pt-BR',{style:isMoney?'currency':'decimal',currency:'BRL'});`
+  - Retorna valor da fun��o/m�todo.
+- L236: `}`
+  - Fecha bloco de execu��o.
+- L237: `async function loadAll(){`
+  - Define fun��o ass�ncrona com suporte a await.
+- L238: `  const id = currentUser();`
+  - Declara uma constante usada na l�gica.
+- L239: `  if(!id) return;`
+  - Verifica condi��o para decidir o fluxo.
+- L240: `  const [ov,trend,cats] = await Promise.all([`
+  - Declara uma constante usada na l�gica.
+- L241: `    api('/api/overview?userId='+id),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L242: `    api('/api/expenses/trend?days=30&userId='+id),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L243: `    api('/api/expenses/categories?period=month&userId='+id)`
+  - Define m�todo/fun��o da classe ou objeto.
+- L244: `  ]);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L245: ``
+  - Linha em branco para organizar blocos.
+- L246: `  const list = [`
+  - Declara uma constante usada na l�gica.
+- L247: `    ['Saldo', ov.balances.current],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L248: `    ['Poupanca', ov.balances.savings],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L249: `    ['Emergencia', ov.balances.emergency],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L250: `    ['Total Patrimonio', ov.balances.total],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L251: `    ['Gasto no mes', ov.month.spent],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L252: `    ['Transacoes mes', ov.month.transactions],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L253: `    ['Cartoes', ov.cards.total],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L254: `    ['Parcelamentos', ov.installments],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L255: `    ['Metas', ov.goals]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L256: `  ];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L257: ``
+  - Linha em branco para organizar blocos.
+- L258: `  document.getElementById('cards').innerHTML = list.map(function(item){`
+  - Abre bloco de execu��o.
+- L259: `    const k = item[0];`
+  - Declara uma constante usada na l�gica.
+- L260: `    const v = item[1];`
+  - Declara uma constante usada na l�gica.
+- L261: `    return '<div class="card"><h3>' + k + '</h3><div class="v">' + formatValue(k,v) + '</div></div>';`
+  - Retorna valor da fun��o/m�todo.
+- L262: `  }).join('');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L263: ``
+  - Linha em branco para organizar blocos.
+- L264: `  const trendLabels=(trend.points||[]).map(p=>p.day);`
+  - Declara uma constante usada na l�gica.
+- L265: `  const trendValues=(trend.points||[]).map(p=>Number(p.total||0));`
+  - Declara uma constante usada na l�gica.
+- L266: `  if(trendChart) trendChart.destroy();`
+  - Verifica condi��o para decidir o fluxo.
+- L267: `  trendChart = new Chart(document.getElementById('trend'), {`
+  - Abre bloco de execu��o.
+- L268: `    type:'line', data:{labels:trendLabels,datasets:[{label:'Gasto diario',data:trendValues,borderColor:'#62b0ff',backgroundColor:'rgba(98,176,255,.2)'}]}, options:{responsive:false}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L269: `  });`
+  - Fecha bloco de execu��o.
+- L270: ``
+  - Linha em branco para organizar blocos.
+- L271: `  const catLabels=(cats.categories||[]).map(c=>c.category);`
+  - Declara uma constante usada na l�gica.
+- L272: `  const catValues=(cats.categories||[]).map(c=>Number(c.total||0));`
+  - Declara uma constante usada na l�gica.
+- L273: `  if(catChart) catChart.destroy();`
+  - Verifica condi��o para decidir o fluxo.
+- L274: `  catChart = new Chart(document.getElementById('cats'), {`
+  - Abre bloco de execu��o.
+- L275: `    type:'bar', data:{labels:catLabels,datasets:[{label:'Categorias',data:catValues,backgroundColor:'#30c49b'}]}, options:{responsive:false}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L276: `  });`
+  - Fecha bloco de execu��o.
+- L277: `}`
+  - Fecha bloco de execu��o.
+- L278: `(async()=>{ await loadUsers(); await loadAll(); })();`
+  - Usa resultado de opera��o ass�ncrona.
+- L279: `</script>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L280: `</body>`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L281: `</html>\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L282: `    });`
+  - Fecha bloco de execu��o.
+- L283: `  }`
+  - Fecha bloco de execu��o.
+- L284: ``
+  - Linha em branco para organizar blocos.
+- L285: `  start() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L286: `    if (!this.enabled) return null;`
+  - Verifica condi��o para decidir o fluxo.
+- L287: `    this.setupRoutes();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L288: `    this.server = this.app.listen(this.port, () => {`
+  - Define fun��o an�nima/arrow function.
+- L289: `      console.log(\`📊 Dashboard web ativo em ${this.baseUrl}/dashboard\`);`
+  - Registra informa��o de execu��o no log.
+- L290: `    });`
+  - Fecha bloco de execu��o.
+- L291: `    return this.server;`
+  - Retorna valor da fun��o/m�todo.
+- L292: `  }`
+  - Fecha bloco de execu��o.
+- L293: ``
+  - Linha em branco para organizar blocos.
+- L294: `  getDashboardLink() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L295: `    if (!this.enabled) return null;`
+  - Verifica condi��o para decidir o fluxo.
+- L296: `    return \`${this.baseUrl}/dashboard\`;`
+  - Retorna valor da fun��o/m�todo.
+- L297: `  }`
+  - Fecha bloco de execu��o.
+- L298: `}`
+  - Fecha bloco de execu��o.
+- L299: ``
+  - Linha em branco para organizar blocos.
+- L300: `module.exports = DashboardServer;`
+  - Exporta m�dulo para ser usado em outros arquivos.
+
+## src/services/exportService.js
+
+- L1: `const fs = require('fs');`
+  - Importa um m�dulo para uso neste arquivo.
+- L2: `const path = require('path');`
+  - Importa um m�dulo para uso neste arquivo.
+- L3: `const PDFDocument = require('pdfkit');`
+  - Importa um m�dulo para uso neste arquivo.
+- L4: `const XLSX = require('xlsx');`
+  - Importa um m�dulo para uso neste arquivo.
+- L5: ``
+  - Linha em branco para organizar blocos.
+- L6: `class ExportService {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L7: `  constructor(dao, reports, exportDir) {`
+  - Inicializa estado da classe e depend�ncias.
+- L8: `    this.dao = dao;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L9: `    this.reports = reports;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L10: `    this.exportDir = exportDir || path.join(__dirname, '../../exports');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L11: ``
+  - Linha em branco para organizar blocos.
+- L12: `    if (!fs.existsSync(this.exportDir)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L13: `      fs.mkdirSync(this.exportDir, { recursive: true });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L14: `    }`
+  - Fecha bloco de execu��o.
+- L15: `  }`
+  - Fecha bloco de execu��o.
+- L16: ``
+  - Linha em branco para organizar blocos.
+- L17: `  getSafeFileName(input) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L18: `    return String(input || 'usuario')`
+  - Retorna valor da fun��o/m�todo.
+- L19: `      .normalize('NFD')`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L20: `      .replace(/[\u0300-\u036f]/g, '')`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L21: `      .replace(/[^a-zA-Z0-9_-]/g, '_')`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L22: `      .replace(/_+/g, '_')`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L23: `      .slice(0, 40);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L24: `  }`
+  - Fecha bloco de execu��o.
+- L25: ``
+  - Linha em branco para organizar blocos.
+- L26: `  getUserDataset(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L27: `    const user = this.dao.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L28: `    if (!user) return null;`
+  - Verifica condi��o para decidir o fluxo.
+- L29: ``
+  - Linha em branco para organizar blocos.
+- L30: `    const now = new Date();`
+  - Declara uma constante usada na l�gica.
+- L31: `    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);`
+  - Declara uma constante usada na l�gica.
+- L32: `    const yearStart = new Date(now.getFullYear(), 0, 1);`
+  - Declara uma constante usada na l�gica.
+- L33: ``
+  - Linha em branco para organizar blocos.
+- L34: `    const expensesMonth = this.dao.getExpensesByUser(userId, {`
+  - Declara uma constante usada na l�gica.
+- L35: `      startDate: monthStart.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L36: `      endDate: now.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L37: `      transactionType: 'expense'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L38: `    });`
+  - Fecha bloco de execu��o.
+- L39: ``
+  - Linha em branco para organizar blocos.
+- L40: `    const expensesYear = this.dao.getExpensesByUser(userId, {`
+  - Declara uma constante usada na l�gica.
+- L41: `      startDate: yearStart.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L42: `      endDate: now.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L43: `      transactionType: 'expense'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L44: `    });`
+  - Fecha bloco de execu��o.
+- L45: ``
+  - Linha em branco para organizar blocos.
+- L46: `    const installments = this.dao.getInstallmentsByUser(userId);`
+  - Declara uma constante usada na l�gica.
+- L47: `    const cards = this.dao.getAllCardsByUserId(userId);`
+  - Declara uma constante usada na l�gica.
+- L48: `    const goals = this.dao.getSavingsGoalsByUser(userId);`
+  - Declara uma constante usada na l�gica.
+- L49: ``
+  - Linha em branco para organizar blocos.
+- L50: `    return {`
+  - Retorna valor da fun��o/m�todo.
+- L51: `      user,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L52: `      generatedAt: now,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L53: `      expensesMonth,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L54: `      expensesYear,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L55: `      installments,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L56: `      cards,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L57: `      goals,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L58: `      categoryMonth: this.dao.getExpensesByCategory(userId, monthStart.toISOString(), now.toISOString()),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L59: `      trendMonth: this.dao.getExpenseTrendByDay(userId, monthStart.toISOString(), now.toISOString()),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L60: `      trendMonths: this.dao.getExpenseTrendByMonth(userId, 6)`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L61: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L62: `  }`
+  - Fecha bloco de execu��o.
+- L63: ``
+  - Linha em branco para organizar blocos.
+- L64: `  async exportExcel(userId) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L65: `    const data = this.getUserDataset(userId);`
+  - Declara uma constante usada na l�gica.
+- L66: `    if (!data) return { success: false, error: 'Usuario nao encontrado.' };`
+  - Verifica condi��o para decidir o fluxo.
+- L67: ``
+  - Linha em branco para organizar blocos.
+- L68: `    const safeUser = this.getSafeFileName(data.user.name);`
+  - Declara uma constante usada na l�gica.
+- L69: `    const stamp = new Date().toISOString().replace(/[:.]/g, '-');`
+  - Declara uma constante usada na l�gica.
+- L70: `    const fileName = \`relatorio_${safeUser}_${stamp}.xlsx\`;`
+  - Declara uma constante usada na l�gica.
+- L71: `    const filePath = path.join(this.exportDir, fileName);`
+  - Declara uma constante usada na l�gica.
+- L72: ``
+  - Linha em branco para organizar blocos.
+- L73: `    const wb = XLSX.utils.book_new();`
+  - Declara uma constante usada na l�gica.
+- L74: ``
+  - Linha em branco para organizar blocos.
+- L75: `    const summaryRows = [`
+  - Declara uma constante usada na l�gica.
+- L76: `      ['Campo', 'Valor'],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L77: `      ['Usuario', data.user.name],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L78: `      ['WhatsApp', data.user.whatsapp_id],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L79: `      ['Gerado em', data.generatedAt.toISOString()],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L80: `      ['Saldo principal', Number(data.user.current_balance || 0)],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L81: `      ['Poupanca', Number(data.user.savings_balance || 0)],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L82: `      ['Reserva emergencia', Number(data.user.emergency_fund || 0)],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L83: `      ['Patrimonio total', Number((data.user.current_balance || 0) + (data.user.savings_balance || 0) + (data.user.emergency_fund || 0))],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L84: `      ['Gastos no mes', Number(data.expensesMonth.reduce((sum, e) => sum + Number(e.amount || 0), 0))],`
+  - Define fun��o an�nima/arrow function.
+- L85: `      ['Transacoes no mes', data.expensesMonth.length],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L86: `      ['Parcelamentos ativos', data.installments.length],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L87: `      ['Cartoes cadastrados', data.cards.length],`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L88: `      ['Metas', data.goals.length]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L89: `    ];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L90: `    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryRows), 'Resumo');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L91: ``
+  - Linha em branco para organizar blocos.
+- L92: `    const expensesRows = [`
+  - Declara uma constante usada na l�gica.
+- L93: `      ['Data', 'Descricao', 'Categoria', 'Valor', 'Tipo']`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L94: `    ];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L95: `    for (let i = 0; i < data.expensesYear.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L96: `      const e = data.expensesYear[i];`
+  - Declara uma constante usada na l�gica.
+- L97: `      expensesRows.push([`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L98: `        e.date || e.created_at || '',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L99: `        e.description || '',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L100: `        e.category_name || '',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L101: `        Number(e.amount || 0),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L102: `        e.transaction_type || 'expense'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L103: `      ]);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L104: `    }`
+  - Fecha bloco de execu��o.
+- L105: `    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(expensesRows), 'Transacoes');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L106: ``
+  - Linha em branco para organizar blocos.
+- L107: `    const goalsRows = [['ID', 'Meta', 'Alvo', 'Progresso', 'Percentual', 'Status', 'Prazo']];`
+  - Declara uma constante usada na l�gica.
+- L108: `    for (let i = 0; i < data.goals.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L109: `      const g = data.goals[i];`
+  - Declara uma constante usada na l�gica.
+- L110: `      goalsRows.push([`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L111: `        g.id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L112: `        g.name,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L113: `        Number(g.target_amount || 0),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L114: `        Number(g.current_progress || 0),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L115: `        Number(g.progress_percent || 0),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L116: `        g.status,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L117: `        g.target_date || ''`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L118: `      ]);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L119: `    }`
+  - Fecha bloco de execu��o.
+- L120: `    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(goalsRows), 'Metas');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L121: ``
+  - Linha em branco para organizar blocos.
+- L122: `    const cardsRows = [['ID', 'Nome', 'Limite', 'Usado', 'Disponivel', 'Fatura', 'Vencimento']];`
+  - Declara uma constante usada na l�gica.
+- L123: `    for (let i = 0; i < data.cards.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L124: `      const c = data.cards[i];`
+  - Declara uma constante usada na l�gica.
+- L125: `      cardsRows.push([`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L126: `        c.id,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L127: `        c.card_name,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L128: `        Number(c.card_limit || 0),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L129: `        Number(c.current_balance || 0),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L130: `        Number(c.available_limit || 0),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L131: `        Number(c.invoice_amount || 0),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L132: `        c.invoice_due_day`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L133: `      ]);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L134: `    }`
+  - Fecha bloco de execu��o.
+- L135: `    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(cardsRows), 'Cartoes');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L136: ``
+  - Linha em branco para organizar blocos.
+- L137: `    const categoryRows = [['Categoria', 'Total', 'Qtd']];`
+  - Declara uma constante usada na l�gica.
+- L138: `    for (let i = 0; i < data.categoryMonth.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L139: `      const c = data.categoryMonth[i];`
+  - Declara uma constante usada na l�gica.
+- L140: `      categoryRows.push([c.category, Number(c.total || 0), Number(c.count || 0)]);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L141: `    }`
+  - Fecha bloco de execu��o.
+- L142: `    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(categoryRows), 'CategoriasMes');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L143: ``
+  - Linha em branco para organizar blocos.
+- L144: `    XLSX.writeFile(wb, filePath);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L145: ``
+  - Linha em branco para organizar blocos.
+- L146: `    return { success: true, filePath, fileName };`
+  - Retorna valor da fun��o/m�todo.
+- L147: `  }`
+  - Fecha bloco de execu��o.
+- L148: ``
+  - Linha em branco para organizar blocos.
+- L149: `  async exportPdf(userId) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L150: `    const data = this.getUserDataset(userId);`
+  - Declara uma constante usada na l�gica.
+- L151: `    if (!data) return { success: false, error: 'Usuario nao encontrado.' };`
+  - Verifica condi��o para decidir o fluxo.
+- L152: ``
+  - Linha em branco para organizar blocos.
+- L153: `    const safeUser = this.getSafeFileName(data.user.name);`
+  - Declara uma constante usada na l�gica.
+- L154: `    const stamp = new Date().toISOString().replace(/[:.]/g, '-');`
+  - Declara uma constante usada na l�gica.
+- L155: `    const fileName = \`relatorio_${safeUser}_${stamp}.pdf\`;`
+  - Declara uma constante usada na l�gica.
+- L156: `    const filePath = path.join(this.exportDir, fileName);`
+  - Declara uma constante usada na l�gica.
+- L157: ``
+  - Linha em branco para organizar blocos.
+- L158: `    const totalMonth = data.expensesMonth.reduce((sum, e) => sum + Number(e.amount || 0), 0);`
+  - Declara uma constante usada na l�gica.
+- L159: `    const topCategories = data.categoryMonth.slice(0, 8);`
+  - Declara uma constante usada na l�gica.
+- L160: ``
+  - Linha em branco para organizar blocos.
+- L161: `    await new Promise((resolve, reject) => {`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L162: `      const doc = new PDFDocument({ margin: 40 });`
+  - Declara uma constante usada na l�gica.
+- L163: `      const stream = fs.createWriteStream(filePath);`
+  - Declara uma constante usada na l�gica.
+- L164: `      doc.pipe(stream);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L165: ``
+  - Linha em branco para organizar blocos.
+- L166: `      doc.fontSize(18).text('Relatorio Financeiro', { align: 'left' });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L167: `      doc.moveDown(0.5);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L168: `      doc.fontSize(10).text(\`Usuario: ${data.user.name}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L169: `      doc.text(\`WhatsApp: ${data.user.whatsapp_id}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L170: `      doc.text(\`Gerado em: ${data.generatedAt.toISOString()}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L171: `      doc.moveDown();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L172: ``
+  - Linha em branco para organizar blocos.
+- L173: `      doc.fontSize(14).text('Resumo');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L174: `      doc.fontSize(10);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L175: `      doc.text(\`Saldo principal: ${this.reports.formatMoney(Number(data.user.current_balance || 0))}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L176: `      doc.text(\`Poupanca: ${this.reports.formatMoney(Number(data.user.savings_balance || 0))}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L177: `      doc.text(\`Reserva emergencia: ${this.reports.formatMoney(Number(data.user.emergency_fund || 0))}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L178: `      doc.text(\`Gastos no mes: ${this.reports.formatMoney(totalMonth)}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L179: `      doc.text(\`Transacoes no mes: ${data.expensesMonth.length}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L180: `      doc.text(\`Parcelamentos ativos: ${data.installments.length}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L181: `      doc.text(\`Cartoes cadastrados: ${data.cards.length}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L182: `      doc.text(\`Metas de economia: ${data.goals.length}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L183: ``
+  - Linha em branco para organizar blocos.
+- L184: `      doc.moveDown();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L185: `      doc.fontSize(14).text('Categorias do mes');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L186: `      doc.fontSize(10);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L187: ``
+  - Linha em branco para organizar blocos.
+- L188: `      if (topCategories.length === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L189: `        doc.text('Sem gastos no periodo.');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L190: `      } else {`
+  - Abre bloco de execu��o.
+- L191: `        for (let i = 0; i < topCategories.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L192: `          const c = topCategories[i];`
+  - Declara uma constante usada na l�gica.
+- L193: `          doc.text(\`${i + 1}. ${c.category}: ${this.reports.formatMoney(Number(c.total || 0))} (${c.count}x)\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L194: `        }`
+  - Fecha bloco de execu��o.
+- L195: `      }`
+  - Fecha bloco de execu��o.
+- L196: ``
+  - Linha em branco para organizar blocos.
+- L197: `      doc.moveDown();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L198: `      doc.fontSize(14).text('Metas');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L199: `      doc.fontSize(10);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L200: `      if (data.goals.length === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L201: `        doc.text('Nenhuma meta cadastrada.');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L202: `      } else {`
+  - Abre bloco de execu��o.
+- L203: `        for (let i = 0; i < data.goals.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L204: `          const g = data.goals[i];`
+  - Declara uma constante usada na l�gica.
+- L205: `          doc.text(\`#${g.id} ${g.name}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L206: `          doc.text(\`Alvo: ${this.reports.formatMoney(Number(g.target_amount || 0))} | Progresso: ${this.reports.formatMoney(Number(g.current_progress || 0))} (${g.progress_percent || 0}%)\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L207: `          doc.text(\`Status: ${g.status}${g.target_date ? \` | Prazo: ${g.target_date}\` : ''}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L208: `          doc.moveDown(0.4);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L209: `        }`
+  - Fecha bloco de execu��o.
+- L210: `      }`
+  - Fecha bloco de execu��o.
+- L211: ``
+  - Linha em branco para organizar blocos.
+- L212: `      doc.end();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L213: `      stream.on('finish', resolve);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L214: `      stream.on('error', reject);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L215: `    });`
+  - Fecha bloco de execu��o.
+- L216: ``
+  - Linha em branco para organizar blocos.
+- L217: `    return { success: true, filePath, fileName };`
+  - Retorna valor da fun��o/m�todo.
+- L218: `  }`
+  - Fecha bloco de execu��o.
+- L219: `}`
+  - Fecha bloco de execu��o.
+- L220: ``
+  - Linha em branco para organizar blocos.
+- L221: `module.exports = ExportService;`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L222: ``
+  - Linha em branco para organizar blocos.
+
+## src/services/forecastService.js
+
+- L1: `class ForecastService {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L2: `  constructor(dao, reports) {`
+  - Inicializa estado da classe e depend�ncias.
+- L3: `    this.dao = dao;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L4: `    this.reports = reports;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L5: `  }`
+  - Fecha bloco de execu��o.
+- L6: ``
+  - Linha em branco para organizar blocos.
+- L7: `  linearRegression(points) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L8: `    const n = points.length;`
+  - Declara uma constante usada na l�gica.
+- L9: `    if (n === 0) return { slope: 0, intercept: 0 };`
+  - Verifica condi��o para decidir o fluxo.
+- L10: ``
+  - Linha em branco para organizar blocos.
+- L11: `    let sumX = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L12: `    let sumY = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L13: `    let sumXY = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L14: `    let sumXX = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L15: ``
+  - Linha em branco para organizar blocos.
+- L16: `    for (let i = 0; i < n; i++) {`
+  - Inicia la�o de repeti��o.
+- L17: `      const x = points[i].x;`
+  - Declara uma constante usada na l�gica.
+- L18: `      const y = points[i].y;`
+  - Declara uma constante usada na l�gica.
+- L19: `      sumX += x;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L20: `      sumY += y;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L21: `      sumXY += x * y;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L22: `      sumXX += x * x;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L23: `    }`
+  - Fecha bloco de execu��o.
+- L24: ``
+  - Linha em branco para organizar blocos.
+- L25: `    const denominator = (n * sumXX) - (sumX * sumX);`
+  - Declara uma constante usada na l�gica.
+- L26: `    if (denominator === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L27: `      return { slope: 0, intercept: sumY / n };`
+  - Retorna valor da fun��o/m�todo.
+- L28: `    }`
+  - Fecha bloco de execu��o.
+- L29: ``
+  - Linha em branco para organizar blocos.
+- L30: `    const slope = ((n * sumXY) - (sumX * sumY)) / denominator;`
+  - Declara uma constante usada na l�gica.
+- L31: `    const intercept = (sumY - (slope * sumX)) / n;`
+  - Declara uma constante usada na l�gica.
+- L32: `    return { slope, intercept };`
+  - Retorna valor da fun��o/m�todo.
+- L33: `  }`
+  - Fecha bloco de execu��o.
+- L34: ``
+  - Linha em branco para organizar blocos.
+- L35: `  getVolatility(values) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L36: `    if (!values.length) return 0;`
+  - Verifica condi��o para decidir o fluxo.
+- L37: `    const mean = values.reduce((s, v) => s + v, 0) / values.length;`
+  - Declara uma constante usada na l�gica.
+- L38: `    if (mean === 0) return 0;`
+  - Verifica condi��o para decidir o fluxo.
+- L39: ``
+  - Linha em branco para organizar blocos.
+- L40: `    const variance = values.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / values.length;`
+  - Declara uma constante usada na l�gica.
+- L41: `    const stdDev = Math.sqrt(variance);`
+  - Declara uma constante usada na l�gica.
+- L42: `    return stdDev / mean;`
+  - Retorna valor da fun��o/m�todo.
+- L43: `  }`
+  - Fecha bloco de execu��o.
+- L44: ``
+  - Linha em branco para organizar blocos.
+- L45: `  generateForecast(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L46: `    const user = this.dao.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L47: `    if (!user) {`
+  - Verifica condi��o para decidir o fluxo.
+- L48: `      return { success: false, error: 'Usuario nao encontrado.' };`
+  - Retorna valor da fun��o/m�todo.
+- L49: `    }`
+  - Fecha bloco de execu��o.
+- L50: ``
+  - Linha em branco para organizar blocos.
+- L51: `    const now = new Date();`
+  - Declara uma constante usada na l�gica.
+- L52: `    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);`
+  - Declara uma constante usada na l�gica.
+- L53: `    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);`
+  - Declara uma constante usada na l�gica.
+- L54: ``
+  - Linha em branco para organizar blocos.
+- L55: `    const history = this.dao.getExpensesForForecast(userId, 120);`
+  - Declara uma constante usada na l�gica.
+- L56: `    if (!history || history.length < 7) {`
+  - Verifica condi��o para decidir o fluxo.
+- L57: `      return {`
+  - Retorna valor da fun��o/m�todo.
+- L58: `        success: false,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L59: `        error: 'Historico insuficiente. Registre pelo menos 7 dias de gastos para previsao.'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L60: `      };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L61: `    }`
+  - Fecha bloco de execu��o.
+- L62: ``
+  - Linha em branco para organizar blocos.
+- L63: `    const thisMonthDaily = this.dao.getExpenseTrendByDay(userId, monthStart.toISOString(), now.toISOString());`
+  - Declara uma constante usada na l�gica.
+- L64: `    const spentSoFar = thisMonthDaily.reduce((sum, row) => sum + Number(row.total || 0), 0);`
+  - Declara uma constante usada na l�gica.
+- L65: ``
+  - Linha em branco para organizar blocos.
+- L66: `    const points = history.map((row, idx) => ({ x: idx + 1, y: Number(row.total || 0) }));`
+  - Declara uma constante usada na l�gica.
+- L67: `    const values = points.map(p => p.y);`
+  - Declara uma constante usada na l�gica.
+- L68: `    const regression = this.linearRegression(points);`
+  - Declara uma constante usada na l�gica.
+- L69: ``
+  - Linha em branco para organizar blocos.
+- L70: `    const currentDay = Math.max(1, now.getDate());`
+  - Declara uma constante usada na l�gica.
+- L71: `    const daysInMonth = monthEnd.getDate();`
+  - Declara uma constante usada na l�gica.
+- L72: `    const remainingDays = Math.max(0, daysInMonth - currentDay);`
+  - Declara uma constante usada na l�gica.
+- L73: ``
+  - Linha em branco para organizar blocos.
+- L74: `    const avgDailyCurrentMonth = spentSoFar / currentDay;`
+  - Declara uma constante usada na l�gica.
+- L75: `    const trendDaily = Math.max(0, (regression.slope * (points.length + 1)) + regression.intercept);`
+  - Declara uma constante usada na l�gica.
+- L76: `    const projectedDaily = Math.max(0, (avgDailyCurrentMonth * 0.65) + (trendDaily * 0.35));`
+  - Declara uma constante usada na l�gica.
+- L77: ``
+  - Linha em branco para organizar blocos.
+- L78: `    const projectedTotal = parseFloat((spentSoFar + (projectedDaily * remainingDays)).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L79: `    const volatility = this.getVolatility(values);`
+  - Declara uma constante usada na l�gica.
+- L80: ``
+  - Linha em branco para organizar blocos.
+- L81: `    let confidence = 90;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L82: `    if (history.length < 20) confidence -= 15;`
+  - Verifica condi��o para decidir o fluxo.
+- L83: `    if (history.length < 45) confidence -= 10;`
+  - Verifica condi��o para decidir o fluxo.
+- L84: `    confidence -= Math.min(35, Math.round(volatility * 30));`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L85: `    confidence = Math.max(40, Math.min(95, confidence));`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L86: ``
+  - Linha em branco para organizar blocos.
+- L87: `    const trendLabel = regression.slope > 1`
+  - Declara uma constante usada na l�gica.
+- L88: `      ? 'alta'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L89: `      : regression.slope < -1`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L90: `        ? 'queda'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L91: `        : 'estavel';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L92: ``
+  - Linha em branco para organizar blocos.
+- L93: `    return {`
+  - Retorna valor da fun��o/m�todo.
+- L94: `      success: true,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L95: `      user,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L96: `      spentSoFar: parseFloat(spentSoFar.toFixed(2)),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L97: `      projectedTotal,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L98: `      projectedDaily: parseFloat(projectedDaily.toFixed(2)),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L99: `      remainingDays,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L100: `      daysInMonth,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L101: `      currentDay,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L102: `      confidence,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L103: `      trendLabel,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L104: `      slope: regression.slope,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L105: `      volatility: parseFloat(volatility.toFixed(3))`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L106: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L107: `  }`
+  - Fecha bloco de execu��o.
+- L108: ``
+  - Linha em branco para organizar blocos.
+- L109: `  generateForecastMessage(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L110: `    const result = this.generateForecast(userId);`
+  - Declara uma constante usada na l�gica.
+- L111: `    const timestamp = this.reports.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L112: ``
+  - Linha em branco para organizar blocos.
+- L113: `    if (!result.success) {`
+  - Verifica condi��o para decidir o fluxo.
+- L114: `      return \`?? *PREVISAO DE GASTOS*\n\n${result.error}\n\n?? ${timestamp.formatted}\`;`
+  - Retorna valor da fun��o/m�todo.
+- L115: `    }`
+  - Fecha bloco de execu��o.
+- L116: ``
+  - Linha em branco para organizar blocos.
+- L117: `    let msg = '?? *PREVISAO DE GASTOS (IA)*\n\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L118: `    msg += \`?? Usuario: ${result.user.name}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L119: `    msg += \`?? Mes atual: dia ${result.currentDay}/${result.daysInMonth}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L120: `    msg += \`?? Gasto ate agora: ${this.reports.formatMoney(result.spentSoFar)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L121: `    msg += \`?? Projecao do mes: *${this.reports.formatMoney(result.projectedTotal)}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L122: `    msg += \`?? Media diaria projetada: ${this.reports.formatMoney(result.projectedDaily)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L123: `    msg += \`? Dias restantes: ${result.remainingDays}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L124: ``
+  - Linha em branco para organizar blocos.
+- L125: `    msg += '?? *SINAL DA IA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L126: `    msg += \`   Tendencia: ${result.trendLabel}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L127: `    msg += \`   Confianca estimada: ${result.confidence}%\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L128: ``
+  - Linha em branco para organizar blocos.
+- L129: `    if (result.trendLabel === 'alta') {`
+  - Verifica condi��o para decidir o fluxo.
+- L130: `      msg += '\n?? Seus gastos estao acelerando. Considere reduzir despesas variaveis.';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L131: `    } else if (result.trendLabel === 'queda') {`
+  - Abre bloco de execu��o.
+- L132: `      msg += '\n? Boa tendencia: seus gastos estao desacelerando.';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L133: `    } else {`
+  - Abre bloco de execu��o.
+- L134: `      msg += '\n?? Tendencia neutra no momento.';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L135: `    }`
+  - Fecha bloco de execu��o.
+- L136: ``
+  - Linha em branco para organizar blocos.
+- L137: `    msg += \`\n\n?? ${timestamp.formatted}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L138: `    return msg;`
+  - Retorna valor da fun��o/m�todo.
+- L139: `  }`
+  - Fecha bloco de execu��o.
+- L140: `}`
+  - Fecha bloco de execu��o.
+- L141: ``
+  - Linha em branco para organizar blocos.
+- L142: `module.exports = ForecastService;`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L143: ``
+  - Linha em branco para organizar blocos.
+
+## src/services/nlp.js
+
+- L1: `class NLPProcessor {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L2: `  constructor() {`
+  - Inicializa estado da classe e depend�ncias.
+- L3: `    this.amountRegexSource = '(?:\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{1,2})?|\\d+(?:[.,]\\d{1,2})?)';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L4: `    const amountCapture = \`(${this.amountRegexSource})\`;`
+  - Declara uma constante usada na l�gica.
+- L5: ``
+  - Linha em branco para organizar blocos.
+- L6: `    this.moneyPatterns = [`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L7: `      new RegExp(\`(?:gastei|paguei|comprei|saiu|foi|custou|deu)\\s+(?:r\\$|rs)?\\s*${amountCapture}\`, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L8: `      new RegExp(\`(?:r\\$|rs)\\s*${amountCapture}\`, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L9: `      new RegExp(\`${amountCapture}\\s*(?:reais|real|conto|contos|pila|pilas|pau|mangos)\`, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L10: `      new RegExp(\`${amountCapture}\\s*(?:R\\$|RS)\`, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L11: `      new RegExp(\`^${amountCapture}\\s+\`, 'i')`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L12: `    ];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L13: ``
+  - Linha em branco para organizar blocos.
+- L14: `    this.installmentPattern = new RegExp(`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L15: `      \`(${this.amountRegexSource})\\s*(?:em|por|parcelado em|parcelada em|parcelado|parcelada)\\s*(\\d+)x?\`,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L16: `      'i'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L17: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L18: ``
+  - Linha em branco para organizar blocos.
+- L19: `    this.commandPatterns = {`
+  - Abre bloco de execu��o.
+- L20: `      setBalance: new RegExp(\`^\\/saldo\\s+${amountCapture}\\s*$\`, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L21: `      getBalance: /^\/saldo\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L22: `      addBalance: new RegExp(\`^\\/adicionar\\s+${amountCapture}\\s*$\`, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L23: ``
+  - Linha em branco para organizar blocos.
+- L24: `      getSavings: /^\/poupan[c\u00E7]a\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L25: `      depositSavings: new RegExp(\`^\\/guardar\\s+${amountCapture}\\s*$\`, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L26: `      withdrawSavings: new RegExp(\`^\\/retirar\\s+${amountCapture}\\s*$\`, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L27: ``
+  - Linha em branco para organizar blocos.
+- L28: `      getEmergency: /^\/emerg[e\u00EA]ncia\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L29: `      depositEmergency: new RegExp(\`^\\/reservar\\s+${amountCapture}\\s*$\`, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L30: `      withdrawEmergency: new RegExp(\`^\\/usar\\s+(?:reserva\\s+)?${amountCapture}\\s*$\`, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L31: ``
+  - Linha em branco para organizar blocos.
+- L32: `      createCard: /^\/cart[a\u00E3]o\s+criar\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L33: `      listCards: /^\/cart[o\u00F5]es\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L34: `      setCardLimit: new RegExp(\`^\\/cart[a\\u00E3]o\\s+limite\\s+${amountCapture}\\s*$\`, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L35: `      getCard: /^\/cart[a\u00E3]o\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L36: `      getCardByName: /^\/cart[a\u00E3]o\s+(.+)/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L37: `      payInvoiceCard: /^\/pagar\s+fatura\s+(.+)/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L38: `      deleteCard: /^\/deletar\s+cart[a\u00E3]o\s+(.+)/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L39: `      resetCard: /^\/zerar\s+cart[a\u00E3]o\s+(.+)/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L40: `      vencimentos: /^\/vencimentos?\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L41: ``
+  - Linha em branco para organizar blocos.
+- L42: `      getInstallments: /^\/parcelamentos?\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L43: `      payInstallment: /^\/pagar\s+(?:parcela\s+)?(.+)/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L44: ``
+  - Linha em branco para organizar blocos.
+- L45: `      getReminders: /^\/(?:lembretes?|lembrar|avisos?)/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L46: `      getDuePayments: /^\/(?:vencidas?|atrasadas?|pendentes?)/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L47: ``
+  - Linha em branco para organizar blocos.
+- L48: `      resetBalance: /^\/(?:zerar|resetar|limpar)\s+saldo\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L49: `      resetSavings: /^\/(?:zerar|resetar|limpar)\s+poupan[c\u00E7]a\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L50: `      resetEmergency: /^\/(?:zerar|resetar|limpar)\s+(?:reserva|reserva\s+emerg[e\u00EA]ncia|reserva\s+emergencia)\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L51: `      resetInstallments: /^\/(?:zerar|resetar|limpar|apagar)\s+(?:parcelas?|parcelamentos?)\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L52: `      resetEverything: /^\/(?:zerar|resetar|limpar)\s+(?:tudo|sistema)\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L53: ``
+  - Linha em branco para organizar blocos.
+- L54: `      confirmReset: /^SIM,?\s*ZERAR\s+TUDO\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L55: ``
+  - Linha em branco para organizar blocos.
+- L56: `      reportWeekly: /^\/relat[o\u00F3]rio\s+(?:semana|semanal|week|weekly)/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L57: `      reportMonthly: /^\/relat[o\u00F3]rio\s+(?:m[e\u00EA]s|mes|mensal|month|monthly)/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L58: ``
+  - Linha em branco para organizar blocos.
+- L59: `      reportWeeklyShort: /^\/(?:semana|semanal)\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L60: `      reportMonthlyShort: /^\/(?:m[e\u00EA]s|mes|mensal)\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L61: ``
+  - Linha em branco para organizar blocos.
+- L62: `      reportChartWeekly: /^\/grafico\s+(?:semana|semanal)\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L63: `      reportChartMonthly: /^\/grafico\s+(?:m[e\u00EA]s|mes|mensal)\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L64: ``
+  - Linha em branco para organizar blocos.
+- L65: `      goalsList: /^\/metas?\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L66: `      goalsCreate: /^\/metas?\s+criar\s+(.+)$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L67: `      goalsDelete: /^\/metas?\s+(?:remover|apagar|deletar)\s+(\d+)\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L68: `      goalsComplete: /^\/metas?\s+(?:concluir|finalizar)\s+(\d+)\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L69: ``
+  - Linha em branco para organizar blocos.
+- L70: `      exportExcel: /^\/exportar\s+(?:excel|xlsx)\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L71: `      exportPdf: /^\/exportar\s+pdf\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L72: `      exportAll: /^\/exportar\s+(?:ambos|tudo)\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L73: ``
+  - Linha em branco para organizar blocos.
+- L74: `      dashboard: /^\/dashboard\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L75: `      forecast: /^\/previs[a\u00E3]o(?:\s+ia)?\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L76: ``
+  - Linha em branco para organizar blocos.
+- L77: `      syncStatus: /^\/sync\s+status\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L78: `      syncNow: /^\/sync\s+agora\s*$/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L79: ``
+  - Linha em branco para organizar blocos.
+- L80: `      help: /^\/(?:ajuda|help|comandos)/i,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L81: `      start: /^\/(?:start|come[\u00E7c]ar|comecar)/i`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L82: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L83: `  }`
+  - Fecha bloco de execu��o.
+- L84: ``
+  - Linha em branco para organizar blocos.
+- L85: `  parseAmountString(rawValue) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L86: `    if (rawValue === null || rawValue === undefined) return null;`
+  - Verifica condi��o para decidir o fluxo.
+- L87: ``
+  - Linha em branco para organizar blocos.
+- L88: `    let value = String(rawValue).trim().replace(/[^\d.,-]/g, '');`
+  - Declara vari�vel com valor que pode ser alterado.
+- L89: `    if (!value) return null;`
+  - Verifica condi��o para decidir o fluxo.
+- L90: ``
+  - Linha em branco para organizar blocos.
+- L91: `    const hasComma = value.includes(',');`
+  - Declara uma constante usada na l�gica.
+- L92: `    const hasDot = value.includes('.');`
+  - Declara uma constante usada na l�gica.
+- L93: ``
+  - Linha em branco para organizar blocos.
+- L94: `    if (hasComma && hasDot) {`
+  - Verifica condi��o para decidir o fluxo.
+- L95: `      if (value.lastIndexOf(',') > value.lastIndexOf('.')) {`
+  - Verifica condi��o para decidir o fluxo.
+- L96: `        value = value.replace(/\./g, '').replace(',', '.');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L97: `      } else {`
+  - Abre bloco de execu��o.
+- L98: `        value = value.replace(/,/g, '');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L99: `      }`
+  - Fecha bloco de execu��o.
+- L100: `    } else if (hasComma) {`
+  - Abre bloco de execu��o.
+- L101: `      const commaCount = (value.match(/,/g) || []).length;`
+  - Declara uma constante usada na l�gica.
+- L102: `      if (commaCount > 1) {`
+  - Verifica condi��o para decidir o fluxo.
+- L103: `        value = value.replace(/,/g, '');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L104: `      } else {`
+  - Abre bloco de execu��o.
+- L105: `        const parts = value.split(',');`
+  - Declara uma constante usada na l�gica.
+- L106: `        if (parts[1] && parts[1].length === 3) {`
+  - Verifica condi��o para decidir o fluxo.
+- L107: `          value = parts.join('');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L108: `        } else {`
+  - Abre bloco de execu��o.
+- L109: `          value = value.replace(',', '.');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L110: `        }`
+  - Fecha bloco de execu��o.
+- L111: `      }`
+  - Fecha bloco de execu��o.
+- L112: `    } else if (hasDot) {`
+  - Abre bloco de execu��o.
+- L113: `      const dotCount = (value.match(/\./g) || []).length;`
+  - Declara uma constante usada na l�gica.
+- L114: `      if (dotCount > 1) {`
+  - Verifica condi��o para decidir o fluxo.
+- L115: `        value = value.replace(/\./g, '');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L116: `      } else {`
+  - Abre bloco de execu��o.
+- L117: `        const parts = value.split('.');`
+  - Declara uma constante usada na l�gica.
+- L118: `        if (parts[1] && parts[1].length === 3) {`
+  - Verifica condi��o para decidir o fluxo.
+- L119: `          value = parts.join('');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L120: `        }`
+  - Fecha bloco de execu��o.
+- L121: `      }`
+  - Fecha bloco de execu��o.
+- L122: `    }`
+  - Fecha bloco de execu��o.
+- L123: ``
+  - Linha em branco para organizar blocos.
+- L124: `    const parsed = Number.parseFloat(value);`
+  - Declara uma constante usada na l�gica.
+- L125: `    return Number.isFinite(parsed) ? parsed : null;`
+  - Retorna valor da fun��o/m�todo.
+- L126: `  }`
+  - Fecha bloco de execu��o.
+- L127: ``
+  - Linha em branco para organizar blocos.
+- L128: `  extractAmount(text) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L129: `    for (let i = 0; i < this.moneyPatterns.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L130: `      const pattern = this.moneyPatterns[i];`
+  - Declara uma constante usada na l�gica.
+- L131: `      const match = text.match(pattern);`
+  - Declara uma constante usada na l�gica.
+- L132: `      if (match) {`
+  - Verifica condi��o para decidir o fluxo.
+- L133: `        const amount = this.parseAmountString(match[1]);`
+  - Declara uma constante usada na l�gica.
+- L134: `        if (amount !== null) return amount;`
+  - Verifica condi��o para decidir o fluxo.
+- L135: `      }`
+  - Fecha bloco de execu��o.
+- L136: `    }`
+  - Fecha bloco de execu��o.
+- L137: `    return null;`
+  - Retorna valor da fun��o/m�todo.
+- L138: `  }`
+  - Fecha bloco de execu��o.
+- L139: ``
+  - Linha em branco para organizar blocos.
+- L140: `  isInstallmentPurchase(text) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L141: `    return this.installmentPattern.test(text);`
+  - Retorna valor da fun��o/m�todo.
+- L142: `  }`
+  - Fecha bloco de execu��o.
+- L143: ``
+  - Linha em branco para organizar blocos.
+- L144: `  extractInstallmentInfo(text) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L145: `    const match = text.match(this.installmentPattern);`
+  - Declara uma constante usada na l�gica.
+- L146: `    if (!match) return null;`
+  - Verifica condi��o para decidir o fluxo.
+- L147: ``
+  - Linha em branco para organizar blocos.
+- L148: `    const totalAmount = this.parseAmountString(match[1]);`
+  - Declara uma constante usada na l�gica.
+- L149: `    const installments = parseInt(match[2]);`
+  - Declara uma constante usada na l�gica.
+- L150: ``
+  - Linha em branco para organizar blocos.
+- L151: `    if (!totalAmount || totalAmount <= 0 || installments <= 0 || installments > 100) return null;`
+  - Verifica condi��o para decidir o fluxo.
+- L152: ``
+  - Linha em branco para organizar blocos.
+- L153: `    const installmentAmount = parseFloat((totalAmount / installments).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L154: ``
+  - Linha em branco para organizar blocos.
+- L155: `    return {`
+  - Retorna valor da fun��o/m�todo.
+- L156: `      totalAmount: totalAmount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L157: `      installments: installments,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L158: `      installmentAmount: installmentAmount`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L159: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L160: `  }`
+  - Fecha bloco de execu��o.
+- L161: ``
+  - Linha em branco para organizar blocos.
+- L162: `  extractInstallmentDescription(text) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L163: `    let description = text;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L164: ``
+  - Linha em branco para organizar blocos.
+- L165: `    description = description.replace(/^(?:gastei|paguei|comprei|saiu|foi|custou|deu)\s+/i, '');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L166: `    description = description.replace(`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L167: `      new RegExp('(?:r\\$|rs)?\\s*' + this.amountRegexSource, 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L168: `      ''`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L169: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L170: `    description = description.replace(/\s*(?:em|por|parcelado em|parcelada em|parcelado|parcelada)\s*\d+x?/gi, '');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L171: ``
+  - Linha em branco para organizar blocos.
+- L172: `    description = description.replace(/(?:r\$|\brs\b)\s*/gi, '');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L173: `    description = description.replace(/^\s*(?:em|de|com|no|na|para|pro|pra)\s+/i, '');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L174: `    description = description.trim();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L175: ``
+  - Linha em branco para organizar blocos.
+- L176: `    return description || 'Compra parcelada';`
+  - Retorna valor da fun��o/m�todo.
+- L177: `  }`
+  - Fecha bloco de execu��o.
+- L178: ``
+  - Linha em branco para organizar blocos.
+- L179: `  extractDescription(text) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L180: `    let description = text;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L181: ``
+  - Linha em branco para organizar blocos.
+- L182: `    description = description.replace(/^(?:gastei|paguei|comprei|saiu|foi|custou|deu)\s+/i, '');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L183: `    description = description.replace(`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L184: `      new RegExp('(?:r\\$|rs)?\\s*' + this.amountRegexSource + '\\s*(?:reais?|contos?|pilas?|pau|mangos)?', 'i'),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L185: `      ''`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L186: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L187: ``
+  - Linha em branco para organizar blocos.
+- L188: `    description = description.replace(/(?:r\$|\brs\b)\s*/gi, '');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L189: `    description = description.replace(/^\s*(?:em|de|com|no|na|para|pro|pra)\s+/i, '');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L190: `    description = description.trim();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L191: ``
+  - Linha em branco para organizar blocos.
+- L192: `    return description || 'Gasto';`
+  - Retorna valor da fun��o/m�todo.
+- L193: `  }`
+  - Fecha bloco de execu��o.
+- L194: ``
+  - Linha em branco para organizar blocos.
+- L195: `  identifyCommand(text) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L196: `    const trimmedText = text.trim();`
+  - Declara uma constante usada na l�gica.
+- L197: ``
+  - Linha em branco para organizar blocos.
+- L198: `    const keys = Object.keys(this.commandPatterns);`
+  - Declara uma constante usada na l�gica.
+- L199: `    for (let i = 0; i < keys.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L200: `      const command = keys[i];`
+  - Declara uma constante usada na l�gica.
+- L201: `      const pattern = this.commandPatterns[command];`
+  - Declara uma constante usada na l�gica.
+- L202: `      const match = trimmedText.match(pattern);`
+  - Declara uma constante usada na l�gica.
+- L203: ``
+  - Linha em branco para organizar blocos.
+- L204: `      if (match) {`
+  - Verifica condi��o para decidir o fluxo.
+- L205: `        const result = { command: command };`
+  - Declara uma constante usada na l�gica.
+- L206: ``
+  - Linha em branco para organizar blocos.
+- L207: `        if (match[1]) {`
+  - Verifica condi��o para decidir o fluxo.
+- L208: `          if (command === 'payInstallment' ||`
+  - Verifica condi��o para decidir o fluxo.
+- L209: `              command === 'getCardByName' ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L210: `              command === 'payInvoiceCard' ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L211: `              command === 'deleteCard' ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L212: `              command === 'resetCard' ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L213: `              command === 'goalsCreate') {`
+  - Abre bloco de execu��o.
+- L214: `            result.description = match[1].trim();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L215: `          } else {`
+  - Abre bloco de execu��o.
+- L216: `            result.amount = this.parseAmountString(match[1]);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L217: `          }`
+  - Fecha bloco de execu��o.
+- L218: `        }`
+  - Fecha bloco de execu��o.
+- L219: ``
+  - Linha em branco para organizar blocos.
+- L220: `        if (command === 'reportWeeklyShort') result.command = 'reportWeekly';`
+  - Verifica condi��o para decidir o fluxo.
+- L221: `        if (command === 'reportMonthlyShort') result.command = 'reportMonthly';`
+  - Verifica condi��o para decidir o fluxo.
+- L222: `        if (command === 'reportChartWeekly') {`
+  - Verifica condi��o para decidir o fluxo.
+- L223: `          result.command = 'reportChart';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L224: `          result.description = 'week';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L225: `        }`
+  - Fecha bloco de execu��o.
+- L226: `        if (command === 'reportChartMonthly') {`
+  - Verifica condi��o para decidir o fluxo.
+- L227: `          result.command = 'reportChart';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L228: `          result.description = 'month';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L229: `        }`
+  - Fecha bloco de execu��o.
+- L230: ``
+  - Linha em branco para organizar blocos.
+- L231: `        return result;`
+  - Retorna valor da fun��o/m�todo.
+- L232: `      }`
+  - Fecha bloco de execu��o.
+- L233: `    }`
+  - Fecha bloco de execu��o.
+- L234: ``
+  - Linha em branco para organizar blocos.
+- L235: `    return null;`
+  - Retorna valor da fun��o/m�todo.
+- L236: `  }`
+  - Fecha bloco de execu��o.
+- L237: ``
+  - Linha em branco para organizar blocos.
+- L238: `  looksLikeExpense(text) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L239: `    const hasAmount = this.extractAmount(text) !== null;`
+  - Declara uma constante usada na l�gica.
+- L240: ``
+  - Linha em branco para organizar blocos.
+- L241: `    const expenseKeywords = [`
+  - Declara uma constante usada na l�gica.
+- L242: `      'gastei', 'paguei', 'comprei', 'saiu', 'foi', 'custou',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L243: `      'deu', 'comprando', 'no mercado', 'na farmacia', 'na farmácia', 'almocei',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L244: `      'jantei', 'lanchou', 'tomei'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L245: `    ];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L246: ``
+  - Linha em branco para organizar blocos.
+- L247: `    const textLower = text.toLowerCase();`
+  - Declara uma constante usada na l�gica.
+- L248: `    let hasKeyword = false;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L249: `    for (let i = 0; i < expenseKeywords.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L250: `      if (textLower.indexOf(expenseKeywords[i]) !== -1) {`
+  - Verifica condi��o para decidir o fluxo.
+- L251: `        hasKeyword = true;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L252: `        break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L253: `      }`
+  - Fecha bloco de execu��o.
+- L254: `    }`
+  - Fecha bloco de execu��o.
+- L255: ``
+  - Linha em branco para organizar blocos.
+- L256: `    return hasAmount || hasKeyword;`
+  - Retorna valor da fun��o/m�todo.
+- L257: `  }`
+  - Fecha bloco de execu��o.
+- L258: ``
+  - Linha em branco para organizar blocos.
+- L259: `  processMessage(text) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L260: `    const command = this.identifyCommand(text);`
+  - Declara uma constante usada na l�gica.
+- L261: `    if (command) {`
+  - Verifica condi��o para decidir o fluxo.
+- L262: `      return {`
+  - Retorna valor da fun��o/m�todo.
+- L263: `        type: 'command',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L264: `        command: command.command,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L265: `        amount: command.amount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L266: `        description: command.description`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L267: `      };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L268: `    }`
+  - Fecha bloco de execu��o.
+- L269: ``
+  - Linha em branco para organizar blocos.
+- L270: `    if (this.isInstallmentPurchase(text) && this.looksLikeExpense(text)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L271: `      const installmentInfo = this.extractInstallmentInfo(text);`
+  - Declara uma constante usada na l�gica.
+- L272: ``
+  - Linha em branco para organizar blocos.
+- L273: `      if (installmentInfo) {`
+  - Verifica condi��o para decidir o fluxo.
+- L274: `        const description = this.extractInstallmentDescription(text);`
+  - Declara uma constante usada na l�gica.
+- L275: ``
+  - Linha em branco para organizar blocos.
+- L276: `        return {`
+  - Retorna valor da fun��o/m�todo.
+- L277: `          type: 'installment',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L278: `          totalAmount: installmentInfo.totalAmount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L279: `          installments: installmentInfo.installments,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L280: `          installmentAmount: installmentInfo.installmentAmount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L281: `          description: description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L282: `          date: new Date(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L283: `          rawText: text`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L284: `        };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L285: `      }`
+  - Fecha bloco de execu��o.
+- L286: `    }`
+  - Fecha bloco de execu��o.
+- L287: ``
+  - Linha em branco para organizar blocos.
+- L288: `    if (this.looksLikeExpense(text)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L289: `      const amount = this.extractAmount(text);`
+  - Declara uma constante usada na l�gica.
+- L290: ``
+  - Linha em branco para organizar blocos.
+- L291: `      if (amount && amount > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L292: `        const description = this.extractDescription(text);`
+  - Declara uma constante usada na l�gica.
+- L293: ``
+  - Linha em branco para organizar blocos.
+- L294: `        return {`
+  - Retorna valor da fun��o/m�todo.
+- L295: `          type: 'expense',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L296: `          amount: amount,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L297: `          description: description,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L298: `          date: new Date(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L299: `          rawText: text`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L300: `        };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L301: `      }`
+  - Fecha bloco de execu��o.
+- L302: `    }`
+  - Fecha bloco de execu��o.
+- L303: ``
+  - Linha em branco para organizar blocos.
+- L304: `    return {`
+  - Retorna valor da fun��o/m�todo.
+- L305: `      type: 'unknown',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L306: `      text: text`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L307: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L308: `  }`
+  - Fecha bloco de execu��o.
+- L309: ``
+  - Linha em branco para organizar blocos.
+- L310: `  isValidAmount(amount) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L311: `    return amount !== null && amount > 0 && amount < 1000000;`
+  - Retorna valor da fun��o/m�todo.
+- L312: `  }`
+  - Fecha bloco de execu��o.
+- L313: `}`
+  - Fecha bloco de execu��o.
+- L314: ``
+  - Linha em branco para organizar blocos.
+- L315: `module.exports = NLPProcessor;`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L316: ``
+  - Linha em branco para organizar blocos.
+
+## src/services/postgresSync.js
+
+- L1: `const { Pool } = require('pg');`
+  - Importa um m�dulo para uso neste arquivo.
+- L2: ``
+  - Linha em branco para organizar blocos.
+- L3: `class PostgresSyncService {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L4: `  constructor(dao, options = {}) {`
+  - Inicializa estado da classe e depend�ncias.
+- L5: `    this.dao = dao;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L6: `    this.enabled = String(process.env.POSTGRES_ENABLED || '').toLowerCase() === 'true' && !!process.env.DATABASE_URL;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L7: `    this.source = options.source || 'whatsapp-bot';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L8: `    this.pool = null;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L9: ``
+  - Linha em branco para organizar blocos.
+- L10: `    this.syncInProgress = false;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L11: `    this.pendingSync = false;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L12: `    this.lastSyncAt = null;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L13: `    this.lastError = null;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L14: `    this.lastStatus = 'idle';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L15: `  }`
+  - Fecha bloco de execu��o.
+- L16: ``
+  - Linha em branco para organizar blocos.
+- L17: `  async init() {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L18: `    if (!this.enabled) return;`
+  - Verifica condi��o para decidir o fluxo.
+- L19: ``
+  - Linha em branco para organizar blocos.
+- L20: `    this.pool = new Pool({`
+  - Abre bloco de execu��o.
+- L21: `      connectionString: process.env.DATABASE_URL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L22: `      ssl: String(process.env.POSTGRES_SSL || '').toLowerCase() === 'true'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L23: `        ? { rejectUnauthorized: false }`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L24: `        : undefined`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L25: `    });`
+  - Fecha bloco de execu��o.
+- L26: ``
+  - Linha em branco para organizar blocos.
+- L27: `    await this.pool.query(\``
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L28: `      CREATE TABLE IF NOT EXISTS finance_cloud_state (`
+  - Define estrutura de tabela no banco de dados.
+- L29: `        id INTEGER PRIMARY KEY,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L30: `        source TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L31: `        state JSONB NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L32: `        updated_at TIMESTAMPTZ DEFAULT NOW()`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L33: `      )`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L34: `    \`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L35: ``
+  - Linha em branco para organizar blocos.
+- L36: `    await this.pool.query(\``
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L37: `      CREATE TABLE IF NOT EXISTS finance_sync_log (`
+  - Define estrutura de tabela no banco de dados.
+- L38: `        id BIGSERIAL PRIMARY KEY,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L39: `        source TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L40: `        status TEXT NOT NULL,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L41: `        details TEXT,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L42: `        created_at TIMESTAMPTZ DEFAULT NOW()`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L43: `      )`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L44: `    \`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L45: ``
+  - Linha em branco para organizar blocos.
+- L46: `    this.lastStatus = 'ready';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L47: `  }`
+  - Fecha bloco de execu��o.
+- L48: ``
+  - Linha em branco para organizar blocos.
+- L49: `  getStatus() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L50: `    return {`
+  - Retorna valor da fun��o/m�todo.
+- L51: `      enabled: this.enabled,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L52: `      inProgress: this.syncInProgress,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L53: `      pending: this.pendingSync,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L54: `      lastSyncAt: this.lastSyncAt,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L55: `      lastError: this.lastError,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L56: `      lastStatus: this.lastStatus`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L57: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L58: `  }`
+  - Fecha bloco de execu��o.
+- L59: ``
+  - Linha em branco para organizar blocos.
+- L60: `  queueSync() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L61: `    if (!this.enabled) return;`
+  - Verifica condi��o para decidir o fluxo.
+- L62: `    this.pendingSync = true;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L63: ``
+  - Linha em branco para organizar blocos.
+- L64: `    if (this.syncInProgress) return;`
+  - Verifica condi��o para decidir o fluxo.
+- L65: `    setTimeout(() => {`
+  - Agenda execu��o futura de fun��o.
+- L66: `      this.syncNow().catch(() => {});`
+  - Define fun��o an�nima/arrow function.
+- L67: `    }, 3000);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L68: `  }`
+  - Fecha bloco de execu��o.
+- L69: ``
+  - Linha em branco para organizar blocos.
+- L70: `  async syncNow() {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L71: `    if (!this.enabled) return { success: false, error: 'PostgreSQL desabilitado.' };`
+  - Verifica condi��o para decidir o fluxo.
+- L72: `    if (this.syncInProgress) return { success: false, error: 'Sync ja em andamento.' };`
+  - Verifica condi��o para decidir o fluxo.
+- L73: ``
+  - Linha em branco para organizar blocos.
+- L74: `    this.syncInProgress = true;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L75: `    this.pendingSync = false;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L76: `    this.lastStatus = 'running';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L77: ``
+  - Linha em branco para organizar blocos.
+- L78: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L79: `      const state = this.dao.getAllTableData();`
+  - Declara uma constante usada na l�gica.
+- L80: `      const payload = {`
+  - Declara uma constante usada na l�gica.
+- L81: `        version: 1,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L82: `        generated_at: new Date().toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L83: `        source: this.source,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L84: `        tables: state`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L85: `      };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L86: ``
+  - Linha em branco para organizar blocos.
+- L87: `      await this.pool.query(`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L88: `        \`INSERT INTO finance_cloud_state (id, source, state, updated_at)`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L89: `         VALUES (1, $1, $2::jsonb, NOW())`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L90: `         ON CONFLICT (id)`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L91: `         DO UPDATE SET source = EXCLUDED.source, state = EXCLUDED.state, updated_at = NOW()\`,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L92: `        [this.source, JSON.stringify(payload)]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L93: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L94: ``
+  - Linha em branco para organizar blocos.
+- L95: `      await this.pool.query(`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L96: `        'INSERT INTO finance_sync_log (source, status, details) VALUES ($1, $2, $3)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L97: `        [this.source, 'success', 'Sync completo']`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L98: `      );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L99: ``
+  - Linha em branco para organizar blocos.
+- L100: `      this.lastSyncAt = new Date().toISOString();`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L101: `      this.lastError = null;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L102: `      this.lastStatus = 'ok';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L103: `      return { success: true, syncedAt: this.lastSyncAt };`
+  - Retorna valor da fun��o/m�todo.
+- L104: `    } catch (error) {`
+  - Abre bloco de execu��o.
+- L105: `      this.lastError = error.message;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L106: `      this.lastStatus = 'error';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L107: ``
+  - Linha em branco para organizar blocos.
+- L108: `      try {`
+  - Inicia bloco protegido contra exce��es.
+- L109: `        await this.pool.query(`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L110: `          'INSERT INTO finance_sync_log (source, status, details) VALUES ($1, $2, $3)',`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L111: `          [this.source, 'error', error.message]`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L112: `        );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L113: `      } catch (_) {}`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L114: ``
+  - Linha em branco para organizar blocos.
+- L115: `      return { success: false, error: error.message };`
+  - Retorna valor da fun��o/m�todo.
+- L116: `    } finally {`
+  - Abre bloco de execu��o.
+- L117: `      this.syncInProgress = false;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L118: `      if (this.pendingSync) {`
+  - Verifica condi��o para decidir o fluxo.
+- L119: `        setTimeout(() => this.syncNow().catch(() => {}), 2000);`
+  - Agenda execu��o futura de fun��o.
+- L120: `      }`
+  - Fecha bloco de execu��o.
+- L121: `    }`
+  - Fecha bloco de execu��o.
+- L122: `  }`
+  - Fecha bloco de execu��o.
+- L123: `}`
+  - Fecha bloco de execu��o.
+- L124: ``
+  - Linha em branco para organizar blocos.
+- L125: `module.exports = PostgresSyncService;`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L126: ``
+  - Linha em branco para organizar blocos.
+
+## src/services/reports.js
+
+- L1: `class ReportGenerator {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L2: `  constructor(dao) {`
+  - Inicializa estado da classe e depend�ncias.
+- L3: `    this.dao = dao;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L4: `  }`
+  - Fecha bloco de execu��o.
+- L5: ``
+  - Linha em branco para organizar blocos.
+- L6: `  getCurrentBrazilTimestamp() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L7: `    const now = new Date();`
+  - Declara uma constante usada na l�gica.
+- L8: ``
+  - Linha em branco para organizar blocos.
+- L9: `    const day = String(now.getDate()).padStart(2, '0');`
+  - Declara uma constante usada na l�gica.
+- L10: `    const month = String(now.getMonth() + 1).padStart(2, '0');`
+  - Declara uma constante usada na l�gica.
+- L11: `    const year = now.getFullYear();`
+  - Declara uma constante usada na l�gica.
+- L12: `    const hour = String(now.getHours()).padStart(2, '0');`
+  - Declara uma constante usada na l�gica.
+- L13: `    const minute = String(now.getMinutes()).padStart(2, '0');`
+  - Declara uma constante usada na l�gica.
+- L14: ``
+  - Linha em branco para organizar blocos.
+- L15: `    return {`
+  - Retorna valor da fun��o/m�todo.
+- L16: `      formatted: \`${day}/${month}/${year} às ${hour}:${minute}\`,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L17: `      iso: now.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L18: `      date: now`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L19: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L20: `  }`
+  - Fecha bloco de execu��o.
+- L21: ``
+  - Linha em branco para organizar blocos.
+- L22: `  getBrazilDate(date) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L23: `    return date ? new Date(date) : new Date();`
+  - Retorna valor da fun��o/m�todo.
+- L24: `  }`
+  - Fecha bloco de execu��o.
+- L25: ``
+  - Linha em branco para organizar blocos.
+- L26: `  formatMoney(value) {`
+  - Abre bloco de execu��o.
+- L27: `    return 'R$ ' + value.toFixed(2).replace('.', ',');`
+  - Retorna valor da fun��o/m�todo.
+- L28: `  }`
+  - Fecha bloco de execu��o.
+- L29: ``
+  - Linha em branco para organizar blocos.
+- L30: `  formatDate(date) {`
+  - Abre bloco de execu��o.
+- L31: `    const d = this.getBrazilDate(date);`
+  - Declara uma constante usada na l�gica.
+- L32: `    const day = String(d.getDate()).padStart(2, '0');`
+  - Declara uma constante usada na l�gica.
+- L33: `    const month = String(d.getMonth() + 1).padStart(2, '0');`
+  - Declara uma constante usada na l�gica.
+- L34: `    const year = d.getFullYear();`
+  - Declara uma constante usada na l�gica.
+- L35: `    const hour = String(d.getHours()).padStart(2, '0');`
+  - Declara uma constante usada na l�gica.
+- L36: `    const minute = String(d.getMinutes()).padStart(2, '0');`
+  - Declara uma constante usada na l�gica.
+- L37: `    return \`${day}/${month}/${year} às ${hour}:${minute}\`;`
+  - Retorna valor da fun��o/m�todo.
+- L38: `  }`
+  - Fecha bloco de execu��o.
+- L39: ``
+  - Linha em branco para organizar blocos.
+- L40: `  formatDateShort(date) {`
+  - Abre bloco de execu��o.
+- L41: `    const d = this.getBrazilDate(date);`
+  - Declara uma constante usada na l�gica.
+- L42: `    const day = String(d.getDate()).padStart(2, '0');`
+  - Declara uma constante usada na l�gica.
+- L43: `    const month = String(d.getMonth() + 1).padStart(2, '0');`
+  - Declara uma constante usada na l�gica.
+- L44: `    const year = d.getFullYear();`
+  - Declara uma constante usada na l�gica.
+- L45: `    return \`${day}/${month}/${year}\`;`
+  - Retorna valor da fun��o/m�todo.
+- L46: `  }`
+  - Fecha bloco de execu��o.
+- L47: ``
+  - Linha em branco para organizar blocos.
+- L48: `  buildProgressBar(percent, width = 16) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L49: `    const safePercent = Math.max(0, Math.min(100, Number(percent || 0)));`
+  - Declara uma constante usada na l�gica.
+- L50: `    const filled = Math.round((safePercent / 100) * width);`
+  - Declara uma constante usada na l�gica.
+- L51: `    return \`${'█'.repeat(filled)}${'░'.repeat(Math.max(0, width - filled))}\`;`
+  - Retorna valor da fun��o/m�todo.
+- L52: `  }`
+  - Fecha bloco de execu��o.
+- L53: ``
+  - Linha em branco para organizar blocos.
+- L54: `  generateBalanceReport(user) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L55: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L56: `    const totalMoney = user.current_balance + user.savings_balance + user.emergency_fund;`
+  - Declara uma constante usada na l�gica.
+- L57: `    const percentage = user.initial_balance > 0 `
+  - Declara uma constante usada na l�gica.
+- L58: `      ? ((user.current_balance / user.initial_balance) * 100).toFixed(1)`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L59: `      : 0;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L60: ``
+  - Linha em branco para organizar blocos.
+- L61: `    const spent = user.initial_balance - user.current_balance;`
+  - Declara uma constante usada na l�gica.
+- L62: `    `
+  - Linha em branco para organizar blocos.
+- L63: `    let emoji = '💰';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L64: `    if (percentage < 20) emoji = '🚨';`
+  - Verifica condi��o para decidir o fluxo.
+- L65: `    else if (percentage < 50) emoji = '⚠️';`
+  - Verifica condi��o alternativa no fluxo.
+- L66: ``
+  - Linha em branco para organizar blocos.
+- L67: `    let report = '╔═══════════════════════════════════════╗\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L68: `    report += \`${emoji} *RESUMO FINANCEIRO*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L69: `    report += '╚═══════════════════════════════════════╝\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L70: `    `
+  - Linha em branco para organizar blocos.
+- L71: `    report += \`👤 *Usuário:* ${user.name}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L72: `    report += \`📅 *Data:* ${timestamp.formatted}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L73: `    `
+  - Linha em branco para organizar blocos.
+- L74: `    report += '💵 *SALDO PRINCIPAL*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L75: `    report += \`   Inicial: ${this.formatMoney(user.initial_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L76: `    report += \`   Gasto: ${this.formatMoney(spent)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L77: `    report += \`   Disponível: *${this.formatMoney(user.current_balance)}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L78: `    report += \`   └─ ${percentage}% restante\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L79: `    `
+  - Linha em branco para organizar blocos.
+- L80: `    if (user.savings_balance > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L81: `      report += '🏷 *POUPANÇA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L82: `      report += \`   Guardado: *${this.formatMoney(user.savings_balance)}*\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L83: `    }`
+  - Fecha bloco de execu��o.
+- L84: `    `
+  - Linha em branco para organizar blocos.
+- L85: `    if (user.emergency_fund > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L86: `      report += '🚨 *RESERVA DE EMERGÊNCIA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L87: `      report += \`   Reservado: *${this.formatMoney(user.emergency_fund)}*\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L88: `    }`
+  - Fecha bloco de execu��o.
+- L89: `    `
+  - Linha em branco para organizar blocos.
+- L90: `    report += '💎 *PATRIMÔNIO TOTAL*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L91: `    report += \`   *${this.formatMoney(totalMoney)}*\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L92: `    `
+  - Linha em branco para organizar blocos.
+- L93: `    report += '═══════════════════════════════════════';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L94: ``
+  - Linha em branco para organizar blocos.
+- L95: `    return report;`
+  - Retorna valor da fun��o/m�todo.
+- L96: `  }`
+  - Fecha bloco de execu��o.
+- L97: ``
+  - Linha em branco para organizar blocos.
+- L98: `  generateWeeklyReport(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L99: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L100: `    const user = this.dao.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L101: `    `
+  - Linha em branco para organizar blocos.
+- L102: `    if (!user) {`
+  - Verifica condi��o para decidir o fluxo.
+- L103: `      return '❌ *Erro ao gerar relatório*\n\n📌 Usuário não encontrado\n🕑 ' + timestamp.formatted;`
+  - Retorna valor da fun��o/m�todo.
+- L104: `    }`
+  - Fecha bloco de execu��o.
+- L105: `    `
+  - Linha em branco para organizar blocos.
+- L106: `    const today = this.getBrazilDate(new Date());`
+  - Declara uma constante usada na l�gica.
+- L107: `    const weekAgo = new Date(today);`
+  - Declara uma constante usada na l�gica.
+- L108: `    weekAgo.setDate(weekAgo.getDate() - 7);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L109: ``
+  - Linha em branco para organizar blocos.
+- L110: `    const expenses = this.dao.getExpensesByUser(userId, {`
+  - Declara uma constante usada na l�gica.
+- L111: `      startDate: weekAgo.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L112: `      endDate: today.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L113: `      transactionType: 'expense'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L114: `    });`
+  - Fecha bloco de execu��o.
+- L115: ``
+  - Linha em branco para organizar blocos.
+- L116: `    let total = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L117: `    for (let i = 0; i < expenses.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L118: `      total += expenses[i].amount;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L119: `    }`
+  - Fecha bloco de execu��o.
+- L120: `    const average = expenses.length > 0 ? total / 7 : 0;`
+  - Declara uma constante usada na l�gica.
+- L121: `    `
+  - Linha em branco para organizar blocos.
+- L122: `    const byCategory = this.dao.getExpensesByCategory(userId, weekAgo.toISOString(), today.toISOString());`
+  - Declara uma constante usada na l�gica.
+- L123: `    const totalMoney = user.current_balance + user.savings_balance + user.emergency_fund;`
+  - Declara uma constante usada na l�gica.
+- L124: ``
+  - Linha em branco para organizar blocos.
+- L125: `    let report = '╔═══════════════════════════════════════╗\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L126: `    report += '📊 *RELATÓRIO SEMANAL*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L127: `    report += '╚═══════════════════════════════════════╝\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L128: `    `
+  - Linha em branco para organizar blocos.
+- L129: `    report += \`👤 *Usuário:* ${user.name}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L130: `    report += \`📆 *Período:* ${this.formatDateShort(weekAgo)} até ${this.formatDateShort(today)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L131: `    report += \`🕑 *Gerado em:* ${timestamp.formatted}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L132: `    `
+  - Linha em branco para organizar blocos.
+- L133: `    report += '💸 *RESUMO DA SEMANA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L134: `    report += \`   Total gasto: ${this.formatMoney(total)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L135: `    report += \`   Transações: ${expenses.length}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L136: `    report += \`   Média/dia: ${this.formatMoney(average)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L137: `    `
+  - Linha em branco para organizar blocos.
+- L138: `    report += '💰 *SITUAÇÃO ATUAL*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L139: `    report += \`   Saldo: ${this.formatMoney(user.current_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L140: `    if (user.savings_balance > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L141: `      report += \`   Poupança: ${this.formatMoney(user.savings_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L142: `    }`
+  - Fecha bloco de execu��o.
+- L143: `    if (user.emergency_fund > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L144: `      report += \`   Emergência: ${this.formatMoney(user.emergency_fund)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L145: `    }`
+  - Fecha bloco de execu��o.
+- L146: `    report += \`   *Total: ${this.formatMoney(totalMoney)}*\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L147: ``
+  - Linha em branco para organizar blocos.
+- L148: `    if (byCategory.length > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L149: `      report += '🏷️ *CATEGORIAS MAIS USADAS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L150: `      for (let i = 0; i < Math.min(byCategory.length, 5); i++) {`
+  - Inicia la�o de repeti��o.
+- L151: `        const cat = byCategory[i];`
+  - Declara uma constante usada na l�gica.
+- L152: `        const percentage = total > 0 ? ((cat.total / total) * 100).toFixed(0) : '0';`
+  - Declara uma constante usada na l�gica.
+- L153: `        const bar = this.buildProgressBar(Number(percentage), 12);`
+  - Declara uma constante usada na l�gica.
+- L154: `        report += \`   ${cat.emoji} ${cat.category}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L155: `        report += \`     ${this.formatMoney(cat.total)} (${percentage}%)\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L156: `        report += \`     ${bar}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L157: `      }`
+  - Fecha bloco de execu��o.
+- L158: `      report += '\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L159: `    }`
+  - Fecha bloco de execu��o.
+- L160: ``
+  - Linha em branco para organizar blocos.
+- L161: `    if (expenses.length > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L162: `      const sorted = expenses.slice().sort(function(a, b) { return b.amount - a.amount; });`
+  - Declara uma constante usada na l�gica.
+- L163: `      const topExpenses = sorted.slice(0, 3);`
+  - Declara uma constante usada na l�gica.
+- L164: `      report += '💰 *MAIORES GASTOS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L165: `      for (let i = 0; i < topExpenses.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L166: `        const exp = topExpenses[i];`
+  - Declara uma constante usada na l�gica.
+- L167: `        report += \`   ${i + 1}. ${exp.description}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L168: `        report += \`      ${this.formatMoney(exp.amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L169: `      }`
+  - Fecha bloco de execu��o.
+- L170: `    }`
+  - Fecha bloco de execu��o.
+- L171: `    `
+  - Linha em branco para organizar blocos.
+- L172: `    report += '\n═══════════════════════════════════════';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L173: ``
+  - Linha em branco para organizar blocos.
+- L174: `    return report;`
+  - Retorna valor da fun��o/m�todo.
+- L175: `  }`
+  - Fecha bloco de execu��o.
+- L176: ``
+  - Linha em branco para organizar blocos.
+- L177: `  generateMonthlyReport(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L178: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L179: `    const user = this.dao.getUserById(userId);`
+  - Declara uma constante usada na l�gica.
+- L180: `    `
+  - Linha em branco para organizar blocos.
+- L181: `    if (!user) {`
+  - Verifica condi��o para decidir o fluxo.
+- L182: `      return '❌ *Erro ao gerar relatório*\n\n📌 Usuário não encontrado\n🕑 ' + timestamp.formatted;`
+  - Retorna valor da fun��o/m�todo.
+- L183: `    }`
+  - Fecha bloco de execu��o.
+- L184: `    `
+  - Linha em branco para organizar blocos.
+- L185: `    const today = this.getBrazilDate(new Date());`
+  - Declara uma constante usada na l�gica.
+- L186: `    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);`
+  - Declara uma constante usada na l�gica.
+- L187: `    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);`
+  - Declara uma constante usada na l�gica.
+- L188: ``
+  - Linha em branco para organizar blocos.
+- L189: `    const expenses = this.dao.getExpensesByUser(userId, {`
+  - Declara uma constante usada na l�gica.
+- L190: `      startDate: monthStart.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L191: `      endDate: monthEnd.toISOString(),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L192: `      transactionType: 'expense'`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L193: `    });`
+  - Fecha bloco de execu��o.
+- L194: ``
+  - Linha em branco para organizar blocos.
+- L195: `    let total = 0;`
+  - Declara vari�vel com valor que pode ser alterado.
+- L196: `    for (let i = 0; i < expenses.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L197: `      total += expenses[i].amount;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L198: `    }`
+  - Fecha bloco de execu��o.
+- L199: `    const daysInMonth = monthEnd.getDate();`
+  - Declara uma constante usada na l�gica.
+- L200: `    const currentDay = today.getDate();`
+  - Declara uma constante usada na l�gica.
+- L201: `    const average = currentDay > 0 ? total / currentDay : 0;`
+  - Declara uma constante usada na l�gica.
+- L202: `    const projection = average * daysInMonth;`
+  - Declara uma constante usada na l�gica.
+- L203: `    `
+  - Linha em branco para organizar blocos.
+- L204: `    const stats = this.dao.getUserStats(userId);`
+  - Declara uma constante usada na l�gica.
+- L205: `    const byCategory = this.dao.getExpensesByCategory(userId, monthStart.toISOString(), monthEnd.toISOString());`
+  - Declara uma constante usada na l�gica.
+- L206: `    const totalMoney = user.current_balance + user.savings_balance + user.emergency_fund;`
+  - Declara uma constante usada na l�gica.
+- L207: ``
+  - Linha em branco para organizar blocos.
+- L208: `    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];`
+  - Declara uma constante usada na l�gica.
+- L209: `    const monthName = monthNames[monthStart.getMonth()] + '/' + monthStart.getFullYear();`
+  - Declara uma constante usada na l�gica.
+- L210: ``
+  - Linha em branco para organizar blocos.
+- L211: `    let report = '╔═══════════════════════════════════════╗\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L212: `    report += '📈 *RELATÓRIO MENSAL*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L213: `    report += '╚═══════════════════════════════════════╝\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L214: `    `
+  - Linha em branco para organizar blocos.
+- L215: `    report += \`👤 *Usuário:* ${user.name}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L216: `    report += \`📆 *Mês:* ${monthName}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L217: `    report += \`🕑 *Gerado em:* ${timestamp.formatted}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L218: `    `
+  - Linha em branco para organizar blocos.
+- L219: `    report += '💸 *RESUMO DO MÊS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L220: `    report += \`   Total gasto: ${this.formatMoney(total)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L221: `    report += \`   Transações: ${expenses.length}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L222: `    report += \`   Média/dia: ${this.formatMoney(average)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L223: `    report += \`   Projeção mensal: ${this.formatMoney(projection)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L224: `    report += \`   Ticket médio: ${this.formatMoney(stats.avg_expense || 0)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L225: `    `
+  - Linha em branco para organizar blocos.
+- L226: `    report += '💰 *SITUAÇÃO ATUAL*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L227: `    report += \`   Saldo: ${this.formatMoney(user.current_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L228: `    if (user.savings_balance > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L229: `      report += \`   Poupança: ${this.formatMoney(user.savings_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L230: `    }`
+  - Fecha bloco de execu��o.
+- L231: `    if (user.emergency_fund > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L232: `      report += \`   Emergência: ${this.formatMoney(user.emergency_fund)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L233: `    }`
+  - Fecha bloco de execu��o.
+- L234: `    report += \`   *Total: ${this.formatMoney(totalMoney)}*\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L235: ``
+  - Linha em branco para organizar blocos.
+- L236: `    if (byCategory.length > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L237: `      report += '🏷️ *DISTRIBUIÇÃO POR CATEGORIA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L238: `      for (let i = 0; i < Math.min(byCategory.length, 8); i++) {`
+  - Inicia la�o de repeti��o.
+- L239: `        const cat = byCategory[i];`
+  - Declara uma constante usada na l�gica.
+- L240: `        const percentage = total > 0 ? ((cat.total / total) * 100).toFixed(0) : '0';`
+  - Declara uma constante usada na l�gica.
+- L241: `        const bar = this.buildProgressBar(Number(percentage), 12);`
+  - Declara uma constante usada na l�gica.
+- L242: `        report += \`   ${cat.emoji} ${cat.category}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L243: `        report += \`     ${this.formatMoney(cat.total)} (${percentage}%) • ${cat.count}x\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L244: `        report += \`     ${bar}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L245: `      }`
+  - Fecha bloco de execu��o.
+- L246: `      report += '\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L247: `    }`
+  - Fecha bloco de execu��o.
+- L248: ``
+  - Linha em branco para organizar blocos.
+- L249: `    const percentageUsed = user.initial_balance > 0 ? ((total / user.initial_balance) * 100).toFixed(0) : 0;`
+  - Declara uma constante usada na l�gica.
+- L250: `    const percentageSaved = user.initial_balance > 0 ? ((totalMoney / user.initial_balance) * 100).toFixed(0) : 0;`
+  - Declara uma constante usada na l�gica.
+- L251: ``
+  - Linha em branco para organizar blocos.
+- L252: `    report += '📊 *ANÁLISE FINANCEIRA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L253: `    report += \`   Percentual gasto: ${percentageUsed}%\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L254: `    report += \`   Patrimônio atual: ${percentageSaved}%\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L255: ``
+  - Linha em branco para organizar blocos.
+- L256: `    if (user.current_balance < 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L257: `      report += '\n🚨 *ATENÇÃO: Saldo negativo!*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L258: `      report += 'Você está gastando mais do que tem.\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L259: `    } else if (user.current_balance < user.initial_balance * 0.3) {`
+  - Abre bloco de execu��o.
+- L260: `      report += '\n⚠️ *AVISO: Saldo baixo!*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L261: `      report += 'Considere reduzir gastos.\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L262: `    } else {`
+  - Abre bloco de execu��o.
+- L263: `      report += '\n✅ *Parabéns! Você está no controle!*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L264: `    }`
+  - Fecha bloco de execu��o.
+- L265: `    `
+  - Linha em branco para organizar blocos.
+- L266: `    report += '\n═══════════════════════════════════════';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L267: ``
+  - Linha em branco para organizar blocos.
+- L268: `    return report;`
+  - Retorna valor da fun��o/m�todo.
+- L269: `  }`
+  - Fecha bloco de execu��o.
+- L270: ``
+  - Linha em branco para organizar blocos.
+- L271: `  generateExpenseConfirmation(expense, user, category) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L272: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L273: `    `
+  - Linha em branco para organizar blocos.
+- L274: `    let report = '✅ *GASTO REGISTRADO*\n\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L275: `    `
+  - Linha em branco para organizar blocos.
+- L276: `    report += \`${category.emoji} *Categoria:* ${category.name}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L277: `    report += \`💵 *Valor:* ${this.formatMoney(expense.amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L278: `    report += \`📝 *Descrição:* ${expense.description}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L279: `    report += \`🕑 *Registrado em:* ${timestamp.formatted}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L280: `    `
+  - Linha em branco para organizar blocos.
+- L281: `    report += '💰 *Saldo Atualizado*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L282: `    report += \`   Principal: *${this.formatMoney(user.current_balance)}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L283: `    `
+  - Linha em branco para organizar blocos.
+- L284: `    if (user.savings_balance > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L285: `      report += \`   Poupança: ${this.formatMoney(user.savings_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L286: `    }`
+  - Fecha bloco de execu��o.
+- L287: `    if (user.emergency_fund > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L288: `      report += \`   Emergência: ${this.formatMoney(user.emergency_fund)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L289: `    }`
+  - Fecha bloco de execu��o.
+- L290: `    `
+  - Linha em branco para organizar blocos.
+- L291: `    const totalMoney = user.current_balance + user.savings_balance + user.emergency_fund;`
+  - Declara uma constante usada na l�gica.
+- L292: `    report += \`   Total: ${this.formatMoney(totalMoney)}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L293: `    `
+  - Linha em branco para organizar blocos.
+- L294: `    return report;`
+  - Retorna valor da fun��o/m�todo.
+- L295: `  }`
+  - Fecha bloco de execu��o.
+- L296: ``
+  - Linha em branco para organizar blocos.
+- L297: `  generateSavingsConfirmation(action, amount, user) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L298: `    if (!user) {`
+  - Verifica condi��o para decidir o fluxo.
+- L299: `      return '❌ *Erro ao processar*\n\nUsuário não encontrado.';`
+  - Retorna valor da fun��o/m�todo.
+- L300: `    }`
+  - Fecha bloco de execu��o.
+- L301: `    `
+  - Linha em branco para organizar blocos.
+- L302: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L303: `    let msg = action === 'deposit' ? '✅ *DINHEIRO GUARDADO*\n\n' : '✅ *DINHEIRO RETIRADO*\n\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L304: `    `
+  - Linha em branco para organizar blocos.
+- L305: `    msg += \`💵 *Valor:* ${this.formatMoney(amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L306: `    msg += \`🕑 *Data/Hora:* ${timestamp.formatted}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L307: `    `
+  - Linha em branco para organizar blocos.
+- L308: `    msg += '💰 *SALDOS ATUALIZADOS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L309: `    msg += \`   Principal: ${this.formatMoney(user.current_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L310: `    msg += \`   Poupança: *${this.formatMoney(user.savings_balance)}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L311: `    `
+  - Linha em branco para organizar blocos.
+- L312: `    if (user.emergency_fund > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L313: `      msg += \`   Emergência: ${this.formatMoney(user.emergency_fund)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L314: `    }`
+  - Fecha bloco de execu��o.
+- L315: `    `
+  - Linha em branco para organizar blocos.
+- L316: `    const total = user.current_balance + user.savings_balance + user.emergency_fund;`
+  - Declara uma constante usada na l�gica.
+- L317: `    msg += \`   Total: ${this.formatMoney(total)}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L318: `    `
+  - Linha em branco para organizar blocos.
+- L319: `    return msg;`
+  - Retorna valor da fun��o/m�todo.
+- L320: `  }`
+  - Fecha bloco de execu��o.
+- L321: ``
+  - Linha em branco para organizar blocos.
+- L322: `  generateEmergencyConfirmation(action, amount, user) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L323: `    if (!user) {`
+  - Verifica condi��o para decidir o fluxo.
+- L324: `      return '❌ *Erro ao processar*\n\nUsuário não encontrado.';`
+  - Retorna valor da fun��o/m�todo.
+- L325: `    }`
+  - Fecha bloco de execu��o.
+- L326: `    `
+  - Linha em branco para organizar blocos.
+- L327: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L328: `    let msg = action === 'deposit' ? '✅ *RESERVA CRIADA*\n\n' : '✅ *RESERVA UTILIZADA*\n\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L329: `    `
+  - Linha em branco para organizar blocos.
+- L330: `    msg += \`💵 *Valor:* ${this.formatMoney(amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L331: `    msg += \`🕑 *Data/Hora:* ${timestamp.formatted}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L332: `    `
+  - Linha em branco para organizar blocos.
+- L333: `    msg += '💰 *SALDOS ATUALIZADOS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L334: `    msg += \`   Principal: ${this.formatMoney(user.current_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L335: `    `
+  - Linha em branco para organizar blocos.
+- L336: `    if (user.savings_balance > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L337: `      msg += \`   Poupança: ${this.formatMoney(user.savings_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L338: `    }`
+  - Fecha bloco de execu��o.
+- L339: `    `
+  - Linha em branco para organizar blocos.
+- L340: `    msg += \`   Emergência: *${this.formatMoney(user.emergency_fund)}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L341: `    `
+  - Linha em branco para organizar blocos.
+- L342: `    const total = user.current_balance + user.savings_balance + user.emergency_fund;`
+  - Declara uma constante usada na l�gica.
+- L343: `    msg += \`   Total: ${this.formatMoney(total)}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L344: `    `
+  - Linha em branco para organizar blocos.
+- L345: `    return msg;`
+  - Retorna valor da fun��o/m�todo.
+- L346: `  }`
+  - Fecha bloco de execu��o.
+- L347: ``
+  - Linha em branco para organizar blocos.
+- L348: `  generateInstallmentsList(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L349: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L350: `    const installments = this.dao.getInstallmentsByUser(userId);`
+  - Declara uma constante usada na l�gica.
+- L351: `    `
+  - Linha em branco para organizar blocos.
+- L352: `    if (installments.length === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L353: `      return '📦 *PARCELAMENTOS*\n\nVocê não tem compras parceladas.\n\nUse: "comprei celular por 1200 em 12x"\n\n🕑 ' + timestamp.formatted;`
+  - Retorna valor da fun��o/m�todo.
+- L354: `    }`
+  - Fecha bloco de execu��o.
+- L355: `    `
+  - Linha em branco para organizar blocos.
+- L356: `    let report = '╔═══════════════════════════════════════╗\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L357: `    report += '📦 *SUAS COMPRAS PARCELADAS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L358: `    report += '╚═══════════════════════════════════════╝\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L359: `    `
+  - Linha em branco para organizar blocos.
+- L360: `    for (let i = 0; i < installments.length; i++) {`
+  - Inicia la�o de repeti��o.
+- L361: `      const inst = installments[i];`
+  - Declara uma constante usada na l�gica.
+- L362: `      const pending = inst.pending_count;`
+  - Declara uma constante usada na l�gica.
+- L363: `      const paid = inst.paid_count;`
+  - Declara uma constante usada na l�gica.
+- L364: `      const total = inst.total_installments;`
+  - Declara uma constante usada na l�gica.
+- L365: `      const remaining = parseFloat((pending * inst.installment_amount).toFixed(2));`
+  - Declara uma constante usada na l�gica.
+- L366: `      `
+  - Linha em branco para organizar blocos.
+- L367: `      report += \`${i + 1}. ${inst.category_emoji} *${inst.description}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L368: `      report += \`   💰 Total: ${this.formatMoney(inst.total_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L369: `      report += \`   📊 Parcelas: ${paid}/${total} pagas\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L370: `      report += \`   💵 Parcela: ${this.formatMoney(inst.installment_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L371: `      report += \`   ⏳ Restante: ${this.formatMoney(remaining)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L372: `      report += \`   📅 Criado: ${this.formatDate(inst.created_at)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L373: `    }`
+  - Fecha bloco de execu��o.
+- L374: `    `
+  - Linha em branco para organizar blocos.
+- L375: `    report += '💡 Use \`/pagar celular\` para pagar a próxima parcela\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L376: `    report += '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L377: `    `
+  - Linha em branco para organizar blocos.
+- L378: `    return report;`
+  - Retorna valor da fun��o/m�todo.
+- L379: `  }`
+  - Fecha bloco de execu��o.
+- L380: ``
+  - Linha em branco para organizar blocos.
+- L381: `  generateInstallmentConfirmation(installment, category) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L382: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L383: `    `
+  - Linha em branco para organizar blocos.
+- L384: `    let report = '✅ *COMPRA PARCELADA REGISTRADA*\n\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L385: `    `
+  - Linha em branco para organizar blocos.
+- L386: `    report += \`${category.emoji} *Produto:* ${installment.description}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L387: `    report += \`💰 *Valor Total:* ${this.formatMoney(installment.total_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L388: `    report += \`📊 *Parcelas:* ${installment.total_installments}x de ${this.formatMoney(installment.installment_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L389: `    report += \`🕑 *Registrado em:* ${timestamp.formatted}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L390: `    `
+  - Linha em branco para organizar blocos.
+- L391: `    report += '💡 *Como pagar parcelas:*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L392: `    report += \`   \\`/pagar ${installment.description}\\`\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L393: `    report += '   ou \`/parcelamentos\` para ver todas';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L394: `    `
+  - Linha em branco para organizar blocos.
+- L395: `    return report;`
+  - Retorna valor da fun��o/m�todo.
+- L396: `  }`
+  - Fecha bloco de execu��o.
+- L397: ``
+  - Linha em branco para organizar blocos.
+- L398: `  generatePaymentConfirmation(installment, payment, user) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L399: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L400: `    `
+  - Linha em branco para organizar blocos.
+- L401: `    let report = '✅ *PARCELA PAGA*\n\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L402: `    `
+  - Linha em branco para organizar blocos.
+- L403: `    report += \`📦 *Produto:* ${installment.description}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L404: `    report += \`📊 *Parcela:* ${payment.installment_number}/${installment.total_installments}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L405: `    report += \`💵 *Valor:* ${this.formatMoney(payment.amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L406: `    report += \`🕑 *Pago em:* ${timestamp.formatted}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L407: `    `
+  - Linha em branco para organizar blocos.
+- L408: `    const paid = payment.installment_number;`
+  - Declara uma constante usada na l�gica.
+- L409: `    const remaining = installment.total_installments - paid;`
+  - Declara uma constante usada na l�gica.
+- L410: `    `
+  - Linha em branco para organizar blocos.
+- L411: `    if (remaining > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L412: `      report += \`⏳ *Restam ${remaining} parcelas*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L413: `      report += \`   ${remaining}x de ${this.formatMoney(installment.installment_amount)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L414: `    } else {`
+  - Abre bloco de execu��o.
+- L415: `      report += '🎉 *PARABÉNS! TOTALMENTE PAGO!*\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L416: `    }`
+  - Fecha bloco de execu��o.
+- L417: `    `
+  - Linha em branco para organizar blocos.
+- L418: `    report += \`💰 *Saldo Atualizado:* ${this.formatMoney(user.current_balance)}\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L419: `    `
+  - Linha em branco para organizar blocos.
+- L420: `    return report;`
+  - Retorna valor da fun��o/m�todo.
+- L421: `  }`
+  - Fecha bloco de execu��o.
+- L422: ``
+  - Linha em branco para organizar blocos.
+- L423: `  getBrazilDateOnly(date) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L424: `    const d = this.getBrazilDate(date);`
+  - Declara uma constante usada na l�gica.
+- L425: `    d.setHours(0, 0, 0, 0);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L426: `    return d;`
+  - Retorna valor da fun��o/m�todo.
+- L427: `  }`
+  - Fecha bloco de execu��o.
+- L428: ``
+  - Linha em branco para organizar blocos.
+- L429: `  generateRemindersList(userId) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L430: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L431: `    const pending = this.dao.getPendingPaymentsByUser(userId);`
+  - Declara uma constante usada na l�gica.
+- L432: `    `
+  - Linha em branco para organizar blocos.
+- L433: `    if (pending.length === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L434: `      return '✅ *PARCELAS EM DIA*\n\nVocê não tem parcelas pendentes!\n\n🕑 ' + timestamp.formatted;`
+  - Retorna valor da fun��o/m�todo.
+- L435: `    }`
+  - Fecha bloco de execu��o.
+- L436: `    `
+  - Linha em branco para organizar blocos.
+- L437: `    const today = this.getBrazilDateOnly(new Date());`
+  - Declara uma constante usada na l�gica.
+- L438: `    let overdue = [];`
+  - Declara vari�vel com valor que pode ser alterado.
+- L439: `    let upcoming = [];`
+  - Declara vari�vel com valor que pode ser alterado.
+- L440: `    `
+  - Linha em branco para organizar blocos.
+- L441: `    for (const p of pending) {`
+  - Inicia la�o de repeti��o.
+- L442: `      const dueDate = this.getBrazilDateOnly(p.due_date);`
+  - Declara uma constante usada na l�gica.
+- L443: `      if (dueDate < today) {`
+  - Verifica condi��o para decidir o fluxo.
+- L444: `        overdue.push(p);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L445: `      } else {`
+  - Abre bloco de execu��o.
+- L446: `        upcoming.push(p);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L447: `      }`
+  - Fecha bloco de execu��o.
+- L448: `    }`
+  - Fecha bloco de execu��o.
+- L449: `    `
+  - Linha em branco para organizar blocos.
+- L450: `    let report = '╔═══════════════════════════════════════╗\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L451: `    report += '📅 *LEMBRETES DE PARCELAS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L452: `    report += '╚═══════════════════════════════════════╝\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L453: `    `
+  - Linha em branco para organizar blocos.
+- L454: `    if (overdue.length > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L455: `      report += \`❌ *VENCIDAS (${overdue.length})*\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L456: `      for (const p of overdue) {`
+  - Inicia la�o de repeti��o.
+- L457: `        const daysLate = Math.floor((today - this.getBrazilDateOnly(p.due_date)) / (1000 * 60 * 60 * 24));`
+  - Declara uma constante usada na l�gica.
+- L458: `        report += \`   • ${p.emoji} *${p.description}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L459: `        report += \`     Parcela: ${p.installment_number}/${p.total_installments}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L460: `        report += \`     Valor: ${this.formatMoney(p.amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L461: `        report += \`     Venceu: ${this.formatDateShort(p.due_date)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L462: `        report += \`     ⚠️ Atrasada há ${daysLate} dia(s)\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L463: `      }`
+  - Fecha bloco de execu��o.
+- L464: `    }`
+  - Fecha bloco de execu��o.
+- L465: `    `
+  - Linha em branco para organizar blocos.
+- L466: `    if (upcoming.length > 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L467: `      report += \`⏳ *PRÓXIMAS (${upcoming.length})*\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L468: `      const limit = Math.min(upcoming.length, 5);`
+  - Declara uma constante usada na l�gica.
+- L469: `      for (let i = 0; i < limit; i++) {`
+  - Inicia la�o de repeti��o.
+- L470: `        const p = upcoming[i];`
+  - Declara uma constante usada na l�gica.
+- L471: `        const daysUntil = Math.ceil((this.getBrazilDateOnly(p.due_date) - today) / (1000 * 60 * 60 * 24));`
+  - Declara uma constante usada na l�gica.
+- L472: `        report += \`   • ${p.emoji} *${p.description}*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L473: `        report += \`     Parcela: ${p.installment_number}/${p.total_installments}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L474: `        report += \`     Valor: ${this.formatMoney(p.amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L475: `        report += \`     Vence: ${this.formatDateShort(p.due_date)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L476: `        `
+  - Linha em branco para organizar blocos.
+- L477: `        if (daysUntil === 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L478: `          report += '     🔔 Vence HOJE!\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L479: `        } else if (daysUntil === 1) {`
+  - Abre bloco de execu��o.
+- L480: `          report += '     ⏰ Vence AMANHÃ!\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L481: `        } else {`
+  - Abre bloco de execu��o.
+- L482: `          report += \`     📅 Faltam ${daysUntil} dias\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L483: `        }`
+  - Fecha bloco de execu��o.
+- L484: `      }`
+  - Fecha bloco de execu��o.
+- L485: `    }`
+  - Fecha bloco de execu��o.
+- L486: `    `
+  - Linha em branco para organizar blocos.
+- L487: `    report += '💡 Use \`/pagar [nome]\` para pagar uma parcela\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L488: `    report += '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L489: `    `
+  - Linha em branco para organizar blocos.
+- L490: `    return report;`
+  - Retorna valor da fun��o/m�todo.
+- L491: `  }`
+  - Fecha bloco de execu��o.
+- L492: ``
+  - Linha em branco para organizar blocos.
+- L493: `  generateReminderMessage(payment) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L494: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L495: `    const today = this.getBrazilDateOnly(new Date());`
+  - Declara uma constante usada na l�gica.
+- L496: `    const dueDate = this.getBrazilDateOnly(payment.due_date);`
+  - Declara uma constante usada na l�gica.
+- L497: `    `
+  - Linha em branco para organizar blocos.
+- L498: `    let msg = '';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L499: `    `
+  - Linha em branco para organizar blocos.
+- L500: `    if (dueDate < today) {`
+  - Verifica condi��o para decidir o fluxo.
+- L501: `      const daysLate = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));`
+  - Declara uma constante usada na l�gica.
+- L502: `      msg = '❌ *PARCELA VENCIDA*\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L503: `      msg += \`⚠️ Atrasada há ${daysLate} dia(s)\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L504: `    } else {`
+  - Abre bloco de execu��o.
+- L505: `      msg = '🔔 *LEMBRETE DE PAGAMENTO*\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L506: `      msg += '📅 Vence HOJE\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L507: `    }`
+  - Fecha bloco de execu��o.
+- L508: `    `
+  - Linha em branco para organizar blocos.
+- L509: `    msg += \`${payment.emoji} *Compra:* ${payment.description}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L510: `    msg += \`💳 *Parcela:* ${payment.installment_number}/${payment.total_installments}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L511: `    msg += \`💰 *Valor:* ${this.formatMoney(payment.amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L512: `    msg += \`📅 *Vencimento:* ${this.formatDateShort(payment.due_date)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L513: `    msg += \`💡 Use \\`/pagar ${payment.description}\\` para pagar\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L514: `    msg += '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L515: `    `
+  - Linha em branco para organizar blocos.
+- L516: `    return msg;`
+  - Retorna valor da fun��o/m�todo.
+- L517: `  }`
+  - Fecha bloco de execu��o.
+- L518: ``
+  - Linha em branco para organizar blocos.
+- L519: `  generateResetConfirmation(type) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L520: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L521: `    let msg = '✅ *OPERAÇÃO CONCLUÍDA*\n\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L522: `    `
+  - Linha em branco para organizar blocos.
+- L523: `  switch(type) {`
+  - Seleciona fluxo com base em m�ltiplos casos.
+- L524: `  case 'balance':`
+  - Define um caso dentro do switch.
+- L525: `    msg += '💰 *Saldo principal zerado*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L526: `    break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L527: `  case 'savings':`
+  - Define um caso dentro do switch.
+- L528: `    msg += '🏷 *Poupança zerada*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L529: `    break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L530: `  case 'emergency':`
+  - Define um caso dentro do switch.
+- L531: `    msg += '🚨 *Reserva de emergência zerada*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L532: `    break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L533: `  case 'card':  // ⭐ ADICIONAR ESTE CASO`
+  - Define um caso dentro do switch.
+- L534: `    msg += '💳 *Cartão de crédito zerado*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L535: `    msg += '\nTodos os dados do cartão foram removidos:\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L536: `    msg += '• Saldo usado zerado\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L537: `    msg += '• Fatura zerada\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L538: `    msg += '• Histórico de compras removido\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L539: `    break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L540: ` case 'installments':`
+  - Define um caso dentro do switch.
+- L541: `  msg += '📦 *Parcelamentos zerados*\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L542: `  msg += 'Todas as compras parceladas foram removidas com sucesso!\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L543: `  break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L544: `  case 'everything':`
+  - Define um caso dentro do switch.
+- L545: `        msg += '☢️ *SISTEMA TOTALMENTE ZERADO*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L546: `        msg += '\nTodos os dados foram removidos:\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L547: `        msg += '• Saldo principal\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L548: `        msg += '• Poupança\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L549: `        msg += '• Reserva de emergência\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L550: `        msg += '• Parcelamentos\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L551: `        msg += '• Histórico de gastos\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L552: `        break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L553: `    }`
+  - Fecha bloco de execu��o.
+- L554: `    `
+  - Linha em branco para organizar blocos.
+- L555: `    msg += \`🕑 *Data/Hora:* ${timestamp.formatted}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L556: `    `
+  - Linha em branco para organizar blocos.
+- L557: `    if (type === 'everything') {`
+  - Verifica condi��o para decidir o fluxo.
+- L558: `      msg += '💡 Use \`/saldo 1000\` para redefinir seu saldo';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L559: `    } else {`
+  - Abre bloco de execu��o.
+- L560: `      msg += '⚠️ *Esta ação é irreversível*';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L561: `    }`
+  - Fecha bloco de execu��o.
+- L562: `    `
+  - Linha em branco para organizar blocos.
+- L563: `    return msg;`
+  - Retorna valor da fun��o/m�todo.
+- L564: `  }`
+  - Fecha bloco de execu��o.
+- L565: ``
+  - Linha em branco para organizar blocos.
+- L566: `  generateResetWarning(type) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L567: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L568: `    let msg = '⚠️ *ATENÇÃO - OPERAÇÃO IRREVERSÍVEL*\n\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L569: `    `
+  - Linha em branco para organizar blocos.
+- L570: `    switch(type) {`
+  - Seleciona fluxo com base em m�ltiplos casos.
+- L571: `      case 'balance':`
+  - Define um caso dentro do switch.
+- L572: `        msg += 'Você está prestes a *zerar seu saldo principal*.\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L573: `        msg += 'Isso irá:\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L574: `        msg += '• Resetar saldo atual para R$ 0,00\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L575: `        msg += '• Resetar saldo inicial para R$ 0,00\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L576: `        break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L577: `      case 'savings':`
+  - Define um caso dentro do switch.
+- L578: `        msg += 'Você está prestes a *zerar sua poupança*.\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L579: `        msg += 'Todo o dinheiro guardado será removido.\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L580: `        break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L581: `      case 'emergency':`
+  - Define um caso dentro do switch.
+- L582: `        msg += 'Você está prestes a *zerar sua reserva de emergência*.\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L583: `        msg += 'Todo o valor reservado será removido.\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L584: `        break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L585: `         case 'card':  `
+  - Define um caso dentro do switch.
+- L586: `         msg += 'Você está prestes a *zerar seu cartão de crédito*.\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L587: `         msg += 'Isso irá:\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L588: `        msg += '• Zerar todo o saldo usado\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L589: `        msg += '• Zerar a fatura atual\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L590: `        msg += '• Remover histórico de compras\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L591: `        msg += '• Manter o limite do cartão\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L592: `    break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L593: `      case 'installments':`
+  - Define um caso dentro do switch.
+- L594: `        msg += 'Você está prestes a *zerar todos os parcelamentos*.\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L595: `        msg += 'Isso irá:\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L596: `        msg += '• Remover todas as compras parceladas\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L597: `        msg += '• Remover histórico de parcelas pagas\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L598: `        msg += '• Remover parcelas pendentes\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L599: `        break;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L600: `      case 'everything':`
+  - Define um caso dentro do switch.
+- L601: `  msg += '☢️ *VOCÊ ESTÁ PRESTES A ZERAR TODO O SISTEMA!*\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L602: `  msg += '⚠️ Isso irá remover PERMANENTEMENTE:\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L603: `  msg += '• Saldo principal e inicial\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L604: `  msg += '• Poupança completa\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L605: `  msg += '• Reserva de emergência\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L606: `  msg += '• Todos os parcelamentos\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L607: `  msg += '• Todo o histórico de gastos\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L608: `  msg += '❌ *ESTA AÇÃO NÃO PODE SER DESFEITA!*\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L609: `  msg += '⏱️ **Você tem 2 minutos para confirmar**\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L610: `  msg += 'Para confirmar, digite novamente:\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L611: `  msg += '\`/zerar tudo\`\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L612: `  msg += 'Qualquer outro comando cancelará a operação.\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L613: `  msg += '🕒 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L614: `  return msg;`
+  - Retorna valor da fun��o/m�todo.
+- L615: `    }`
+  - Fecha bloco de execu��o.
+- L616: `    `
+  - Linha em branco para organizar blocos.
+- L617: `    msg += '\n⚠️ *Esta ação NÃO pode ser desfeita!*\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L618: `    msg += 'Para confirmar, use o comando novamente:\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L619: `    msg += \`\\`/zerar ${type === 'balance' ? 'saldo' : type === 'savings' ? 'poupanca' : type === 'emergency' ? 'reserva' : 'parcelas'}\\`\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L620: `    msg += '🕑 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L621: `    `
+  - Linha em branco para organizar blocos.
+- L622: `    return msg;`
+  - Retorna valor da fun��o/m�todo.
+- L623: `  }`
+  - Fecha bloco de execu��o.
+- L624: ``
+  - Linha em branco para organizar blocos.
+- L625: `  generateHelpMessage() {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L626: `  const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L627: ``
+  - Linha em branco para organizar blocos.
+- L628: `  let help = '╔═══════════════════════════════════════╗\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L629: `  help += '🤖 *BOT FINANCEIRO - AJUDA COMPLETA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L630: `  help += '╚═══════════════════════════════════════╝\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L631: ``
+  - Linha em branco para organizar blocos.
+- L632: `  help += '💸 *REGISTRAR GASTOS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L633: `  help += 'Escreva naturalmente:\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L634: `  help += '• "Gastei 50 no mercado"\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L635: `  help += '• "Paguei 15 no uber"\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L636: `  help += '• "Almocei por 25 reais"\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L637: ``
+  - Linha em branco para organizar blocos.
+- L638: `  help += '💰 *SALDO PRINCIPAL*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L639: `  help += '• \`/saldo\` - Ver saldo\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L640: `  help += '• \`/saldo 1000\` - Definir inicial\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L641: `  help += '• \`/adicionar 500\` - Adicionar saldo\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L642: `  help += '• \`/zerar saldo\` - Zerar saldo ⚠️\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L643: ``
+  - Linha em branco para organizar blocos.
+- L644: `  help += '🏷 *POUPANÇA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L645: `  help += '• \`/poupanca\` - Ver poupança\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L646: `  help += '• \`/guardar 100\` - Guardar dinheiro\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L647: `  help += '• \`/retirar 50\` - Retirar da poupança\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L648: `  help += '• \`/zerar poupanca\` - Zerar poupança ⚠️\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L649: ``
+  - Linha em branco para organizar blocos.
+- L650: `  help += '🚨 *RESERVA DE EMERGÊNCIA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L651: `  help += '• \`/emergencia\` - Ver reserva\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L652: `  help += '• \`/reservar 200\` - Adicionar à reserva\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L653: `  help += '• \`/usar 100\` - Usar da reserva\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L654: `  help += '• \`/zerar reserva\` - Zerar reserva ⚠️\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L655: ``
+  - Linha em branco para organizar blocos.
+- L656: `  help += '💳 *CARTÃO DE CRÉDITO*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L657: `  help += '• \`/cartao\` - Ver informações do cartão\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L658: `  help += '• \`/cartao limite 5000\` - Definir limite\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L659: `  help += '• \`/pagar fatura\` - Pagar fatura do cartão\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L660: `  help += '• \`/zerar cartao\` - Zerar cartão ⚠️\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L661: `  help += '_💡 Gastos perguntam se foram no cartão_\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L662: ``
+  - Linha em branco para organizar blocos.
+- L663: `  help += '📦 *PARCELAMENTOS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L664: `  help += '• "comprei celular por 1200 em 12x"\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L665: `  help += '• \`/parcelamentos\` - Ver todas parcelas\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L666: `  help += '• \`/pagar celular\` - Pagar próxima parcela\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L667: `  help += '• \`/zerar parcelas\` - Zerar parcelamentos ⚠️\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L668: ``
+  - Linha em branco para organizar blocos.
+- L669: `  help += '🔔 *LEMBRETES*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L670: `  help += '• \`/lembretes\` - Ver lembretes\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L671: `  help += '• \`/vencidas\` - Ver parcelas atrasadas\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L672: `  help += '_⚠️ Lembretes só funcionam com bot ligado_\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L673: ``
+  - Linha em branco para organizar blocos.
+- L674: `  help += '📊 *RELATÓRIOS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L675: `  help += '• \`/relatorio semanal\` ou \`/semana\`\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L676: `  help += '• \`/relatorio mensal\` ou \`/mes\`\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L677: ``
+  - Linha em branco para organizar blocos.
+- L678: `  help += '📈 *GRÁFICOS VISUAIS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L679: `  help += '• \`/grafico semana\`\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L680: `  help += '• \`/grafico mes\`\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L681: ``
+  - Linha em branco para organizar blocos.
+- L682: `  help += '🎯 *METAS DE ECONOMIA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L683: `  help += '• \`/meta\` - Listar metas\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L684: `  help += '• \`/meta criar 5000 viagem\`\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L685: `  help += '• \`/meta remover [id]\`\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L686: `  help += '• \`/meta concluir [id]\`\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L687: ``
+  - Linha em branco para organizar blocos.
+- L688: `  help += '📦 *EXPORTAÇÃO*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L689: `  help += '• \`/exportar excel\`\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L690: `  help += '• \`/exportar pdf\`\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L691: `  help += '• \`/exportar ambos\`\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L692: ``
+  - Linha em branco para organizar blocos.
+- L693: `  help += '🌐 *DASHBOARD E IA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L694: `  help += '• \`/dashboard\` - Link do painel web\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L695: `  help += '• \`/previsao\` - Projeção de gastos com IA\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L696: ``
+  - Linha em branco para organizar blocos.
+- L697: `  help += '☢️ *ZERAGEM COMPLETA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L698: `  help += '• \`/zerar tudo\` - Zerar TUDO ☢️\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L699: `  help += '_⚠️ Remove saldo, poupança, reserva, parcelas e histórico_\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L700: `  help += '_⚠️ Todos os comandos de zeragem exigem confirmação_\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L701: ``
+  - Linha em branco para organizar blocos.
+- L702: `  help += '🏷️ *CATEGORIAS AUTOMÁTICAS*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L703: `  help += '🍔 Alimentação • 🚗 Transporte\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L704: `  help += '🛒 Mercado • 🎮 Lazer\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L705: `  help += '💳 Contas • 💊 Saúde\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L706: `  help += '📚 Educação • 👕 Vestuário\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L707: ``
+  - Linha em branco para organizar blocos.
+- L708: `  help += '═══════════════════════════════════════\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L709: `  help += '💡 O bot identifica categorias automaticamente!\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L710: `  help += '✅ TODOS os comandos retornam confirmação\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L711: `  help += 'Desenvolvido por : github.com/devaqn\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L712: `  help += '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L713: ``
+  - Linha em branco para organizar blocos.
+- L714: `  return help;`
+  - Retorna valor da fun��o/m�todo.
+- L715: `}`
+  - Fecha bloco de execu��o.
+- L716: ``
+  - Linha em branco para organizar blocos.
+- L717: `  generateWelcomeMessage(userName) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L718: `    const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L719: ``
+  - Linha em branco para organizar blocos.
+- L720: `    let welcome = '╔═══════════════════════════════════════╗\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L721: `    welcome += '👋 *BEM-VINDO!*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L722: `    welcome += '╚═══════════════════════════════════════╝\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L723: ``
+  - Linha em branco para organizar blocos.
+- L724: `    welcome += \`Olá, *${userName}!* 😊\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L725: `    welcome += 'Sou seu assistente financeiro pessoal! 🤖💰\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L726: ``
+  - Linha em branco para organizar blocos.
+- L727: `    welcome += '🚀 *PRIMEIROS PASSOS*\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L728: `    welcome += '1️⃣ Defina seu saldo inicial:\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L729: `    welcome += '   \`/saldo 1000\`\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L730: ``
+  - Linha em branco para organizar blocos.
+- L731: `    welcome += '2️⃣ Registre seus gastos naturalmente:\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L732: `    welcome += '   "Gastei 50 no mercado"\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L733: ``
+  - Linha em branco para organizar blocos.
+- L734: `    welcome += '3️⃣ Consulte relatórios:\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L735: `    welcome += '   \`/relatorio mensal\`\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L736: ``
+  - Linha em branco para organizar blocos.
+- L737: `    welcome += '💡 *DICA*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L738: `    welcome += 'Use \`/ajuda\` para ver todos os comandos!\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L739: ``
+  - Linha em branco para organizar blocos.
+- L740: `    welcome += '═══════════════════════════════════════\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L741: `    welcome += 'Vamos começar a organizar suas finanças! 💪\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L742: `    welcome += '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L743: ``
+  - Linha em branco para organizar blocos.
+- L744: `    return welcome;`
+  - Retorna valor da fun��o/m�todo.
+- L745: ``
+  - Linha em branco para organizar blocos.
+- L746: `  }`
+  - Fecha bloco de execu��o.
+- L747: `  generateCardReport(card) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L748: `  const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L749: `  const percentUsed = card.card_limit > 0 `
+  - Declara uma constante usada na l�gica.
+- L750: `    ? ((card.current_balance / card.card_limit) * 100).toFixed(1)`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L751: `    : 0;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L752: `  `
+  - Linha em branco para organizar blocos.
+- L753: `  let emoji = '💳';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L754: `  if (card.available_limit < 0) emoji = '🚨';`
+  - Verifica condi��o para decidir o fluxo.
+- L755: `  else if (card.available_limit < card.card_limit * 0.2) emoji = '⚠️';`
+  - Verifica condi��o alternativa no fluxo.
+- L756: `  `
+  - Linha em branco para organizar blocos.
+- L757: `  let report = '╔══════════════════════════════════════════════╗\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L758: `  report += \`${emoji} *CARTÃO DE CRÉDITO*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L759: `  report += '╚══════════════════════════════════════════════╝\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L760: `  `
+  - Linha em branco para organizar blocos.
+- L761: `  report += \`📊 *Limite Total:* ${this.formatMoney(card.card_limit)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L762: `  report += \`💰 *Usado:* ${this.formatMoney(card.current_balance)} (${percentUsed}%)\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L763: `  report += \`✅ *Disponível:* ${this.formatMoney(card.available_limit)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L764: `  `
+  - Linha em branco para organizar blocos.
+- L765: `  report += \`📅 *Fatura Atual:* ${this.formatMoney(card.invoice_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L766: `  report += \`🔔 *Vencimento:* Todo dia ${card.invoice_due_day}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L767: `  `
+  - Linha em branco para organizar blocos.
+- L768: `  if (card.last_payment_date) {`
+  - Verifica condi��o para decidir o fluxo.
+- L769: `    report += \`💵 *Último Pagamento:*\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L770: `    report += \`   Valor: ${this.formatMoney(card.last_payment_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L771: `    report += \`   Data: ${this.formatDate(card.last_payment_date)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L772: `  }`
+  - Fecha bloco de execu��o.
+- L773: `  `
+  - Linha em branco para organizar blocos.
+- L774: `  if (card.available_limit < 0) {`
+  - Verifica condi��o para decidir o fluxo.
+- L775: `    report += '🚨 *ATENÇÃO: Limite estourado!*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L776: `    report += \`Você está ${this.formatMoney(Math.abs(card.available_limit))} acima do limite.\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L777: `  } else if (card.available_limit < card.card_limit * 0.2) {`
+  - Abre bloco de execu��o.
+- L778: `    report += '⚠️ *AVISO: Limite baixo!*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L779: `    report += 'Menos de 20% disponível.\n\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L780: `  }`
+  - Fecha bloco de execu��o.
+- L781: `  `
+  - Linha em branco para organizar blocos.
+- L782: `  report += '══════════════════════════════════════════════\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L783: `  report += '💡 Use \`/pagar fatura\` para pagar\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L784: `  report += '🕐 ' + timestamp.formatted;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L785: `  `
+  - Linha em branco para organizar blocos.
+- L786: `  return report;`
+  - Retorna valor da fun��o/m�todo.
+- L787: `}`
+  - Fecha bloco de execu��o.
+- L788: ``
+  - Linha em branco para organizar blocos.
+- L789: `// 💳 CONFIRMAÇÃO DE COMPRA NO CARTÃO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L790: `generateCardPurchaseConfirmation(expense, card, category) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L791: `  const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L792: `  `
+  - Linha em branco para organizar blocos.
+- L793: `  let report = '✅ *COMPRA NO CARTÃO REGISTRADA*\n\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L794: `  `
+  - Linha em branco para organizar blocos.
+- L795: `  report += \`${category.emoji} *Categoria:* ${category.name}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L796: `  report += \`💵 *Valor:* ${this.formatMoney(expense.amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L797: `  report += \`📝 *Descrição:* ${expense.description}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L798: `  report += \`🕐 *Registrado em:* ${timestamp.formatted}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L799: `  `
+  - Linha em branco para organizar blocos.
+- L800: `  report += '💳 *CARTÃO DE CRÉDITO*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L801: `  report += \`   Limite: ${this.formatMoney(card.card_limit)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L802: `  report += \`   Usado: ${this.formatMoney(card.current_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L803: `  report += \`   Disponível: ${this.formatMoney(card.available_limit)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L804: `  `
+  - Linha em branco para organizar blocos.
+- L805: `  report += \`📅 *Fatura próximo mês:* ${this.formatMoney(card.invoice_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L806: `  report += \`🔔 *Vencimento:* Dia ${card.invoice_due_day}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L807: `  `
+  - Linha em branco para organizar blocos.
+- L808: `  report += '══════════════════════════════════════════════';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L809: `  `
+  - Linha em branco para organizar blocos.
+- L810: `  return report;`
+  - Retorna valor da fun��o/m�todo.
+- L811: `}`
+  - Fecha bloco de execu��o.
+- L812: ``
+  - Linha em branco para organizar blocos.
+- L813: `// 💳 CONFIRMAÇÃO DE PARCELAMENTO NO CARTÃO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L814: `generateCardInstallmentConfirmation(installment, card, category) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L815: `  const timestamp = this.getCurrentBrazilTimestamp();`
+  - Declara uma constante usada na l�gica.
+- L816: `  const nextPendingPayment = this.dao.getNextPendingPayment(installment.id);`
+  - Declara uma constante usada na l�gica.
+- L817: `  const firstDueDateText = nextPendingPayment`
+  - Declara uma constante usada na l�gica.
+- L818: `    ? this.formatDate(nextPendingPayment.due_date)`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L819: `    : 'Nao informado';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L820: `  `
+  - Linha em branco para organizar blocos.
+- L821: `  let report = '✅ *PARCELAMENTO NO CARTÃO REGISTRADO*\n\n';`
+  - Declara vari�vel com valor que pode ser alterado.
+- L822: `  `
+  - Linha em branco para organizar blocos.
+- L823: `  report += \`${category.emoji} *Categoria:* ${category.name}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L824: `  report += \`📦 *Produto:* ${installment.description}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L825: `  report += \`💰 *Total:* ${this.formatMoney(installment.total_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L826: `  report += \`📊 *Parcelas:* ${installment.total_installments}x de ${this.formatMoney(installment.installment_amount)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L827: `  report += \`📅 *Primeira parcela:* ${firstDueDateText}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L828: `  report += \`🕐 *Registrado em:* ${timestamp.formatted}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L829: `  `
+  - Linha em branco para organizar blocos.
+- L830: `  report += '💳 *SITUAÇÃO DO CARTÃO*\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L831: `  report += \`   Limite: ${this.formatMoney(card.card_limit)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L832: `  report += \`   Usado: ${this.formatMoney(card.current_balance)}\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L833: `  report += \`   Disponível: ${this.formatMoney(card.available_limit)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L834: `  `
+  - Linha em branco para organizar blocos.
+- L835: `  report += \`📅 *Fatura atual:* ${this.formatMoney(card.invoice_amount)}\n\n\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L836: `  `
+  - Linha em branco para organizar blocos.
+- L837: `  report += '💡 As parcelas serão cobradas mensalmente\n';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L838: `  report += '══════════════════════════════════════════════';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L839: `  `
+  - Linha em branco para organizar blocos.
+- L840: `  return report;`
+  - Retorna valor da fun��o/m�todo.
+- L841: `}`
+  - Fecha bloco de execu��o.
+- L842: `}`
+  - Fecha bloco de execu��o.
+- L843: ``
+  - Linha em branco para organizar blocos.
+- L844: ``
+  - Linha em branco para organizar blocos.
+- L845: `module.exports = ReportGenerator;`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L846: ``
+  - Linha em branco para organizar blocos.
+
+## src/services/whatsapp.js
+
+- L1: `const makeWASocket = require('@whiskeysockets/baileys').default;`
+  - Importa um m�dulo para uso neste arquivo.
+- L2: `const {`
+  - Declara uma constante usada na l�gica.
+- L3: `  DisconnectReason,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L4: `  useMultiFileAuthState,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L5: `  fetchLatestBaileysVersion,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L6: `  makeCacheableSignalKeyStore`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L7: `} = require('@whiskeysockets/baileys');`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L8: ``
+  - Linha em branco para organizar blocos.
+- L9: `const pino = require('pino');`
+  - Importa um m�dulo para uso neste arquivo.
+- L10: `const qrcode = require('qrcode-terminal');`
+  - Importa um m�dulo para uso neste arquivo.
+- L11: `const fs = require('fs');`
+  - Importa um m�dulo para uso neste arquivo.
+- L12: `const path = require('path');`
+  - Importa um m�dulo para uso neste arquivo.
+- L13: ``
+  - Linha em branco para organizar blocos.
+- L14: `class WhatsAppService {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L15: `  constructor(authPath = './auth_info') {`
+  - Inicializa estado da classe e depend�ncias.
+- L16: `    this.authPath = authPath;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L17: `    this.sock = null;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L18: `    this.qrAttempts = 0;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L19: `    this.maxQRAttempts = 3;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L20: `    this.isConnected = false;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L21: `    this.reconnectAttempts = 0;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L22: `    this.maxReconnectAttempts = 5;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L23: ``
+  - Linha em branco para organizar blocos.
+- L24: `    if (!fs.existsSync(this.authPath)) {`
+  - Verifica condi��o para decidir o fluxo.
+- L25: `      fs.mkdirSync(this.authPath, { recursive: true });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L26: `    }`
+  - Fecha bloco de execu��o.
+- L27: ``
+  - Linha em branco para organizar blocos.
+- L28: `    this.logger = pino({ level: 'silent' });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L29: `  }`
+  - Fecha bloco de execu��o.
+- L30: ``
+  - Linha em branco para organizar blocos.
+- L31: `  async connect(messageHandler) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L32: `    return new Promise(async (resolve, reject) => {`
+  - Retorna valor da fun��o/m�todo.
+- L33: `      try {`
+  - Inicia bloco protegido contra exce��es.
+- L34: `        console.log('📱 Iniciando conexão com WhatsApp...\n');`
+  - Registra informa��o de execu��o no log.
+- L35: ``
+  - Linha em branco para organizar blocos.
+- L36: `        const { state, saveCreds } = await useMultiFileAuthState(this.authPath);`
+  - Declara uma constante usada na l�gica.
+- L37: `        const { version } = await fetchLatestBaileysVersion();`
+  - Declara uma constante usada na l�gica.
+- L38: ``
+  - Linha em branco para organizar blocos.
+- L39: `        this.sock = makeWASocket({`
+  - Abre bloco de execu��o.
+- L40: `          version,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L41: `          auth: {`
+  - Abre bloco de execu��o.
+- L42: `            creds: state.creds,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L43: `            keys: makeCacheableSignalKeyStore(state.keys, this.logger)`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L44: `          },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L45: `          logger: this.logger,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L46: `          printQRInTerminal: false,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L47: `          browser: ['Finance Bot', 'Safari', '1.0.0'], // Mudei para Safari`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L48: `          connectTimeoutMs: 60000,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L49: `          keepAliveIntervalMs: 30000,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L50: `          // 🔥 CONFIGURAÇÕES ANTI-CONFLITO MAIS AGRESSIVAS`
+  - Coment�rio explicativo j� existente no c�digo.
+- L51: `          markOnlineOnConnect: false,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L52: `          syncFullHistory: false,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L53: `          shouldIgnoreJid: jid => jid === 'status@broadcast',`
+  - Define fun��o an�nima/arrow function.
+- L54: `          getMessage: async () => undefined,`
+  - Define fun��o an�nima/arrow function.
+- L55: `          defaultQueryTimeoutMs: undefined,`
+  - Define comportamento padr�o do switch.
+- L56: `          emitOwnEvents: false,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L57: `          fireInitQueries: false,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L58: `          generateHighQualityLinkPreview: false`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L59: `        });`
+  - Fecha bloco de execu��o.
+- L60: ``
+  - Linha em branco para organizar blocos.
+- L61: `        this.sock.ev.on('creds.update', saveCreds);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L62: ``
+  - Linha em branco para organizar blocos.
+- L63: `        this.sock.ev.on('connection.update', async ({ connection, lastDisconnect, qr }) => {`
+  - Define fun��o an�nima/arrow function.
+- L64: `          if (qr) {`
+  - Verifica condi��o para decidir o fluxo.
+- L65: `            this.qrAttempts++;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L66: `            console.log(\`\n📱 QR CODE (${this.qrAttempts}/${this.maxQRAttempts})\n\`);`
+  - Registra informa��o de execu��o no log.
+- L67: `            qrcode.generate(qr, { small: true });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L68: ``
+  - Linha em branco para organizar blocos.
+- L69: `            if (this.qrAttempts >= this.maxQRAttempts) {`
+  - Verifica condi��o para decidir o fluxo.
+- L70: `              this.qrAttempts = 0;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L71: `              console.log('⚠️ Muitas tentativas de QR. Aguarde 1 minuto...\n');`
+  - Registra informa��o de execu��o no log.
+- L72: `              setTimeout(() => this.connect(messageHandler), 60000);`
+  - Agenda execu��o futura de fun��o.
+- L73: `              return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L74: `            }`
+  - Fecha bloco de execu��o.
+- L75: `          }`
+  - Fecha bloco de execu��o.
+- L76: ``
+  - Linha em branco para organizar blocos.
+- L77: `          if (connection === 'close') {`
+  - Verifica condi��o para decidir o fluxo.
+- L78: `            this.isConnected = false;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L79: `            const reason = lastDisconnect?.error?.output?.statusCode;`
+  - Declara uma constante usada na l�gica.
+- L80: `            const errorMsg = lastDisconnect?.error?.message || 'Desconhecido';`
+  - Declara uma constante usada na l�gica.
+- L81: `            `
+  - Linha em branco para organizar blocos.
+- L82: `            console.log('🔌 Conexão fechada');`
+  - Registra informa��o de execu��o no log.
+- L83: `            console.log('📊 Código:', reason);`
+  - Registra informa��o de execu��o no log.
+- L84: `            console.log('📊 Mensagem:', errorMsg);`
+  - Registra informa��o de execu��o no log.
+- L85: ``
+  - Linha em branco para organizar blocos.
+- L86: `            // 🔥 TRATAMENTO ESPECIAL PARA ERRO 440 (CONFLITO)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L87: `            if (reason === 440 || errorMsg.includes('conflict')) {`
+  - Verifica condi��o para decidir o fluxo.
+- L88: `              this.reconnectAttempts++;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L89: `              console.log('\n⚠️ ========================================');`
+  - Registra informa��o de execu��o no log.
+- L90: `              console.log('🚨 CONFLITO DETECTADO! (Erro 440)');`
+  - Registra informa��o de execu��o no log.
+- L91: `              console.log('⚠️ ========================================');`
+  - Registra informa��o de execu��o no log.
+- L92: `              console.log('');`
+  - Registra informa��o de execu��o no log.
+- L93: `              console.log('📌 Possíveis causas:');`
+  - Registra informa��o de execu��o no log.
+- L94: `              console.log('   1. Outro bot rodando com este número');`
+  - Registra informa��o de execu��o no log.
+- L95: `              console.log('   2. WhatsApp Web aberto no navegador');`
+  - Registra informa��o de execu��o no log.
+- L96: `              console.log('   3. Múltiplas instâncias no PM2');`
+  - Registra informa��o de execu��o no log.
+- L97: `              console.log('');`
+  - Registra informa��o de execu��o no log.
+- L98: `              console.log('🔧 Para corrigir:');`
+  - Registra informa��o de execu��o no log.
+- L99: `              console.log('   • pm2 delete all');`
+  - Registra informa��o de execu��o no log.
+- L100: `              console.log('   • pkill -9 node');`
+  - Registra informa��o de execu��o no log.
+- L101: `              console.log('   • pm2 start index.js --instances 1');`
+  - Registra informa��o de execu��o no log.
+- L102: `              console.log('');`
+  - Registra informa��o de execu��o no log.
+- L103: `              `
+  - Linha em branco para organizar blocos.
+- L104: `              if (this.reconnectAttempts >= this.maxReconnectAttempts) {`
+  - Verifica condi��o para decidir o fluxo.
+- L105: `                console.log('❌ Máximo de tentativas atingido.');`
+  - Registra informa��o de execu��o no log.
+- L106: `                console.log('🗑️ Limpando sessão para forçar novo login...\n');`
+  - Registra informa��o de execu��o no log.
+- L107: `                fs.rmSync(this.authPath, { recursive: true, force: true });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L108: `                fs.mkdirSync(this.authPath, { recursive: true });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L109: `                this.reconnectAttempts = 0;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L110: `              }`
+  - Fecha bloco de execu��o.
+- L111: `              `
+  - Linha em branco para organizar blocos.
+- L112: `              const waitTime = Math.min(this.reconnectAttempts * 15000, 60000);`
+  - Declara uma constante usada na l�gica.
+- L113: `              console.log(\`⏸️ Aguardando ${waitTime/1000}s antes de reconectar...\n\`);`
+  - Registra informa��o de execu��o no log.
+- L114: `              setTimeout(() => this.connect(messageHandler), waitTime);`
+  - Agenda execu��o futura de fun��o.
+- L115: `              return;`
+  - Encerra a execu��o da fun��o sem valor.
+- L116: `            }`
+  - Fecha bloco de execu��o.
+- L117: ``
+  - Linha em branco para organizar blocos.
+- L118: `            // OUTROS ERROS`
+  - Coment�rio explicativo j� existente no c�digo.
+- L119: `            if (reason === DisconnectReason.loggedOut) {`
+  - Verifica condi��o para decidir o fluxo.
+- L120: `              console.log('❌ Sessão inválida. Limpando auth...\n');`
+  - Registra informa��o de execu��o no log.
+- L121: `              fs.rmSync(this.authPath, { recursive: true, force: true });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L122: `              fs.mkdirSync(this.authPath, { recursive: true });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L123: `              setTimeout(() => this.connect(messageHandler), 5000);`
+  - Agenda execu��o futura de fun��o.
+- L124: `            } else if (reason === DisconnectReason.restartRequired) {`
+  - Abre bloco de execu��o.
+- L125: `              console.log('🔄 Restart necessário...\n');`
+  - Registra informa��o de execu��o no log.
+- L126: `              setTimeout(() => this.connect(messageHandler), 3000);`
+  - Agenda execu��o futura de fun��o.
+- L127: `            } else if (reason === DisconnectReason.connectionClosed ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L128: `                       reason === DisconnectReason.connectionLost) {`
+  - Abre bloco de execu��o.
+- L129: `              console.log('⚠️ Conexão perdida, reconectando...\n');`
+  - Registra informa��o de execu��o no log.
+- L130: `              setTimeout(() => this.connect(messageHandler), 5000);`
+  - Agenda execu��o futura de fun��o.
+- L131: `            } else if (reason === 515) {`
+  - Abre bloco de execu��o.
+- L132: `              console.log('⚠️ ERRO 515 - Sessão perdida/inválida');`
+  - Registra informa��o de execu��o no log.
+- L133: `              console.log('🔄 Limpando credenciais e reconectando...\n');`
+  - Registra informa��o de execu��o no log.
+- L134: `              fs.rmSync(this.authPath, { recursive: true, force: true });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L135: `              fs.mkdirSync(this.authPath, { recursive: true });`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L136: `              setTimeout(() => this.connect(messageHandler), 5000);`
+  - Agenda execu��o futura de fun��o.
+- L137: `            } else {`
+  - Abre bloco de execu��o.
+- L138: `              console.log('⏸️ Aguardando 10s antes de reconectar...\n');`
+  - Registra informa��o de execu��o no log.
+- L139: `              setTimeout(() => this.connect(messageHandler), 10000);`
+  - Agenda execu��o futura de fun��o.
+- L140: `            }`
+  - Fecha bloco de execu��o.
+- L141: `          }`
+  - Fecha bloco de execu��o.
+- L142: ``
+  - Linha em branco para organizar blocos.
+- L143: `          if (connection === 'open') {`
+  - Verifica condi��o para decidir o fluxo.
+- L144: `            this.isConnected = true;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L145: `            this.qrAttempts = 0;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L146: `            this.reconnectAttempts = 0; // 🔥 RESETAR CONTADOR`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L147: ``
+  - Linha em branco para organizar blocos.
+- L148: `            const me = this.sock.user;`
+  - Declara uma constante usada na l�gica.
+- L149: `            console.log('\n✅ Conectado!');`
+  - Registra informa��o de execu��o no log.
+- L150: `            console.log(\`📱 Conta: ${me.name || 'Sem nome'}\`);`
+  - Registra informa��o de execu��o no log.
+- L151: `            console.log(\`📞 Número: ${me.id.split(':')[0]}\`);`
+  - Registra informa��o de execu��o no log.
+- L152: `            console.log('');`
+  - Registra informa��o de execu��o no log.
+- L153: ``
+  - Linha em branco para organizar blocos.
+- L154: `            resolve(this.sock);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L155: `          }`
+  - Fecha bloco de execu��o.
+- L156: `        });`
+  - Fecha bloco de execu��o.
+- L157: ``
+  - Linha em branco para organizar blocos.
+- L158: `        this.sock.ev.on('messages.upsert', async ({ messages, type }) => {`
+  - Define fun��o an�nima/arrow function.
+- L159: `          if (type !== 'notify') return;`
+  - Verifica condi��o para decidir o fluxo.
+- L160: ``
+  - Linha em branco para organizar blocos.
+- L161: `          for (const msg of messages) {`
+  - Inicia la�o de repeti��o.
+- L162: `            if (!msg.message || msg.key.remoteJid === 'status@broadcast') continue;`
+  - Verifica condi��o para decidir o fluxo.
+- L163: ``
+  - Linha em branco para organizar blocos.
+- L164: `            try {`
+  - Inicia bloco protegido contra exce��es.
+- L165: `              if (messageHandler) await messageHandler(msg);`
+  - Verifica condi��o para decidir o fluxo.
+- L166: `            } catch (err) {`
+  - Abre bloco de execu��o.
+- L167: `              console.error('❌ Erro no handler:', err.message);`
+  - Registra erro no log para diagn�stico.
+- L168: `            }`
+  - Fecha bloco de execu��o.
+- L169: `          }`
+  - Fecha bloco de execu��o.
+- L170: `        });`
+  - Fecha bloco de execu��o.
+- L171: ``
+  - Linha em branco para organizar blocos.
+- L172: `      } catch (error) {`
+  - Abre bloco de execu��o.
+- L173: `        console.error('❌ Erro ao conectar:', error.message);`
+  - Registra erro no log para diagn�stico.
+- L174: `        reject(error);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L175: `      }`
+  - Fecha bloco de execu��o.
+- L176: `    });`
+  - Fecha bloco de execu��o.
+- L177: `  }`
+  - Fecha bloco de execu��o.
+- L178: ``
+  - Linha em branco para organizar blocos.
+- L179: `  async sendMessage(jid, text) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L180: `    if (!this.sock || !this.isConnected) {`
+  - Verifica condi��o para decidir o fluxo.
+- L181: `      throw new Error('WhatsApp não conectado');`
+  - Dispara erro para interromper e sinalizar falha.
+- L182: `    }`
+  - Fecha bloco de execu��o.
+- L183: `    await this.sock.sendMessage(jid, { text });`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L184: `  }`
+  - Fecha bloco de execu��o.
+- L185: ``
+  - Linha em branco para organizar blocos.
+- L186: `  getMimeTypeFromExtension(filePath) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L187: `    const ext = String(path.extname(filePath) || '').toLowerCase();`
+  - Declara uma constante usada na l�gica.
+- L188: `    if (ext === '.pdf') return 'application/pdf';`
+  - Verifica condi��o para decidir o fluxo.
+- L189: `    if (ext === '.xlsx') return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';`
+  - Verifica condi��o para decidir o fluxo.
+- L190: `    if (ext === '.xls') return 'application/vnd.ms-excel';`
+  - Verifica condi��o para decidir o fluxo.
+- L191: `    if (ext === '.csv') return 'text/csv';`
+  - Verifica condi��o para decidir o fluxo.
+- L192: `    return 'application/octet-stream';`
+  - Retorna valor da fun��o/m�todo.
+- L193: `  }`
+  - Fecha bloco de execu��o.
+- L194: ``
+  - Linha em branco para organizar blocos.
+- L195: `  async sendDocument(jid, filePath, fileName, caption = '') {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L196: `    if (!this.sock || !this.isConnected) {`
+  - Verifica condi��o para decidir o fluxo.
+- L197: `      throw new Error('WhatsApp não conectado');`
+  - Dispara erro para interromper e sinalizar falha.
+- L198: `    }`
+  - Fecha bloco de execu��o.
+- L199: ``
+  - Linha em branco para organizar blocos.
+- L200: `    const documentBuffer = fs.readFileSync(filePath);`
+  - Declara uma constante usada na l�gica.
+- L201: `    await this.sock.sendMessage(jid, {`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L202: `      document: documentBuffer,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L203: `      fileName: fileName || path.basename(filePath),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L204: `      mimetype: this.getMimeTypeFromExtension(filePath),`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L205: `      caption`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L206: `    });`
+  - Fecha bloco de execu��o.
+- L207: `  }`
+  - Fecha bloco de execu��o.
+- L208: ``
+  - Linha em branco para organizar blocos.
+- L209: `  async replyMessage(originalMessage, text) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L210: `    if (!this.isConnected) return;`
+  - Verifica condi��o para decidir o fluxo.
+- L211: ``
+  - Linha em branco para organizar blocos.
+- L212: `    await this.sock.sendMessage(`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L213: `      originalMessage.key.remoteJid,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L214: `      { text },`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L215: `      { quoted: originalMessage }`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L216: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L217: `  }`
+  - Fecha bloco de execu��o.
+- L218: ``
+  - Linha em branco para organizar blocos.
+- L219: `  getMessageText(message) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L220: `    const msg = message.message;`
+  - Declara uma constante usada na l�gica.
+- L221: `    return (`
+  - Retorna valor da fun��o/m�todo.
+- L222: `      msg?.conversation ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L223: `      msg?.extendedTextMessage?.text ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L224: `      msg?.imageMessage?.caption ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L225: `      msg?.videoMessage?.caption ||`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L226: `      ''`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L227: `    );`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L228: `  }`
+  - Fecha bloco de execu��o.
+- L229: `  `
+  - Linha em branco para organizar blocos.
+- L230: `  async markAsRead(jid, messageId) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L231: `    if (!this.sock || !this.isConnected) return;`
+  - Verifica condi��o para decidir o fluxo.
+- L232: `    `
+  - Linha em branco para organizar blocos.
+- L233: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L234: `      await this.sock.readMessages([{`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L235: `        remoteJid: jid,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L236: `        id: messageId,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L237: `        participant: undefined`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L238: `      }]);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L239: `    } catch (error) {`
+  - Abre bloco de execu��o.
+- L240: `      console.error('⚠️ Erro ao marcar como lido:', error.message);`
+  - Registra erro no log para diagn�stico.
+- L241: `    }`
+  - Fecha bloco de execu��o.
+- L242: `  }`
+  - Fecha bloco de execu��o.
+- L243: ``
+  - Linha em branco para organizar blocos.
+- L244: `  async sendPresence(jid, type) {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L245: `    if (!this.sock || !this.isConnected) return;`
+  - Verifica condi��o para decidir o fluxo.
+- L246: `    `
+  - Linha em branco para organizar blocos.
+- L247: `    try {`
+  - Inicia bloco protegido contra exce��es.
+- L248: `      await this.sock.sendPresenceUpdate(type, jid);`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L249: `    } catch (error) {`
+  - Abre bloco de execu��o.
+- L250: `      console.error('⚠️ Erro ao enviar presença:', error.message);`
+  - Registra erro no log para diagn�stico.
+- L251: `    }`
+  - Fecha bloco de execu��o.
+- L252: `  }`
+  - Fecha bloco de execu��o.
+- L253: ``
+  - Linha em branco para organizar blocos.
+- L254: `  getSenderInfo(message) {`
+  - Define m�todo/fun��o da classe ou objeto.
+- L255: `    const isGroup = message.key.remoteJid.endsWith('@g.us');`
+  - Declara uma constante usada na l�gica.
+- L256: `    const sender = isGroup ? message.key.participant : message.key.remoteJid;`
+  - Declara uma constante usada na l�gica.
+- L257: `    `
+  - Linha em branco para organizar blocos.
+- L258: `    return {`
+  - Retorna valor da fun��o/m�todo.
+- L259: `      sender: sender,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L260: `      chatId: message.key.remoteJid,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L261: `      isGroup: isGroup,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L262: `      messageId: message.key.id`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L263: `    };`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L264: `  }`
+  - Fecha bloco de execu��o.
+- L265: ``
+  - Linha em branco para organizar blocos.
+- L266: `  async disconnect() {`
+  - Define fun��o ass�ncrona com suporte a await.
+- L267: `    if (this.sock) {`
+  - Verifica condi��o para decidir o fluxo.
+- L268: `      await this.sock.logout();`
+  - Aguarda conclus�o de opera��o ass�ncrona.
+- L269: `      this.isConnected = false;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L270: `      console.log('👋 WhatsApp desconectado');`
+  - Registra informa��o de execu��o no log.
+- L271: `    }`
+  - Fecha bloco de execu��o.
+- L272: `  }`
+  - Fecha bloco de execu��o.
+- L273: `}`
+  - Fecha bloco de execu��o.
+- L274: ``
+  - Linha em branco para organizar blocos.
+- L275: `module.exports = WhatsAppService;`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L276: ``
+  - Linha em branco para organizar blocos.
+
+## src/utils/ErrorMessages.js
+
+- L1: `class ErrorMessages {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L2: `  static COMMAND_NOT_FOUND() {`
+  - Abre bloco de execu��o.
+- L3: `    return '❌ *Comando não reconhecido*\n\nDigite \`/ajuda\` para ver os comandos disponíveis';`
+  - Retorna valor da fun��o/m�todo.
+- L4: `  }`
+  - Fecha bloco de execu��o.
+- L5: ``
+  - Linha em branco para organizar blocos.
+- L6: `  static INVALID_VALUE() {`
+  - Abre bloco de execu��o.
+- L7: `    return '❌ *Valor inválido*\n\nInforme um valor numérico maior que zero';`
+  - Retorna valor da fun��o/m�todo.
+- L8: `  }`
+  - Fecha bloco de execu��o.
+- L9: ``
+  - Linha em branco para organizar blocos.
+- L10: `  static INSUFFICIENT_BALANCE(type) {`
+  - Abre bloco de execu��o.
+- L11: `    if (!type) type = 'saldo';`
+  - Verifica condi��o para decidir o fluxo.
+- L12: `    return '❌ *' + type.charAt(0).toUpperCase() + type.slice(1) + ' insuficiente para realizar esta operação*';`
+  - Retorna valor da fun��o/m�todo.
+- L13: `  }`
+  - Fecha bloco de execu��o.
+- L14: ``
+  - Linha em branco para organizar blocos.
+- L15: `  static CONFIRMATION_FAILED() {`
+  - Abre bloco de execu��o.
+- L16: `    return '❌ *Operação cancelada*\n\nNenhuma alteração foi feita';`
+  - Retorna valor da fun��o/m�todo.
+- L17: `  }`
+  - Fecha bloco de execu��o.
+- L18: ``
+  - Linha em branco para organizar blocos.
+- L19: `  static NO_DATA_FOUND(context) {`
+  - Abre bloco de execu��o.
+- L20: `    if (!context) context = 'este período';`
+  - Verifica condi��o para decidir o fluxo.
+- L21: `    return 'ℹ️ *Nenhum registro encontrado para ' + context + '*';`
+  - Retorna valor da fun��o/m�todo.
+- L22: `  }`
+  - Fecha bloco de execu��o.
+- L23: ``
+  - Linha em branco para organizar blocos.
+- L24: `  static OPERATION_NOT_ALLOWED() {`
+  - Abre bloco de execu��o.
+- L25: `    return '❌ *Operação não permitida ou inexistente*';`
+  - Retorna valor da fun��o/m�todo.
+- L26: `  }`
+  - Fecha bloco de execu��o.
+- L27: ``
+  - Linha em branco para organizar blocos.
+- L28: `  static INITIAL_BALANCE_REQUIRED() {`
+  - Abre bloco de execu��o.
+- L29: `    return '⚠️ *Defina seu saldo inicial primeiro!*\n\nUse: \`/saldo 1000\`';`
+  - Retorna valor da fun��o/m�todo.
+- L30: `  }`
+  - Fecha bloco de execu��o.
+- L31: ``
+  - Linha em branco para organizar blocos.
+- L32: `  static CONFIRMATION_REQUIRED(action) {`
+  - Abre bloco de execu��o.
+- L33: `    return '⚠️ *CONFIRMAÇÃO NECESSÁRIA*\n\n' +`
+  - Retorna valor da fun��o/m�todo.
+- L34: `      'Esta ação é irreversível!\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L35: `      'Para confirmar, responda:\n\n' +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L36: `      '*' + action + '*';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L37: `  }`
+  - Fecha bloco de execu��o.
+- L38: `}`
+  - Fecha bloco de execu��o.
+- L39: ``
+  - Linha em branco para organizar blocos.
+- L40: `module.exports = ErrorMessages;`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L41: ``
+  - Linha em branco para organizar blocos.
+- L42: `// POR ALGUM MOTIVO, ELE ESTA SUBINDO PRO GIT MINUSCULO, NAO SEI QUE PORRA É ESSA, SO SEI QUE PRA RODAR NO TERMUX, ELE PRECISA ESTAR EM MAISCULO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L43: ``
+  - Linha em branco para organizar blocos.
+
+## src/utils/logger.js
+
+- L1: `class Logger {`
+  - Define uma classe com responsabilidades espec�ficas.
+- L2: `  static expense(user, amount, description, category) {`
+  - Abre bloco de execu��o.
+- L3: `    console.log(\`💸 [EXPENSE] ${user.name}: R$ ${amount.toFixed(2)} - ${description} (${category})\`);`
+  - Registra informa��o de execu��o no log.
+- L4: `  }`
+  - Fecha bloco de execu��o.
+- L5: `  `
+  - Linha em branco para organizar blocos.
+- L6: `static card(user, action, cardName) {`
+  - Abre bloco de execu��o.
+- L7: `  console.log(\`💳 [CARD] ${user.name}: ${action} - ${cardName}\`);`
+  - Registra informa��o de execu��o no log.
+- L8: `}`
+  - Fecha bloco de execu��o.
+- L9: `  `
+  - Linha em branco para organizar blocos.
+- L10: `  static installment(user, amount, installments, description) {`
+  - Abre bloco de execu��o.
+- L11: `    console.log(\`📦 [INSTALLMENT] ${user.name}: R$ ${amount.toFixed(2)} em ${installments}x - ${description}\`);`
+  - Registra informa��o de execu��o no log.
+- L12: `  }`
+  - Fecha bloco de execu��o.
+- L13: `  `
+  - Linha em branco para organizar blocos.
+- L14: `  static admin(action) {`
+  - Abre bloco de execu��o.
+- L15: `    console.log(\`🔧 [ADMIN] Comando executado: ${action}\`);`
+  - Registra informa��o de execu��o no log.
+- L16: `  }`
+  - Fecha bloco de execu��o.
+- L17: `  `
+  - Linha em branco para organizar blocos.
+- L18: `  static user(action, name, id) {`
+  - Abre bloco de execu��o.
+- L19: `    console.log(\`👤 [USER] ${action}: ${name} (${id})\`);`
+  - Registra informa��o de execu��o no log.
+- L20: `  }`
+  - Fecha bloco de execu��o.
+- L21: `  `
+  - Linha em branco para organizar blocos.
+- L22: `  static payment(user, type, amount) {`
+  - Abre bloco de execu��o.
+- L23: `    console.log(\`💰 [PAYMENT] ${user.name}: ${type} - R$ ${amount.toFixed(2)}\`);`
+  - Registra informa��o de execu��o no log.
+- L24: `  }`
+  - Fecha bloco de execu��o.
+- L25: `  `
+  - Linha em branco para organizar blocos.
+- L26: `  static invoice(user, action, cardNameOrAmount) {`
+  - Abre bloco de execu��o.
+- L27: `    if (typeof cardNameOrAmount === 'number') {`
+  - Verifica condi��o para decidir o fluxo.
+- L28: `      console.log(\`💳📄 [INVOICE] ${user.name}: ${action} - R$ ${cardNameOrAmount.toFixed(2)}\`);`
+  - Registra informa��o de execu��o no log.
+- L29: `    } else {`
+  - Abre bloco de execu��o.
+- L30: `      console.log(\`💳📄 [INVOICE] ${user.name}: ${action} - ${cardNameOrAmount}\`);`
+  - Registra informa��o de execu��o no log.
+- L31: `    }`
+  - Fecha bloco de execu��o.
+- L32: `  }`
+  - Fecha bloco de execu��o.
+- L33: `  `
+  - Linha em branco para organizar blocos.
+- L34: `  static error(context, error) {`
+  - Abre bloco de execu��o.
+- L35: `    console.error(\`❌ [ERROR] ${context}:\`, error.message);`
+  - Registra erro no log para diagn�stico.
+- L36: `  }`
+  - Fecha bloco de execu��o.
+- L37: `  `
+  - Linha em branco para organizar blocos.
+- L38: `  static warning(message) {`
+  - Abre bloco de execu��o.
+- L39: `    console.warn(\`⚠️ [WARNING] ${message}\`);`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L40: `  }`
+  - Fecha bloco de execu��o.
+- L41: `  `
+  - Linha em branco para organizar blocos.
+- L42: `  static info(message) {`
+  - Abre bloco de execu��o.
+- L43: `    console.log(\`ℹ️ [INFO] ${message}\`);`
+  - Registra informa��o de execu��o no log.
+- L44: `  }`
+  - Fecha bloco de execu��o.
+- L45: `  `
+  - Linha em branco para organizar blocos.
+- L46: `  static success(message) {`
+  - Abre bloco de execu��o.
+- L47: `    console.log(\`✅ [SUCCESS] ${message}\`);`
+  - Registra informa��o de execu��o no log.
+- L48: `  }`
+  - Fecha bloco de execu��o.
+- L49: `}`
+  - Fecha bloco de execu��o.
+- L50: ``
+  - Linha em branco para organizar blocos.
+- L51: `module.exports = Logger;`
+  - Exporta m�dulo para ser usado em outros arquivos.
+
+## src/utils/memoryManager.js
+
+- L1: `// src/utils/memoryManager.js`
+  - Coment�rio explicativo j� existente no c�digo.
+- L2: ``
+  - Linha em branco para organizar blocos.
+- L3: `let conversationMemory = {};`
+  - Declara vari�vel com valor que pode ser alterado.
+- L4: `let userStates = {};`
+  - Declara vari�vel com valor que pode ser alterado.
+- L5: `let messageHistory = {};`
+  - Declara vari�vel com valor que pode ser alterado.
+- L6: ``
+  - Linha em branco para organizar blocos.
+- L7: `// ⭐ MUDE PARA SEU NÚMERO`
+  - Coment�rio explicativo j� existente no c�digo.
+- L8: `const ADMIN_NUMBER = '558187338645@s.whatsapp.net';`
+  - Declara uma constante usada na l�gica.
+- L9: ``
+  - Linha em branco para organizar blocos.
+- L10: `function limparMemoriaGlobal() {`
+  - Abre bloco de execu��o.
+- L11: `  const usuariosAntes = Object.keys(conversationMemory).length;`
+  - Declara uma constante usada na l�gica.
+- L12: `  const mensagensAntes = Object.keys(messageHistory).length;`
+  - Declara uma constante usada na l�gica.
+- L13: ``
+  - Linha em branco para organizar blocos.
+- L14: `  // Limpar propriedades sem reatribuir a referencia do objeto`
+  - Coment�rio explicativo j� existente no c�digo.
+- L15: `  for (const key of Object.keys(conversationMemory)) delete conversationMemory[key];`
+  - Inicia la�o de repeti��o.
+- L16: `  for (const key of Object.keys(userStates)) delete userStates[key];`
+  - Inicia la�o de repeti��o.
+- L17: `  for (const key of Object.keys(messageHistory)) delete messageHistory[key];`
+  - Inicia la�o de repeti��o.
+- L18: ``
+  - Linha em branco para organizar blocos.
+- L19: `  console.log('🧹 MEMÓRIA GLOBAL LIMPA!');`
+  - Registra informa��o de execu��o no log.
+- L20: `  console.log(\`📊 Removidos: ${usuariosAntes} usuários, ${mensagensAntes} conversas\`);`
+  - Registra informa��o de execu��o no log.
+- L21: ``
+  - Linha em branco para organizar blocos.
+- L22: `  return \`✅ *MEMÓRIA GLOBAL LIMPA!*\n\n\` +`
+  - Retorna valor da fun��o/m�todo.
+- L23: `         \`📊 Estatísticas removidas:\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L24: `         \`👥 Usuários: ${usuariosAntes}\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L25: `         \`💬 Conversas: ${mensagensAntes}\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L26: `         \`🔄 Bot resetado com sucesso!\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L27: `}`
+  - Fecha bloco de execu��o.
+- L28: ``
+  - Linha em branco para organizar blocos.
+- L29: `function limparMemoriaUsuario(userId) {`
+  - Abre bloco de execu��o.
+- L30: `  const existia = conversationMemory[userId] !== undefined;`
+  - Declara uma constante usada na l�gica.
+- L31: `  `
+  - Linha em branco para organizar blocos.
+- L32: `  delete conversationMemory[userId];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L33: `  delete userStates[userId];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L34: `  delete messageHistory[userId];`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L35: `  `
+  - Linha em branco para organizar blocos.
+- L36: `  console.log(\`🧹 Memória do usuário ${userId} limpa!\`);`
+  - Registra informa��o de execu��o no log.
+- L37: `  `
+  - Linha em branco para organizar blocos.
+- L38: `  return existia `
+  - Retorna valor da fun��o/m�todo.
+- L39: `    ? '✅ *Sua memória foi limpa!*\n\nEsqueci tudo sobre nossa conversa anterior.' `
+  - Executa uma instru��o da l�gica de neg�cio.
+- L40: `    : '⚠️ Você não tinha dados armazenados em memória.';`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L41: `}`
+  - Fecha bloco de execu��o.
+- L42: ``
+  - Linha em branco para organizar blocos.
+- L43: `function verStatusMemoria() {`
+  - Abre bloco de execu��o.
+- L44: `  const totalUsuarios = Object.keys(conversationMemory).length;`
+  - Declara uma constante usada na l�gica.
+- L45: `  const totalMensagens = Object.keys(messageHistory).length;`
+  - Declara uma constante usada na l�gica.
+- L46: `  const totalEstados = Object.keys(userStates).length;`
+  - Declara uma constante usada na l�gica.
+- L47: ``
+  - Linha em branco para organizar blocos.
+- L48: `  const memoriaUsada = JSON.stringify({`
+  - Declara uma constante usada na l�gica.
+- L49: `    conversationMemory,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L50: `    userStates,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L51: `    messageHistory`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L52: `  }).length;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L53: ``
+  - Linha em branco para organizar blocos.
+- L54: `  const memoriaKB = (memoriaUsada / 1024).toFixed(2);`
+  - Declara uma constante usada na l�gica.
+- L55: ``
+  - Linha em branco para organizar blocos.
+- L56: `  return \`📊 *STATUS DA MEMÓRIA DO BOT*\n\n\` +`
+  - Retorna valor da fun��o/m�todo.
+- L57: `         \`👥 Usuários em memória: *${totalUsuarios}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L58: `         \`💬 Histórico de conversas: *${totalMensagens}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L59: `         \`🔄 Estados ativos: *${totalEstados}*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L60: `         \`💾 Memória utilizada: *${memoriaKB} KB*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L61: `         \`━━━━━━━━━━━━━━━━━━━\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L62: `         \`🧹 *COMANDOS DISPONÍVEIS:*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L63: `         \`*!stats* - Estatísticas gerais do bot\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L64: `         \`*!broadcast [msg]* - Enviar mensagem para todos\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L65: `         \`*!limpar* - Limpa apenas SUA memória\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L66: `         \`*!limpartudo* - Limpa TODA a memória do bot\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L67: `         \`*!status* - Mostra este status\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L68: `         \`*!ajuda* - Mostra ajuda dos comandos\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L69: `}`
+  - Fecha bloco de execu��o.
+- L70: ``
+  - Linha em branco para organizar blocos.
+- L71: `function mostrarAjuda() {`
+  - Abre bloco de execu��o.
+- L72: `  return \`🤖 *COMANDOS ADMINISTRATIVOS*\n\n\` +`
+  - Retorna valor da fun��o/m�todo.
+- L73: `         \`━━━━━━━━━━━━━━━━━━━\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L74: `         \`*📊 Estatísticas e Informações:*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L75: `         \`*!stats*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L76: `         \`└ Mostra estatísticas gerais do bot\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L77: `         \`└ Total de usuários, gastos, saldos, etc\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L78: `         \`*!status*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L79: `         \`└ Ver quantos usuários estão na memória\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L80: `         \`└ Ver uso de memória do bot\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L81: `         \`*📢 Comunicação:*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L82: `         \`*!broadcast [mensagem]*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L83: `         \`└ Envia mensagem para TODOS os usuários\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L84: `         \`└ Exemplo: !broadcast Sistema em manutenção\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L85: `         \`└ ⚠️ Use com cuidado!\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L86: `         \`*🧹 Gerenciamento de Memória:*\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L87: `         \`*!limpar*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L88: `         \`└ Apaga SUA conversa da memória\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L89: `         \`└ Não afeta outros usuários\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L90: `         \`*!limpartudo*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L91: `         \`└ Apaga TODA a memória (todos os usuários)\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L92: `         \`└ ⚠️ Use com MUITO cuidado!\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L93: `         \`*!ajuda*\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L94: `         \`└ Mostra esta mensagem\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L95: `         \`━━━━━━━━━━━━━━━━━━━\n\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L96: `         \`⚠️ Apenas você (admin) pode usar estes comandos.\n\` +`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L97: `         \`🔐 Comandos protegidos por número do admin.\`;`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L98: `}`
+  - Fecha bloco de execu��o.
+- L99: ``
+  - Linha em branco para organizar blocos.
+- L100: `// ⭐ MUDEI DE export PARA module.exports (CommonJS)`
+  - Coment�rio explicativo j� existente no c�digo.
+- L101: `module.exports = {`
+  - Exporta m�dulo para ser usado em outros arquivos.
+- L102: `  ADMIN_NUMBER,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L103: `  limparMemoriaGlobal,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L104: `  limparMemoriaUsuario,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L105: `  verStatusMemoria,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L106: `  mostrarAjuda,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L107: `  conversationMemory,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L108: `  userStates,`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L109: `  messageHistory`
+  - Executa uma instru��o da l�gica de neg�cio.
+- L110: `};`
+  - Executa uma instru��o da l�gica de neg�cio.
+

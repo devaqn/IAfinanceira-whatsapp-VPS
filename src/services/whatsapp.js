@@ -9,6 +9,7 @@ const {
 const pino = require('pino');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
+const path = require('path');
 
 class WhatsAppService {
   constructor(authPath = './auth_info') {
@@ -180,6 +181,29 @@ class WhatsAppService {
       throw new Error('WhatsApp não conectado');
     }
     await this.sock.sendMessage(jid, { text });
+  }
+
+  getMimeTypeFromExtension(filePath) {
+    const ext = String(path.extname(filePath) || '').toLowerCase();
+    if (ext === '.pdf') return 'application/pdf';
+    if (ext === '.xlsx') return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    if (ext === '.xls') return 'application/vnd.ms-excel';
+    if (ext === '.csv') return 'text/csv';
+    return 'application/octet-stream';
+  }
+
+  async sendDocument(jid, filePath, fileName, caption = '') {
+    if (!this.sock || !this.isConnected) {
+      throw new Error('WhatsApp não conectado');
+    }
+
+    const documentBuffer = fs.readFileSync(filePath);
+    await this.sock.sendMessage(jid, {
+      document: documentBuffer,
+      fileName: fileName || path.basename(filePath),
+      mimetype: this.getMimeTypeFromExtension(filePath),
+      caption
+    });
   }
 
   async replyMessage(originalMessage, text) {

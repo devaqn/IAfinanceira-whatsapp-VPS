@@ -8,6 +8,8 @@ const DatabaseSchema = require('./src/database/schema');
 const { DAO } = require('./src/database/dao');
 const WhatsAppService = require('./src/services/whatsapp');
 const MessageHandler = require('./src/handlers/messageHandler');
+const DashboardServer = require('./src/services/dashboardServer');
+const PostgresSyncService = require('./src/services/postgresSync');
 
 console.log('╔═══════════════════════════════════════════════════════════╗');
 console.log('║                                                           ║');
@@ -115,10 +117,31 @@ async function main() {
 
     const whatsapp = new WhatsAppService(AUTH_PATH);
     const messageHandler = new MessageHandler(dao, whatsapp);
+    const dashboard = new DashboardServer(dao, messageHandler.reports);
+    const postgresSync = new PostgresSyncService(dao, { source: 'iafinanceira-whatsapp' });
+
+    try {
+      await postgresSync.init();
+      dao.setCloudSyncService(postgresSync);
+      if (postgresSync.enabled) {
+        const firstSync = await postgresSync.syncNow();
+        if (firstSync.success) {
+          console.log('☁️ Sync PostgreSQL inicial concluído');
+        } else {
+          console.log('⚠️ Sync PostgreSQL inicial falhou: ' + firstSync.error);
+        }
+      }
+    } catch (syncError) {
+      console.log('⚠️ Sync PostgreSQL indisponível: ' + syncError.message);
+    }
 
     console.log('✅ DAO inicializado');
     console.log('✅ WhatsApp service inicializado');
     console.log('✅ Message handler inicializado\n');
+
+    if (dashboard.enabled) {
+      dashboard.start();
+    }
 
     // Lembretes
     startReminders(dao, whatsapp, messageHandler);

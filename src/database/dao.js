@@ -7,6 +7,7 @@ class DAO {
     this.dbPath = dbPath || path.join(__dirname, '../../database/finance.db');
     this.db = null;
     this.hasTransactionType = false;
+    this.cloudSyncService = null;
   }
 
   async init() {
@@ -41,6 +42,16 @@ class DAO {
     const data = this.db.export();
     const buffer = Buffer.from(data);
     fs.writeFileSync(this.dbPath, buffer);
+
+    if (this.cloudSyncService && typeof this.cloudSyncService.queueSync === 'function') {
+      try {
+        this.cloudSyncService.queueSync();
+      } catch (_) {}
+    }
+  }
+
+  setCloudSyncService(syncService) {
+    this.cloudSyncService = syncService || null;
   }
 
   // ============ USUÁRIOS ============
@@ -73,7 +84,7 @@ class DAO {
   }
 
   getTableCount(tableName) {
-    const allowedTables = ['users', 'expenses', 'installments', 'user_cards'];
+    const allowedTables = ['users', 'expenses', 'installments', 'user_cards', 'savings_goals'];
     if (!allowedTables.includes(tableName)) {
       throw new Error('Tabela não permitida para contagem: ' + tableName);
     }
@@ -99,6 +110,7 @@ class DAO {
       totalExpenses: this.getTableCount('expenses'),
       totalInstallments: this.getTableCount('installments'),
       totalCards: this.getTableCount('user_cards'),
+      totalGoals: this.getTableCount('savings_goals'),
       totalBalance: totalBalance,
       totalSavings: totalSavings,
       totalEmergency: totalEmergency
@@ -882,6 +894,13 @@ resetEverything(userId) {
   this.db.run('DELETE FROM installments WHERE user_id = ?', [userId]);
   this.save(); // ✅ SALVAR IMEDIATAMENTE
   
+  // Deletar transações de cartão e cartões
+  this.db.run('DELETE FROM card_transactions WHERE user_id = ?', [userId]);
+  this.save();
+
+  this.db.run('DELETE FROM user_cards WHERE user_id = ?', [userId]);
+  this.save();
+
   // Deletar gastos
   this.db.run('DELETE FROM expenses WHERE user_id = ?', [userId]);
   this.save(); // ✅ SALVAR IMEDIATAMENTE
@@ -1207,6 +1226,178 @@ resetCard(cardId, userId) {
 }
 
 // MANTER a função antiga para compatibilidade (busca o primeiro cartão ou retorna null)
+// ============ METAS DE ECONOMIA ============
+getSavingsAndEmergencyTotal(userId) {
+  const user = this.getUserById(userId);
+  if (!user) return 0;
+  return parseFloat(((user.savings_balance || 0) + (user.emergency_fund || 0)).toFixed(2));
+}
+
+createSavingsGoal(userId, name, targetAmount, targetDate = null) {
+  const normalizedName = (name || '').trim();
+  const amount = Number(targetAmount);
+
+  if (!normalizedName || normalizedName.length < 2) {
+    return { success: false, error: 'Nome da meta invalido.' };
+  }
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return { success: false, error: 'Valor alvo invalido.' };
+  }
+
+  const baseline = this.getSavingsAndEmergencyTotal(userId);
+  this.db.run(
+    `INSERT INTO savings_goals (user_id, name, target_amount, baseline_total, target_date, status, updated_at)
+     VALUES (?, ?, ?, ?, ?, 'active', CURRENT_TIMESTAMP)`,
+    [userId, normalizedName, amount, baseline, targetDate || null]
+  );
+  this.save();
+
+  const result = this.db.exec(
+    'SELECT * FROM savings_goals WHERE user_id = ? ORDER BY id DESC LIMIT 1',
+    [userId]
+  );
+  if (!result[0]) return { success: false, error: 'Falha ao criar meta.' };
+
+  return { success: true, goal: this.rowToObject(result[0]) };
+}
+
+deleteSavingsGoal(userId, goalId) {
+  const before = this.getSavingsGoalById(userId, goalId);
+  if (!before) return false;
+
+  this.db.run('DELETE FROM savings_goals WHERE id = ? AND user_id = ?', [goalId, userId]);
+  this.save();
+  return true;
+}
+
+completeSavingsGoal(userId, goalId) {
+  const goal = this.getSavingsGoalById(userId, goalId);
+  if (!goal) return false;
+
+  this.db.run(
+    "UPDATE savings_goals SET status = 'completed', completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?",
+    [goalId, userId]
+  );
+  this.save();
+  return true;
+}
+
+getSavingsGoalById(userId, goalId) {
+  const result = this.db.exec('SELECT * FROM savings_goals WHERE id = ? AND user_id = ?', [goalId, userId]);
+  return result[0] ? this.rowToObject(result[0]) : null;
+}
+
+getSavingsGoalsByUser(userId) {
+  const result = this.db.exec(
+    'SELECT * FROM savings_goals WHERE user_id = ? ORDER BY CASE status WHEN \'active\' THEN 0 ELSE 1 END, created_at DESC',
+    [userId]
+  );
+  const goals = result[0] ? this.rowsToObjects(result[0]) : [];
+  const totalNow = this.getSavingsAndEmergencyTotal(userId);
+
+  for (let i = 0; i < goals.length; i++) {
+    const goal = goals[i];
+    const baseline = Number(goal.baseline_total || 0);
+    const target = Number(goal.target_amount || 0);
+    const currentProgress = Math.max(0, parseFloat((totalNow - baseline).toFixed(2)));
+    const percent = target > 0 ? Math.min(100, parseFloat(((currentProgress / target) * 100).toFixed(1))) : 0;
+
+    goal.current_progress = currentProgress;
+    goal.progress_percent = percent;
+    goal.remaining_amount = Math.max(0, parseFloat((target - currentProgress).toFixed(2)));
+    goal.current_total = totalNow;
+
+    if (goal.status === 'active' && currentProgress >= target && target > 0) {
+      this.db.run(
+        "UPDATE savings_goals SET status = 'completed', completed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        [goal.id]
+      );
+      goal.status = 'completed';
+      goal.completed_at = new Date().toISOString();
+    }
+  }
+
+  if (goals.length > 0) this.save();
+  return goals;
+}
+
+// ============ ANALYTICS / DASHBOARD ============
+getExpenseTrendByDay(userId, startDate, endDate) {
+  let query = `
+    SELECT DATE(e.date) as day, SUM(e.amount) as total
+    FROM expenses e
+    WHERE e.user_id = ?
+      AND e.date >= ?
+      AND e.date <= ?
+  `;
+
+  if (this.hasTransactionType) {
+    query += " AND e.transaction_type = 'expense'";
+  }
+
+  query += ' GROUP BY DATE(e.date) ORDER BY day ASC';
+
+  const result = this.db.exec(query, [userId, startDate, endDate]);
+  return result[0] ? this.rowsToObjects(result[0]) : [];
+}
+
+getExpenseTrendByMonth(userId, months = 6) {
+  const safeMonths = Math.max(1, Math.min(24, parseInt(months, 10) || 6));
+  const end = new Date();
+  const start = new Date(end);
+  start.setMonth(start.getMonth() - safeMonths + 1);
+  start.setDate(1);
+  start.setHours(0, 0, 0, 0);
+
+  let query = `
+    SELECT strftime('%Y-%m', e.date) as month, SUM(e.amount) as total
+    FROM expenses e
+    WHERE e.user_id = ?
+      AND e.date >= ?
+      AND e.date <= ?
+  `;
+
+  if (this.hasTransactionType) {
+    query += " AND e.transaction_type = 'expense'";
+  }
+
+  query += " GROUP BY strftime('%Y-%m', e.date) ORDER BY month ASC";
+
+  const result = this.db.exec(query, [userId, start.toISOString(), end.toISOString()]);
+  return result[0] ? this.rowsToObjects(result[0]) : [];
+}
+
+getExpensesForForecast(userId, days = 120) {
+  const safeDays = Math.max(7, Math.min(365, parseInt(days, 10) || 120));
+  const end = new Date();
+  const start = new Date(end);
+  start.setDate(start.getDate() - safeDays);
+  start.setHours(0, 0, 0, 0);
+  return this.getExpenseTrendByDay(userId, start.toISOString(), end.toISOString());
+}
+
+getAllTableData() {
+  const tableNames = [
+    'users',
+    'expenses',
+    'categories',
+    'groups',
+    'installments',
+    'installment_payments',
+    'user_cards',
+    'card_transactions',
+    'savings_goals'
+  ];
+
+  const dump = {};
+  for (let i = 0; i < tableNames.length; i++) {
+    const table = tableNames[i];
+    const result = this.db.exec(`SELECT * FROM ${table}`);
+    dump[table] = result[0] ? this.rowsToObjects(result[0]) : [];
+  }
+  return dump;
+}
+
 getCreditCardByUserId(userId) {
   const cards = this.getAllCardsByUserId(userId);
   return cards.length > 0 ? cards[0] : null;

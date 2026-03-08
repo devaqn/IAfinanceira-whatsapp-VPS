@@ -45,6 +45,12 @@ class ReportGenerator {
     return `${day}/${month}/${year}`;
   }
 
+  buildProgressBar(percent, width = 16) {
+    const safePercent = Math.max(0, Math.min(100, Number(percent || 0)));
+    const filled = Math.round((safePercent / 100) * width);
+    return `${'█'.repeat(filled)}${'░'.repeat(Math.max(0, width - filled))}`;
+  }
+
   generateBalanceReport(user) {
     const timestamp = this.getCurrentBrazilTimestamp();
     const totalMoney = user.current_balance + user.savings_balance + user.emergency_fund;
@@ -143,9 +149,11 @@ class ReportGenerator {
       report += '🏷️ *CATEGORIAS MAIS USADAS*\n';
       for (let i = 0; i < Math.min(byCategory.length, 5); i++) {
         const cat = byCategory[i];
-        const percentage = ((cat.total / total) * 100).toFixed(0);
+        const percentage = total > 0 ? ((cat.total / total) * 100).toFixed(0) : '0';
+        const bar = this.buildProgressBar(Number(percentage), 12);
         report += `   ${cat.emoji} ${cat.category}\n`;
         report += `     ${this.formatMoney(cat.total)} (${percentage}%)\n`;
+        report += `     ${bar}\n`;
       }
       report += '\n';
     }
@@ -229,9 +237,11 @@ class ReportGenerator {
       report += '🏷️ *DISTRIBUIÇÃO POR CATEGORIA*\n';
       for (let i = 0; i < Math.min(byCategory.length, 8); i++) {
         const cat = byCategory[i];
-        const percentage = ((cat.total / total) * 100).toFixed(0);
+        const percentage = total > 0 ? ((cat.total / total) * 100).toFixed(0) : '0';
+        const bar = this.buildProgressBar(Number(percentage), 12);
         report += `   ${cat.emoji} ${cat.category}\n`;
         report += `     ${this.formatMoney(cat.total)} (${percentage}%) • ${cat.count}x\n`;
+        report += `     ${bar}\n`;
       }
       report += '\n';
     }
@@ -665,6 +675,25 @@ class ReportGenerator {
   help += '• `/relatorio semanal` ou `/semana`\n';
   help += '• `/relatorio mensal` ou `/mes`\n\n';
 
+  help += '📈 *GRÁFICOS VISUAIS*\n';
+  help += '• `/grafico semana`\n';
+  help += '• `/grafico mes`\n\n';
+
+  help += '🎯 *METAS DE ECONOMIA*\n';
+  help += '• `/meta` - Listar metas\n';
+  help += '• `/meta criar 5000 viagem`\n';
+  help += '• `/meta remover [id]`\n';
+  help += '• `/meta concluir [id]`\n\n';
+
+  help += '📦 *EXPORTAÇÃO*\n';
+  help += '• `/exportar excel`\n';
+  help += '• `/exportar pdf`\n';
+  help += '• `/exportar ambos`\n\n';
+
+  help += '🌐 *DASHBOARD E IA*\n';
+  help += '• `/dashboard` - Link do painel web\n';
+  help += '• `/previsao` - Projeção de gastos com IA\n\n';
+
   help += '☢️ *ZERAGEM COMPLETA*\n';
   help += '• `/zerar tudo` - Zerar TUDO ☢️\n';
   help += '_⚠️ Remove saldo, poupança, reserva, parcelas e histórico_\n';
@@ -784,6 +813,10 @@ generateCardPurchaseConfirmation(expense, card, category) {
 // 💳 CONFIRMAÇÃO DE PARCELAMENTO NO CARTÃO
 generateCardInstallmentConfirmation(installment, card, category) {
   const timestamp = this.getCurrentBrazilTimestamp();
+  const nextPendingPayment = this.dao.getNextPendingPayment(installment.id);
+  const firstDueDateText = nextPendingPayment
+    ? this.formatDate(nextPendingPayment.due_date)
+    : 'Nao informado';
   
   let report = '✅ *PARCELAMENTO NO CARTÃO REGISTRADO*\n\n';
   
@@ -791,7 +824,7 @@ generateCardInstallmentConfirmation(installment, card, category) {
   report += `📦 *Produto:* ${installment.description}\n`;
   report += `💰 *Total:* ${this.formatMoney(installment.total_amount)}\n`;
   report += `📊 *Parcelas:* ${installment.total_installments}x de ${this.formatMoney(installment.installment_amount)}\n`;
-  report += `📅 *Primeira parcela:* ${this.formatDate(installment.first_due_date)}\n`;
+  report += `📅 *Primeira parcela:* ${firstDueDateText}\n`;
   report += `🕐 *Registrado em:* ${timestamp.formatted}\n\n`;
   
   report += '💳 *SITUAÇÃO DO CARTÃO*\n';
