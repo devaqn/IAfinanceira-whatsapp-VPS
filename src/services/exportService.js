@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const PDFDocument = require('pdfkit');
-const XLSX = require('xlsx');
 
 class ExportService {
   constructor(dao, reports, exportDir) {
@@ -20,7 +19,100 @@ class ExportService {
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-zA-Z0-9_-]/g, '_')
       .replace(/_+/g, '_')
-      .slice(0, 40);
+      .replace(/^_+|_+$/g, '')
+      .slice(0, 28) || 'usuario';
+  }
+
+  toValidDate(value) {
+    if (!value) return null;
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  formatFileTimestamp(dateValue) {
+    const date = this.toValidDate(dateValue) || new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hour = String(date.getHours()).padStart(2, '0');
+    const minute = String(date.getMinutes()).padStart(2, '0');
+    const second = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day}_${hour}-${minute}-${second}`;
+  }
+
+  getLastDataChangeAt(data) {
+    const candidates = [];
+    const addCandidate = (value) => {
+      const parsed = this.toValidDate(value);
+      if (parsed) candidates.push(parsed);
+    };
+
+    if (data && data.user) {
+      addCandidate(data.user.updated_at);
+      addCandidate(data.user.created_at);
+    }
+
+    const listGroups = [
+      data ? data.expensesYear : null,
+      data ? data.installments : null,
+      data ? data.cards : null,
+      data ? data.goals : null
+    ];
+
+    for (let i = 0; i < listGroups.length; i++) {
+      const group = listGroups[i];
+      if (!Array.isArray(group)) continue;
+
+      for (let j = 0; j < group.length; j++) {
+        const item = group[j] || {};
+        addCandidate(item.updated_at);
+        addCandidate(item.created_at);
+        addCandidate(item.date);
+        addCandidate(item.transaction_date);
+        addCandidate(item.paid_at);
+        addCandidate(item.completed_at);
+        addCandidate(item.last_payment_date);
+      }
+    }
+
+    if (candidates.length === 0) return data && data.generatedAt ? data.generatedAt : new Date();
+
+    let latest = candidates[0];
+    for (let i = 1; i < candidates.length; i++) {
+      if (candidates[i].getTime() > latest.getTime()) latest = candidates[i];
+    }
+    return latest;
+  }
+
+  buildExportFileName(userName, generatedAt, lastDataChangeAt, extension) {
+    const safeUser = this.getSafeFileName(userName);
+    const generatedStamp = this.formatFileTimestamp(generatedAt);
+    const lastChangeStamp = this.formatFileTimestamp(lastDataChangeAt);
+    return `relatorio_${safeUser}_gerado_${generatedStamp}_ult_alt_${lastChangeStamp}.${extension}`;
+  }
+
+  validateExportedFile(filePath, fileType) {
+    try {
+      if (!fs.existsSync(filePath)) {
+        return { ok: false, error: 'Arquivo nao foi criado.' };
+      }
+
+      const stat = fs.statSync(filePath);
+      if (!stat.isFile() || stat.size <= 0) {
+        return { ok: false, error: 'Arquivo criado esta vazio.' };
+      }
+
+      if (fileType === 'pdf') {
+        const head = fs.readFileSync(filePath).subarray(0, 5).toString('utf8');
+        if (head !== '%PDF-') {
+          return { ok: false, error: 'Arquivo PDF invalido.' };
+        }
+      }
+
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: error.message || 'Falha ao validar arquivo gerado.' };
+    }
   }
 
   getUserDataset(userId) {
@@ -61,98 +153,12 @@ class ExportService {
     };
   }
 
-  async exportExcel(userId) {
-    const data = this.getUserDataset(userId);
-    if (!data) return { success: false, error: 'Usuario nao encontrado.' };
-
-    const safeUser = this.getSafeFileName(data.user.name);
-    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const fileName = `relatorio_${safeUser}_${stamp}.xlsx`;
-    const filePath = path.join(this.exportDir, fileName);
-
-    const wb = XLSX.utils.book_new();
-
-    const summaryRows = [
-      ['Campo', 'Valor'],
-      ['Usuario', data.user.name],
-      ['WhatsApp', data.user.whatsapp_id],
-      ['Gerado em', data.generatedAt.toISOString()],
-      ['Saldo principal', Number(data.user.current_balance || 0)],
-      ['Poupanca', Number(data.user.savings_balance || 0)],
-      ['Reserva emergencia', Number(data.user.emergency_fund || 0)],
-      ['Patrimonio total', Number((data.user.current_balance || 0) + (data.user.savings_balance || 0) + (data.user.emergency_fund || 0))],
-      ['Gastos no mes', Number(data.expensesMonth.reduce((sum, e) => sum + Number(e.amount || 0), 0))],
-      ['Transacoes no mes', data.expensesMonth.length],
-      ['Parcelamentos ativos', data.installments.length],
-      ['Cartoes cadastrados', data.cards.length],
-      ['Metas', data.goals.length]
-    ];
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryRows), 'Resumo');
-
-    const expensesRows = [
-      ['Data', 'Descricao', 'Categoria', 'Valor', 'Tipo']
-    ];
-    for (let i = 0; i < data.expensesYear.length; i++) {
-      const e = data.expensesYear[i];
-      expensesRows.push([
-        e.date || e.created_at || '',
-        e.description || '',
-        e.category_name || '',
-        Number(e.amount || 0),
-        e.transaction_type || 'expense'
-      ]);
-    }
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(expensesRows), 'Transacoes');
-
-    const goalsRows = [['ID', 'Meta', 'Alvo', 'Progresso', 'Percentual', 'Status', 'Prazo']];
-    for (let i = 0; i < data.goals.length; i++) {
-      const g = data.goals[i];
-      goalsRows.push([
-        g.id,
-        g.name,
-        Number(g.target_amount || 0),
-        Number(g.current_progress || 0),
-        Number(g.progress_percent || 0),
-        g.status,
-        g.target_date || ''
-      ]);
-    }
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(goalsRows), 'Metas');
-
-    const cardsRows = [['ID', 'Nome', 'Limite', 'Usado', 'Disponivel', 'Fatura', 'Vencimento']];
-    for (let i = 0; i < data.cards.length; i++) {
-      const c = data.cards[i];
-      cardsRows.push([
-        c.id,
-        c.card_name,
-        Number(c.card_limit || 0),
-        Number(c.current_balance || 0),
-        Number(c.available_limit || 0),
-        Number(c.invoice_amount || 0),
-        c.invoice_due_day
-      ]);
-    }
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(cardsRows), 'Cartoes');
-
-    const categoryRows = [['Categoria', 'Total', 'Qtd']];
-    for (let i = 0; i < data.categoryMonth.length; i++) {
-      const c = data.categoryMonth[i];
-      categoryRows.push([c.category, Number(c.total || 0), Number(c.count || 0)]);
-    }
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(categoryRows), 'CategoriasMes');
-
-    XLSX.writeFile(wb, filePath);
-
-    return { success: true, filePath, fileName };
-  }
-
   async exportPdf(userId) {
     const data = this.getUserDataset(userId);
     if (!data) return { success: false, error: 'Usuario nao encontrado.' };
 
-    const safeUser = this.getSafeFileName(data.user.name);
-    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const fileName = `relatorio_${safeUser}_${stamp}.pdf`;
+    const lastDataChangeAt = this.getLastDataChangeAt(data);
+    const fileName = this.buildExportFileName(data.user.name, data.generatedAt, lastDataChangeAt, 'pdf');
     const filePath = path.join(this.exportDir, fileName);
 
     const totalMonth = data.expensesMonth.reduce((sum, e) => sum + Number(e.amount || 0), 0);
@@ -168,6 +174,7 @@ class ExportService {
       doc.fontSize(10).text(`Usuario: ${data.user.name}`);
       doc.text(`WhatsApp: ${data.user.whatsapp_id}`);
       doc.text(`Gerado em: ${data.generatedAt.toISOString()}`);
+      doc.text(`Ultima alteracao dos dados: ${lastDataChangeAt.toISOString()}`);
       doc.moveDown();
 
       doc.fontSize(14).text('Resumo');
@@ -213,6 +220,11 @@ class ExportService {
       stream.on('finish', resolve);
       stream.on('error', reject);
     });
+
+    const validation = this.validateExportedFile(filePath, 'pdf');
+    if (!validation.ok) {
+      return { success: false, error: validation.error || 'Falha ao validar exportacao PDF.' };
+    }
 
     return { success: true, filePath, fileName };
   }

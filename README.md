@@ -16,9 +16,7 @@ Validação executada localmente com fluxo completo simulado (mensagens reais do
 - relatórios semanal/mensal
 - gráficos visuais por categoria (`/grafico semana` e `/grafico mes`)
 - metas de economia com progresso (`/meta`)
-- exportação de relatório em Excel/PDF (`/exportar`)
-- dashboard web read-only (API + gráficos)
-- previsão de gastos com IA local (`/previsao`)
+- exportação de relatório em PDF (`/exportar`)
 - sincronização em nuvem opcional com PostgreSQL
 - reset global completo (incluindo cartões e transações de cartão)
 - comandos inválidos com `/` retornando erro explícito
@@ -92,13 +90,10 @@ Fluxo com cartão:
 - ✅ `/meta concluir [id]`
 
 ### 11. Exportação
-- ✅ `/exportar excel`
-- ✅ `/exportar pdf`
-- ✅ `/exportar ambos`
+- ✅ `/exportar`
+- ✅ `/exportar` apenas em PDF
 
-### 12. Dashboard, IA e Nuvem
-- ✅ `/dashboard` (painel read-only)
-- ✅ `/previsao` (projeção de gastos com IA local)
+### 12. Nuvem
 - ✅ `/sync status` (admin)
 - ✅ `/sync agora` (admin)
 
@@ -124,10 +119,8 @@ Fluxo com cartão:
 - ✅ Correção do `/zerar tudo` para também limpar `user_cards` e `card_transactions`.
 - ✅ Fallback para comando com `/` não reconhecido responder `Comando não reconhecido`.
 - ✅ Implementação de metas de economia com progresso automático.
-- ✅ Implementação de exportação real para Excel e PDF.
-- ✅ Implementação de dashboard web read-only com API de dados.
+- ✅ Implementação de exportação em PDF.
 - ✅ Implementação de sincronização opcional com PostgreSQL (`POSTGRES_ENABLED`).
-- ✅ Implementação de previsão de gastos com modelo estatístico local.
 
 ## Formatos de Valor Aceitos
 
@@ -158,12 +151,6 @@ Crie com base no `.env.example`:
 ADMIN_NUMBER=5581999999999
 DB_PATH=./database/finance.db
 NODE_ENV=production
-
-# Dashboard
-DASHBOARD_ENABLED=true
-DASHBOARD_PORT=3030
-DASHBOARD_BASE_URL=http://localhost:3030
-DASHBOARD_TOKEN=troque-este-token
 
 # PostgreSQL cloud sync (opcional)
 POSTGRES_ENABLED=false

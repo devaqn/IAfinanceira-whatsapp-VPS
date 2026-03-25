@@ -1,55 +1,70 @@
-# Novas Alteracoes e Fluxo Funcional (VPS)
+# IAFinanceira WhatsApp VPS - Guia de uso e validacao (Atualizado em 08/03/2026)
 
-Este guia documenta as alteracoes novas implementadas no bot e mostra exatamente como colocar para rodar em VPS com validacao pratica.
+Este documento junta:
 
-## 1. O que foi adicionado
+- o que foi corrigido de bugs;
+- como configurar corretamente;
+- como usar no dia a dia;
+- como rodar varredura tecnica para evitar regressao.
 
-- Metas de economia com progresso automatico
-  - `/meta`
-  - `/meta criar [valor] [nome]`
-  - `/meta remover [id]`
-  - `/meta concluir [id]`
+---
 
-- Exportacao de relatorios
-  - `/exportar excel`
-  - `/exportar pdf`
-  - `/exportar ambos`
+## 1) Correcao de bugs aplicada
 
-- Graficos visuais em texto
-  - `/grafico semana`
-  - `/grafico mes`
+### Bug 1: valor com ponto decimal era interpretado errado
 
-- Dashboard web read-only (API + interface web com charts)
-  - `/dashboard`
+Antes:
+- `1000.50` podia virar `100050` em fluxos de cartao/fatura.
 
-- Previsao de gastos com IA local (estatistica)
-  - `/previsao`
+Agora:
+- o parser aceita corretamente:
+  - `1000.50`
+  - `1.000,50`
+  - `R$ 1000,50`
+  - `1000`
 
-- Sincronizacao opcional em nuvem com PostgreSQL
-  - `/sync status` (admin)
-  - `/sync agora` (admin)
+Impacto:
+- cadastro de limite de cartao;
+- pagamento de fatura;
+- qualquer entrada numerica nesses fluxos.
 
-## 2. Requisitos da VPS
+### Bug 2: admin fixo no codigo (ignorava `.env`)
+
+Antes:
+- o admin dependia de numero hardcoded.
+
+Agora:
+- `ADMIN_NUMBER` vem do `.env`;
+- aceita com ou sem sufixo (`@s.whatsapp.net`).
+
+Exemplo valido no `.env`:
+- `ADMIN_NUMBER=5581999999999`
+
+### Bug 3: timeout antigo encerrava fluxo novo (race condition)
+
+Antes:
+- em fluxos multi-etapa (principalmente compra/cartao), timeout antigo podia apagar o estado atual.
+
+Agora:
+- timeout so encerra o estado que ele mesmo abriu (controle por timestamp).
+
+Impacto:
+- fluxo de compra/cartao e criacao de cartao fica estavel mesmo com interacoes em sequencia.
+
+---
+
+## 2) Requisitos da VPS
 
 - Node.js 20+
 - npm 10+
-- PM2 (recomendado para producao)
-- Porta do dashboard liberada (se for usar dashboard)
-- PostgreSQL (opcional, apenas se for usar sync em nuvem)
+- PM2 (recomendado)
+- PostgreSQL (opcional, somente se usar sync)
 
-## 3. Deploy/atualizacao na VPS
+---
 
-No diretorio do projeto:
+## 3) Configuracao do `.env`
 
-```bash
-cd /caminho/do/projeto/IAfinanceira-whatsapp-VPS
-git pull
-npm install
-```
-
-## 4. Configuracao do .env
-
-Use como base o `.env.example` e ajuste os valores reais.
+Use o `.env.example` como base.
 
 Exemplo recomendado:
 
@@ -58,25 +73,26 @@ ADMIN_NUMBER=5581999999999
 DB_PATH=./database/finance.db
 NODE_ENV=production
 
-# Dashboard web read-only
-DASHBOARD_ENABLED=true
-DASHBOARD_PORT=3030
-DASHBOARD_BASE_URL=http://SEU_IP_PUBLICO:3030
-DASHBOARD_TOKEN=troque-este-token-forte
-
-# Sync em nuvem com PostgreSQL (opcional)
+# Sync PostgreSQL (opcional)
 POSTGRES_ENABLED=false
 DATABASE_URL=postgres://user:password@host:5432/finance_bot
 POSTGRES_SSL=false
 ```
 
-### Observacoes importantes
+Observacoes:
+- Ajuste `DATABASE_URL` e `POSTGRES_ENABLED` somente se for usar sincronizacao em nuvem.
 
-- Se `DASHBOARD_ENABLED=true`, abra a porta no firewall.
-- Se usar token no dashboard, acesse com `?token=SEU_TOKEN`.
-- Se `POSTGRES_ENABLED=true`, o bot cria as tabelas de sync automaticamente no banco remoto.
+---
 
-## 5. Subir em producao com PM2
+## 4) Deploy/atualizacao
+
+```bash
+cd /caminho/do/projeto/IAfinanceira-whatsapp-VPS
+git pull
+npm install
+```
+
+Subir com PM2:
 
 ```bash
 pm2 start index.js --name iafinanceira
@@ -84,85 +100,131 @@ pm2 save
 pm2 startup
 ```
 
-Ver logs:
+Logs:
 
 ```bash
 pm2 logs iafinanceira --lines 200
 ```
 
-## 6. Fluxo funcional validado (usuario normal)
+---
 
-Abaixo esta um fluxo pronto, ja testado localmente no handler, para validar ponta a ponta.
+## 5) Como usar (usuario normal)
+
+### Primeiros comandos
 
 1. `/start`
 2. `/saldo 5000`
 3. `/adicionar 300`
-4. `/guardar 500`
-5. `/reservar 200`
-6. `gastei 90 mercado`
-7. `/meta criar 1500 notebook`
-8. `/meta`
-9. `/grafico semana`
-10. `/grafico mes`
-11. `/previsao`
-12. `/exportar excel`
-13. `/exportar pdf`
-14. `/dashboard`
-15. `/comandoinexistente`
+4. `/guardar 200`
+5. `/reservar 100`
 
-Resultado esperado:
+### Gastos
 
-- Todos os comandos respondem.
-- Meta aparece com progresso.
-- Grafico retorna barras por categoria.
-- Exportacoes enviam arquivos.
-- Dashboard retorna URL.
-- Comando invalido retorna "Comando nao reconhecido".
+- `gastei 120 mercado`
+- `paguei 89.90 uber`
+- `comprei 250 restaurante`
 
-## 7. Fluxo funcional validado (cartao + reset total)
+### Cartoes
 
-1. `/saldo 3000`
-2. `/cartao criar`
-3. `Nubank QA`
-4. `3000`
-5. `10`
-6. `gastei 150 uber`
-7. `nubank`
-8. `nao`
-9. `/cartoes`
-10. `/zerar tudo`
-11. `/zerar tudo`
-12. `/cartoes`
+1. `/cartao criar`
+2. Envie nome (ex: `Nubank`)
+3. Envie limite (ex: `1000.50` ou `1.000,50`)
+4. Envie vencimento (1 a 31)
 
-Resultado esperado:
+Outros comandos:
+- `/cartoes`
+- `/cartao nubank`
+- `/pagar fatura nubank`
 
-- Cartao criado e compra registrada.
-- Depois do reset total, lista de cartoes deve ficar vazia.
+### Parcelamentos
 
-## 8. Fluxo admin para sync PostgreSQL (opcional)
+- `comprei celular 1200 em 4x`
+- `/parcelamentos`
+- `/pagar celular`
 
-Requer numero admin (`ADMIN_NUMBER`) e sync habilitado.
+### Metas e relatorios
 
-1. `/sync status`
-2. `/sync agora`
-3. `/sync status`
+- `/meta criar 2000 viagem`
+- `/meta`
+- `/grafico semana`
+- `/grafico mes`
+- `/relatorio semanal`
+- `/relatorio mensal`
 
-Resultado esperado:
+### Exportacoes
 
-- Exibe status de sync e horario do ultimo sync.
+- `/exportar pdf`
+- Excel removido (somente PDF)
 
-## 9. Checklist rapido de producao
+---
+
+## 6) Como usar (admin)
+
+Com `ADMIN_NUMBER` correto no `.env`:
+
+- `!stats`
+- `!status`
+- `!limpar`
+- `!limpartudo`
+- `!broadcast mensagem`
+- `/sync status`
+- `/sync agora`
+
+---
+
+## 7) Varredura tecnica recomendada
+
+### Suite principal
+
+```bash
+node scripts/production-stress-test.js
+```
+
+Esperado:
+- `pass: true`
+- `failedChecks: 0`
+
+### Suite de borda (bugs conhecidos)
+
+```bash
+node scripts/edge-bug-sweep.js
+```
+
+Ou via npm:
+
+```bash
+npm run test:stress
+npm run test:edge
+```
+
+### Checklist manual rapido (5 minutos)
+
+1. Criar cartao com decimal:
+   - limite `1000.50`
+2. Fazer compra no cartao.
+3. Pagar fatura com decimal:
+   - valor `100.50`
+4. Validar admin com numero do `.env`:
+   - executar `!stats`
+
+Se tudo acima responder corretamente, ambiente esta consistente.
+
+---
+
+## 8) Checklist de producao
 
 - Bot responde `/ajuda`
-- Bot responde `/comandoinexistente`
-- `/exportar excel` envia arquivo
-- `/dashboard` retorna link valido
-- `curl http://127.0.0.1:3030/health` retorna `{"ok":true,...}` quando dashboard habilitado
-- PM2 com processo online e restart automatico
+- Bot responde comando invalido com mensagem de erro amigavel
+- Exportacao em PDF envia arquivo
+- PM2 online e com restart automatico
 
-## 10. Problemas comuns
+---
 
-- "Dashboard desabilitado": ativar `DASHBOARD_ENABLED=true` e reiniciar bot.
-- "Sync nao configurado": ativar `POSTGRES_ENABLED=true` e configurar `DATABASE_URL`.
-- "Previsao com historico insuficiente": registrar gastos por mais dias para melhorar estimativa.
-- Arquivo nao enviado na exportacao: verificar permissao de escrita na pasta `exports/`.
+## 9) Problemas comuns
+
+- Sync nao configurado:
+  - revisar `POSTGRES_ENABLED` e `DATABASE_URL`.
+- Exportacao falhando:
+  - conferir permissao de escrita em `exports/`.
+- Comandos admin nao funcionando:
+  - validar `ADMIN_NUMBER` no `.env` e reiniciar o processo.

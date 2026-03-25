@@ -1,26 +1,61 @@
 class ReportGenerator {
   constructor(dao) {
     this.dao = dao;
+    this.timeZone = process.env.APP_TIMEZONE || process.env.TZ || 'America/Recife';
+    this.dateFormatter = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: this.timeZone,
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+    this.dateTimeFormatter = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: this.timeZone,
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
   }
 
   getCurrentBrazilTimestamp() {
     const now = new Date();
 
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const year = now.getFullYear();
-    const hour = String(now.getHours()).padStart(2, '0');
-    const minute = String(now.getMinutes()).padStart(2, '0');
+    const parts = this.getDateParts(now, true);
+    const day = parts.day;
+    const month = parts.month;
+    const year = parts.year;
+    const hour = parts.hour;
+    const minute = parts.minute;
 
     return {
       formatted: `${day}/${month}/${year} às ${hour}:${minute}`,
       iso: now.toISOString(),
-      date: now
+      date: now,
+      timezone: this.timeZone
     };
   }
 
   getBrazilDate(date) {
-    return date ? new Date(date) : new Date();
+    const parsed = date ? new Date(date) : new Date();
+    return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+  }
+
+  getDateParts(date, includeTime) {
+    const parsed = this.getBrazilDate(date);
+    const formatter = includeTime ? this.dateTimeFormatter : this.dateFormatter;
+    const formatted = formatter.formatToParts(parsed);
+    const values = {};
+
+    for (let i = 0; i < formatted.length; i++) {
+      const piece = formatted[i];
+      if (piece.type !== 'literal') {
+        values[piece.type] = piece.value;
+      }
+    }
+
+    return values;
   }
 
   formatMoney(value) {
@@ -28,20 +63,20 @@ class ReportGenerator {
   }
 
   formatDate(date) {
-    const d = this.getBrazilDate(date);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-    const hour = String(d.getHours()).padStart(2, '0');
-    const minute = String(d.getMinutes()).padStart(2, '0');
+    const parts = this.getDateParts(date, true);
+    const day = parts.day;
+    const month = parts.month;
+    const year = parts.year;
+    const hour = parts.hour;
+    const minute = parts.minute;
     return `${day}/${month}/${year} às ${hour}:${minute}`;
   }
 
   formatDateShort(date) {
-    const d = this.getBrazilDate(date);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
+    const parts = this.getDateParts(date, false);
+    const day = parts.day;
+    const month = parts.month;
+    const year = parts.year;
     return `${day}/${month}/${year}`;
   }
 
@@ -686,13 +721,8 @@ class ReportGenerator {
   help += '• `/meta concluir [id]`\n\n';
 
   help += '📦 *EXPORTAÇÃO*\n';
-  help += '• `/exportar excel`\n';
-  help += '• `/exportar pdf`\n';
-  help += '• `/exportar ambos`\n\n';
-
-  help += '🌐 *DASHBOARD E IA*\n';
-  help += '• `/dashboard` - Link do painel web\n';
-  help += '• `/previsao` - Projeção de gastos com IA\n\n';
+  help += '• `/exportar`\n';
+  help += '_Formato disponível: PDF_\n\n';
 
   help += '☢️ *ZERAGEM COMPLETA*\n';
   help += '• `/zerar tudo` - Zerar TUDO ☢️\n';

@@ -4,7 +4,9 @@
   "description": "Bot financeiro WhatsApp para Termux",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test:stress": "node scripts/production-stress-test.js",
+    "test:edge": "node scripts/edge-bug-sweep.js"
   },
   "keywords": [
     "whatsapp",
@@ -18,12 +20,10 @@
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "better-sqlite3": "^12.6.2",
     "dotenv": "^17.2.3",
-    "express": "^5.2.1",
     "pdfkit": "^0.17.2",
     "pg": "^8.20.0",
     "pino": "^10.2.1",
     "qrcode-terminal": "^0.12.0",
-    "sql.js": "^1.12.0",
-    "xlsx": "^0.18.5"
+    "sql.js": "^1.12.0"
   }
 }

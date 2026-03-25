@@ -1,12 +1,10 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const http = require('http');
 
 const DatabaseSchema = require('../src/database/schema');
 const { DAO } = require('../src/database/dao');
 const MessageHandler = require('../src/handlers/messageHandler');
-const DashboardServer = require('../src/services/dashboardServer');
 const { ADMIN_NUMBER } = require('../src/utils/memoryManager');
 
 const USER_JID = '5511999999999@s.whatsapp.net';
@@ -99,42 +97,11 @@ function responseText(result) {
   return replies.map((r) => r.text).join('\n---\n');
 }
 
-function httpGetJson(url) {
-  return new Promise((resolve, reject) => {
-    const req = http.get(url, (res) => {
-      let body = '';
-      res.on('data', (chunk) => {
-        body += chunk;
-      });
-      res.on('end', () => {
-        try {
-          resolve({
-            status: res.statusCode,
-            body: JSON.parse(body)
-          });
-        } catch (_) {
-          resolve({
-            status: res.statusCode,
-            body: body
-          });
-        }
-      });
-    });
-    req.on('error', reject);
-  });
-}
-
 async function main() {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'iaf-prod-sim-'));
   const dbPath = path.join(tempRoot, 'finance.db');
   const exportDir = path.join(tempRoot, 'exports');
   fs.mkdirSync(exportDir, { recursive: true });
-
-  const port = 33000 + Math.floor(Math.random() * 1000);
-  process.env.DASHBOARD_ENABLED = 'true';
-  process.env.DASHBOARD_PORT = String(port);
-  process.env.DASHBOARD_TOKEN = 'token-prod-sim';
-  process.env.DASHBOARD_BASE_URL = `http://127.0.0.1:${port}`;
 
   const schema = new DatabaseSchema(dbPath);
   await schema.init();
@@ -175,10 +142,6 @@ async function main() {
   const whatsapp = new MockWhatsApp();
   const handler = new MessageHandler(dao, whatsapp);
   handler.exportService.exportDir = exportDir;
-
-  const dashboard = new DashboardServer(dao, handler.reports);
-  const dashboardServer = dashboard.start();
-  await new Promise((resolve) => setTimeout(resolve, 150));
 
   let msgSeq = 0;
   async function send(text, sender = USER_JID, pushName = 'QA User') {
@@ -453,17 +416,12 @@ async function main() {
   });
 
   const exportExcel = await send('/exportar excel');
-  expectContains('exportar_excel', exportExcel, {
-    include: ['exportacao concluida', 'excel'],
+  expectContains('exportar_excel_removido', exportExcel, {
+    include: ['excel foi removida', '/exportar'],
     checkTimestamp: true
   });
-  record(
-    'excel_arquivo_gerado',
-    exportExcel.documents.length >= 1 && exportExcel.documents[0].exists && exportExcel.documents[0].size > 0,
-    JSON.stringify(exportExcel.documents[0] || null)
-  );
 
-  const exportPdf = await send('/exportar pdf');
+  const exportPdf = await send('/exportar');
   expectContains('exportar_pdf', exportPdf, {
     include: ['exportacao concluida', 'pdf'],
     checkTimestamp: true
@@ -475,26 +433,9 @@ async function main() {
   );
 
   const exportAll = await send('/exportar ambos');
-  expectContains('exportar_ambos', exportAll, {
-    include: ['exportacao concluida', 'excel', 'pdf'],
+  expectContains('exportar_ambos_removido', exportAll, {
+    include: ['excel foi removida', '/exportar'],
     checkTimestamp: true
-  });
-  record(
-    'ambos_arquivos_gerados',
-    exportAll.documents.length >= 2,
-    `Documentos enviados: ${exportAll.documents.length}`
-  );
-
-  const dashboardCmd = await send('/dashboard');
-  expectContains('dashboard_comando', dashboardCmd, {
-    include: ['dashboard web', '/dashboard'],
-    checkTimestamp: true
-  });
-
-  const forecast = await send('/previsao ia');
-  expectContains('previsao', forecast, {
-    include: ['previsao de gastos'],
-    notInclude: ['erro ao executar comando']
   });
 
   const nonAdminSync = await send('/sync status');
@@ -523,27 +464,6 @@ async function main() {
   expectContains('comando_desconhecido', unknown, {
     include: ['comando nao reconhecido']
   });
-
-  const health = await httpGetJson(`http://127.0.0.1:${port}/health`);
-  record('dashboard_health', health.status === 200 && health.body && health.body.ok === true, JSON.stringify(health));
-
-  const unauthorizedOverview = await httpGetJson(`http://127.0.0.1:${port}/api/overview?userId=1`);
-  record('dashboard_auth_bloqueio', unauthorizedOverview.status === 401, JSON.stringify(unauthorizedOverview));
-
-  const authorizedOverview = await httpGetJson(`http://127.0.0.1:${port}/api/overview?token=token-prod-sim&userId=1`);
-  const authorizedOk = authorizedOverview.status === 200 &&
-    authorizedOverview.body &&
-    authorizedOverview.body.user &&
-    authorizedOverview.body.balances &&
-    typeof authorizedOverview.body.balances.current === 'number';
-  record('dashboard_overview_ok', authorizedOk, JSON.stringify(authorizedOverview));
-
-  const dashboardGoals = await httpGetJson(`http://127.0.0.1:${port}/api/goals?token=token-prod-sim&userId=1`);
-  record('dashboard_goals_ok', dashboardGoals.status === 200 && Array.isArray(dashboardGoals.body.goals), JSON.stringify(dashboardGoals));
-
-  if (dashboardServer && typeof dashboardServer.close === 'function') {
-    await new Promise((resolve) => dashboardServer.close(resolve));
-  }
 
   const result = {
     pass: bugs.length === 0,

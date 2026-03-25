@@ -1321,7 +1321,7 @@ getSavingsGoalsByUser(userId) {
   return goals;
 }
 
-// ============ ANALYTICS / DASHBOARD ============
+// ============ ANALYTICS ============
 getExpenseTrendByDay(userId, startDate, endDate) {
   let query = `
     SELECT DATE(e.date) as day, SUM(e.amount) as total
@@ -1365,15 +1365,6 @@ getExpenseTrendByMonth(userId, months = 6) {
 
   const result = this.db.exec(query, [userId, start.toISOString(), end.toISOString()]);
   return result[0] ? this.rowsToObjects(result[0]) : [];
-}
-
-getExpensesForForecast(userId, days = 120) {
-  const safeDays = Math.max(7, Math.min(365, parseInt(days, 10) || 120));
-  const end = new Date();
-  const start = new Date(end);
-  start.setDate(start.getDate() - safeDays);
-  start.setHours(0, 0, 0, 0);
-  return this.getExpenseTrendByDay(userId, start.toISOString(), end.toISOString());
 }
 
 getAllTableData() {

@@ -4,8 +4,22 @@ let conversationMemory = {};
 let userStates = {};
 let messageHistory = {};
 
-// ⭐ MUDE PARA SEU NÚMERO
-const ADMIN_NUMBER = '558187338645@s.whatsapp.net';
+function normalizeAdminNumber(rawValue) {
+  const raw = String(rawValue || '').trim();
+  if (!raw) return '';
+
+  if (raw.includes('@')) {
+    return raw;
+  }
+
+  const digits = raw.replace(/[^\d]/g, '');
+  if (!digits) return '';
+
+  return `${digits}@s.whatsapp.net`;
+}
+
+const DEFAULT_ADMIN_NUMBER = '558187338645@s.whatsapp.net';
+const ADMIN_NUMBER = normalizeAdminNumber(process.env.ADMIN_NUMBER) || DEFAULT_ADMIN_NUMBER;
 
 function limparMemoriaGlobal() {
   const usuariosAntes = Object.keys(conversationMemory).length;

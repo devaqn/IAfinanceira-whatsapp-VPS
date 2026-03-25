@@ -1,7 +1,6 @@
 const NLPProcessor = require('../services/nlp');
 const ReportGenerator = require('../services/reports');
 const ExportService = require('../services/exportService');
-const ForecastService = require('../services/forecastService');
 const ErrorMessages = require('../utils/ErrorMessages');
 const Logger = require('../utils/logger'); // ⭐ NOVO
 const { TIMEOUTS, PAYMENT_METHODS } = require('../config/constants'); // ⭐ NOVOO CONTANTS
@@ -22,7 +21,6 @@ constructor(dao, whatsappService) {
   this.nlp = new NLPProcessor();
   this.reports = new ReportGenerator(dao);
   this.exportService = new ExportService(dao, this.reports, path.join(__dirname, '../../exports'));
-  this.forecastService = new ForecastService(dao, this.reports);
   
   // ✅ INICIALIZAR TODOS OS OBJETOS PENDENTES
   this.recentlyProcessed = {};
@@ -46,22 +44,49 @@ isBalancePayment(text) {
   return PAYMENT_METHODS.BALANCE.includes(textLower);
 }
 
-cleanupPendingOperation(userId, operationType, timeout = TIMEOUTS.PENDING_PURCHASE) {
-  const self = this;
-  setTimeout(function() {
-    const pendingMap = {
-      'purchase': self.pendingPurchases,
-      'installment': self.pendingInstallments,
-      'invoice': self.pendingInvoicePayments,
-      'reset': self.pendingResets,
-      'card_creation': self.pendingCardCreation
-    };
+parseUserAmount(rawText) {
+  const extractedAmount = this.nlp.extractAmount(rawText);
+  if (extractedAmount && extractedAmount > 0) {
+    return extractedAmount;
+  }
 
-    const targetMap = pendingMap[operationType];
-    if (targetMap && targetMap[userId]) {
-      delete targetMap[userId];
-      Logger.info(`Timeout: ${operationType} expirado para usuário ${userId}`);
+  const parsedAmount = this.nlp.parseAmountString(rawText);
+  if (parsedAmount && parsedAmount > 0) {
+    return parsedAmount;
+  }
+
+  return null;
+}
+
+getPendingMapByType(operationType) {
+  const pendingMap = {
+    'purchase': this.pendingPurchases,
+    'installment': this.pendingInstallments,
+    'invoice': this.pendingInvoicePayments,
+    'reset': this.pendingResets,
+    'card_creation': this.pendingCardCreation
+  };
+  return pendingMap[operationType] || null;
+}
+
+cleanupPendingOperation(userId, operationType, timeout = TIMEOUTS.PENDING_PURCHASE) {
+  const targetMap = this.getPendingMapByType(operationType);
+  const snapshot = targetMap ? targetMap[userId] : null;
+  const expectedTimestamp = (snapshot && Number.isFinite(snapshot.timestamp))
+    ? snapshot.timestamp
+    : null;
+
+  setTimeout(() => {
+    const latestMap = this.getPendingMapByType(operationType);
+    if (!latestMap || !latestMap[userId]) return;
+
+    if (expectedTimestamp !== null) {
+      const currentTimestamp = latestMap[userId].timestamp;
+      if (currentTimestamp !== expectedTimestamp) return;
     }
+
+    delete latestMap[userId];
+    Logger.info(`Timeout: ${operationType} expirado para usuário ${userId}`);
   }, timeout);
 }
 
@@ -80,6 +105,15 @@ parseGoalCreateInput(rawText) {
   if (!name) name = 'Meta de economia';
 
   return { amount, name };
+}
+
+parseGoalId(rawValue) {
+  if (rawValue === null || rawValue === undefined) return null;
+  const match = String(rawValue).match(/\d+/);
+  if (!match) return null;
+
+  const goalId = parseInt(match[0], 10);
+  return Number.isInteger(goalId) && goalId > 0 ? goalId : null;
 }
 
 generateGoalsMessage(userId) {
@@ -148,17 +182,30 @@ generateVisualChartMessage(userId, period) {
   return msg;
 }
 
-getDashboardUrl() {
-  const base = process.env.DASHBOARD_BASE_URL;
-  const port = process.env.DASHBOARD_PORT || '3030';
-  const fallback = `http://localhost:${port}/dashboard`;
-  return (base ? `${base.replace(/\/$/, '')}/dashboard` : fallback);
-}
+getIncomingText(message) {
+  if (this.whatsapp && typeof this.whatsapp.getMessageText === 'function') {
+    const extracted = this.whatsapp.getMessageText(message);
+    if (typeof extracted === 'string') {
+      return extracted;
+    }
+  }
 
+  const msg = message && message.message;
+  if (!msg || typeof msg !== 'object') return '';
+
+  return (
+    msg.conversation ||
+    (msg.extendedTextMessage && msg.extendedTextMessage.text) ||
+    (msg.imageMessage && msg.imageMessage.caption) ||
+    (msg.videoMessage && msg.videoMessage.caption) ||
+    ''
+  );
+}
+	
   async process(message) {
   try {
     // ✅ VALIDAÇÕES EXTRAS
-    if (!message || !message.key) {
+    if (!message || !message.key || !message.key.remoteJid) {
       console.log('⚠️ Mensagem inválida recebida');
       return;
     }
@@ -169,28 +216,29 @@ getDashboardUrl() {
     }
 
     const msg = message.message;
-    const text = msg.conversation ||
-      (msg.extendedTextMessage && msg.extendedTextMessage.text) ||
-      (msg.imageMessage && msg.imageMessage.caption) ||
-      (msg.videoMessage && msg.videoMessage.caption) ||
-      '';
+    if (!msg || typeof msg !== 'object') return;
+
+    const text = this.getIncomingText(message);
       
     if (!text || text.trim() === '') return;
 
-    const isGroup = message.key.remoteJid.endsWith('@g.us');
-    const sender = isGroup ? message.key.participant : message.key.remoteJid;
+    const remoteJid = String(message.key.remoteJid || '');
+    const isGroup = remoteJid.endsWith('@g.us');
+    const sender = isGroup ? message.key.participant : remoteJid;
+    if (!sender) return;
+
     const info = {
       sender: sender,
-      chatId: message.key.remoteJid,
+      chatId: remoteJid,
       isGroup: isGroup,
       messageId: message.key.id
     };
 
       // ==================== ⭐ COMANDOS ADMINISTRATIVOS ⭐ ====================
       // Comparar numeros ignorando sufixo :XX do Baileys
-      const senderClean = sender.split(':')[0].split('@')[0];
-      const adminClean = ADMIN_NUMBER.split(':')[0].split('@')[0];
-      const isAdmin = senderClean === adminClean;
+      const senderClean = String(sender).split(':')[0].split('@')[0];
+      const adminClean = String(ADMIN_NUMBER || '').split(':')[0].split('@')[0];
+      const isAdmin = Boolean(senderClean && adminClean && senderClean === adminClean);
 
       if (isAdmin) {
         const comando = text.toLowerCase().trim();
@@ -303,7 +351,7 @@ this.recentlyProcessed[messageKey] = true;
 const self = this;
 setTimeout(function() {
   delete self.recentlyProcessed[messageKey];
-}, 30000);
+}, TIMEOUTS.MESSAGE_DEDUPLICATION);
 
 
 await this.whatsapp.markAsRead(info.chatId, info.messageId); // ✅ CORRETO
@@ -342,7 +390,8 @@ if (this.pendingPurchases && this.pendingPurchases[user.id]) {
       this.pendingPurchases[user.id] = {
         ...pending,
         awaitingInstallmentAnswer: false,
-        awaitingInstallmentCount: true
+        awaitingInstallmentCount: true,
+        timestamp: Date.now()
       };
       await this.whatsapp.replyMessage(message,
         '📊 *PARCELAMENTO*\n\n' +
@@ -413,7 +462,8 @@ if (this.pendingPurchases && this.pendingPurchases[user.id]) {
     this.pendingPurchases[user.id] = {
       ...pending,
       selectedCard: card,
-      awaitingInstallmentAnswer: true
+      awaitingInstallmentAnswer: true,
+      timestamp: Date.now()
     };
 
     await this.whatsapp.replyMessage(message,
@@ -496,15 +546,8 @@ if (this.pendingInstallments && this.pendingInstallments[user.id]) {
 if (this.pendingInvoicePayments && this.pendingInvoicePayments[user.id]) {
   const pending = this.pendingInvoicePayments[user.id];
 
-  // Tentar extrair valor do texto - aceitar numero puro tambem
-  let amount = this.nlp.extractAmount(text);
-  if (!amount) {
-    const cleanVal = text.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
-    const parsed = parseFloat(cleanVal);
-    if (!isNaN(parsed) && parsed > 0) {
-      amount = parsed;
-    }
-  }
+  // Tentar extrair valor do texto (aceita 1000.50, 1.000,50, R$ 1000 etc.)
+  const amount = this.parseUserAmount(text);
 
   if (amount && amount > 0) {
     const timestamp = this.reports.getCurrentBrazilTimestamp();
@@ -641,13 +684,7 @@ if (this.pendingCardCreation && this.pendingCardCreation[user.id]) {
 // 💳 AGUARDANDO LIMITE DO CARTÃO
 if (pending.step === 'waiting_limit') {
   const timestamp = this.reports.getCurrentBrazilTimestamp();
-
-  const cleanValue = text
-    .replace(/[R$\s]/g, '')
-    .replace(/\./g, '')
-    .replace(',', '.');
-
-  const limitValue = parseFloat(cleanValue);
+  const limitValue = this.parseUserAmount(text);
 
   if (isNaN(limitValue) || limitValue < 100) {
     await this.whatsapp.replyMessage(message,
@@ -1271,9 +1308,9 @@ else if (command.command === 'getCard') {
       }
 
       else if (command.command === 'goalsDelete') {
-        const goalId = parseInt(command.amount, 10);
+        const goalId = this.parseGoalId(command.amount);
         if (!goalId) {
-          response = '❌ *ID inválido*\n\nUse `/meta remover [id]`\n\n🕑 ' + timestamp.formatted;
+          response = '❌ *ID inválido*\n\nUse `/meta remover 1` ou `/meta remover #1`\n\n🕑 ' + timestamp.formatted;
         } else {
           const removed = this.dao.deleteSavingsGoal(user.id, goalId);
           response = removed
@@ -1283,9 +1320,9 @@ else if (command.command === 'getCard') {
       }
 
       else if (command.command === 'goalsComplete') {
-        const goalId = parseInt(command.amount, 10);
+        const goalId = this.parseGoalId(command.amount);
         if (!goalId) {
-          response = '❌ *ID inválido*\n\nUse `/meta concluir [id]`\n\n🕑 ' + timestamp.formatted;
+          response = '❌ *ID inválido*\n\nUse `/meta concluir 1` ou `/meta concluir #1`\n\n🕑 ' + timestamp.formatted;
         } else {
           const completed = this.dao.completeSavingsGoal(user.id, goalId);
           response = completed
@@ -1294,57 +1331,20 @@ else if (command.command === 'getCard') {
         }
       }
 
-      else if (command.command === 'exportExcel' || command.command === 'exportPdf' || command.command === 'exportAll') {
-        const wantsExcel = command.command === 'exportExcel' || command.command === 'exportAll';
-        const wantsPdf = command.command === 'exportPdf' || command.command === 'exportAll';
-        const sentFiles = [];
-
-        if (wantsExcel) {
-          const excel = await this.exportService.exportExcel(user.id);
-          if (excel.success && this.whatsapp.sendDocument) {
-            await this.whatsapp.sendDocument(info.chatId, excel.filePath, excel.fileName, '📊 Exportação Excel');
-            sentFiles.push('Excel');
-          } else if (!excel.success) {
-            response = '❌ *Falha ao gerar Excel*\n\n' + excel.error + '\n\n🕑 ' + timestamp.formatted;
-          }
-        }
-
-        if (!response && wantsPdf) {
-          const pdf = await this.exportService.exportPdf(user.id);
-          if (pdf.success && this.whatsapp.sendDocument) {
-            await this.whatsapp.sendDocument(info.chatId, pdf.filePath, pdf.fileName, '📄 Exportação PDF');
-            sentFiles.push('PDF');
-          } else if (!pdf.success) {
-            response = '❌ *Falha ao gerar PDF*\n\n' + pdf.error + '\n\n🕑 ' + timestamp.formatted;
-          }
-        }
-
-        if (!response) {
-          response = '✅ *EXPORTAÇÃO CONCLUÍDA*\n\n' +
-            `Arquivos enviados: ${sentFiles.join(', ') || 'nenhum'}\n\n` +
-            '🕑 ' + timestamp.formatted;
-        }
-      }
-
-      else if (command.command === 'dashboard') {
-        const dashboardEnabled = String(process.env.DASHBOARD_ENABLED || '').toLowerCase() === 'true';
-        const link = this.getDashboardUrl();
-        if (!dashboardEnabled) {
-          response = '⚠️ *DASHBOARD DESABILITADO*\n\n' +
-            'Defina `DASHBOARD_ENABLED=true` no .env e reinicie o bot.\n\n' +
-            '🕑 ' + timestamp.formatted;
+      else if (command.command === 'exportPdf') {
+        const pdf = await this.exportService.exportPdf(user.id);
+        if (pdf.success && this.whatsapp.sendDocument) {
+          await this.whatsapp.sendDocument(info.chatId, pdf.filePath, pdf.fileName, '📄 Exportação PDF');
+          response = '✅ *EXPORTAÇÃO CONCLUÍDA*\n\nArquivos enviados: PDF\n\n🕑 ' + timestamp.formatted;
         } else {
-          const tokenHint = process.env.DASHBOARD_TOKEN ? '\n🔐 Token ativo: adicione `?token=SEU_TOKEN` no link.' : '';
-          response = '📊 *DASHBOARD WEB*\n\n' +
-            `Acesse: ${link}\n` +
-            'Modo: leitura (read-only)\n' +
-            tokenHint +
-            '\n\n🕑 ' + timestamp.formatted;
+          response = '❌ *Falha ao gerar PDF*\n\n' + (pdf.error || 'Erro desconhecido') + '\n\n🕑 ' + timestamp.formatted;
         }
       }
 
-      else if (command.command === 'forecast') {
-        response = this.forecastService.generateForecastMessage(user.id);
+      else if (command.command === 'exportLegacyUnsupported') {
+        response = '⚠️ *Exportação em Excel foi removida.*\n\n' +
+          'Use apenas: `/exportar`\n\n' +
+          '🕑 ' + timestamp.formatted;
       }
 
       else if (command.command === 'syncStatus') {

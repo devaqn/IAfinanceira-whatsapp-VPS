@@ -65,15 +65,11 @@ class NLPProcessor {
 
       goalsList: /^\/metas?\s*$/i,
       goalsCreate: /^\/metas?\s+criar\s+(.+)$/i,
-      goalsDelete: /^\/metas?\s+(?:remover|apagar|deletar)\s+(\d+)\s*$/i,
-      goalsComplete: /^\/metas?\s+(?:concluir|finalizar)\s+(\d+)\s*$/i,
+      goalsDelete: /^\/metas?\s+(?:remover|apagar|deletar|excluir)\s+(?:id\s*)?#?(\d+)\s*$/i,
+      goalsComplete: /^\/metas?\s+(?:concluir|finalizar)\s+(?:id\s*)?#?(\d+)\s*$/i,
 
-      exportExcel: /^\/exportar\s+(?:excel|xlsx)\s*$/i,
-      exportPdf: /^\/exportar\s+pdf\s*$/i,
-      exportAll: /^\/exportar\s+(?:ambos|tudo)\s*$/i,
-
-      dashboard: /^\/dashboard\s*$/i,
-      forecast: /^\/previs[a\u00E3]o(?:\s+ia)?\s*$/i,
+      exportPdf: /^\/exportar\s*$/i,
+      exportLegacyUnsupported: /^\/exportar\s+(?:excel|xlsx|ambos|tudo)\s*$/i,
 
       syncStatus: /^\/sync\s+status\s*$/i,
       syncNow: /^\/sync\s+agora\s*$/i,

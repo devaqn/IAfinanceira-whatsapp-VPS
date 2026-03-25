@@ -1,14 +1,13 @@
-// ⭐ DEFINIR TIMEZONE ANTES DE QUALQUER COISA
-process.env.TZ = 'America/Sao_Paulo';
-
 require('dotenv').config();
+
+// ⭐ Timezone padrao do bot (Recife/PE), com opcao de override por APP_TIMEZONE
+process.env.TZ = process.env.APP_TIMEZONE || process.env.TZ || 'America/Recife';
 const path = require('path');
 const fs = require('fs');
 const DatabaseSchema = require('./src/database/schema');
 const { DAO } = require('./src/database/dao');
 const WhatsAppService = require('./src/services/whatsapp');
 const MessageHandler = require('./src/handlers/messageHandler');
-const DashboardServer = require('./src/services/dashboardServer');
 const PostgresSyncService = require('./src/services/postgresSync');
 
 console.log('╔═══════════════════════════════════════════════════════════╗');
@@ -117,7 +116,6 @@ async function main() {
 
     const whatsapp = new WhatsAppService(AUTH_PATH);
     const messageHandler = new MessageHandler(dao, whatsapp);
-    const dashboard = new DashboardServer(dao, messageHandler.reports);
     const postgresSync = new PostgresSyncService(dao, { source: 'iafinanceira-whatsapp' });
 
     try {
@@ -138,10 +136,6 @@ async function main() {
     console.log('✅ DAO inicializado');
     console.log('✅ WhatsApp service inicializado');
     console.log('✅ Message handler inicializado\n');
-
-    if (dashboard.enabled) {
-      dashboard.start();
-    }
 
     // Lembretes
     startReminders(dao, whatsapp, messageHandler);

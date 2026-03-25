@@ -186,8 +186,6 @@ class WhatsAppService {
   getMimeTypeFromExtension(filePath) {
     const ext = String(path.extname(filePath) || '').toLowerCase();
     if (ext === '.pdf') return 'application/pdf';
-    if (ext === '.xlsx') return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-    if (ext === '.xls') return 'application/vnd.ms-excel';
     if (ext === '.csv') return 'text/csv';
     return 'application/octet-stream';
   }
@@ -216,15 +214,80 @@ class WhatsAppService {
     );
   }
 
+  extractTextFromContent(content, depth = 0) {
+    if (!content || typeof content !== 'object' || depth > 8) {
+      return '';
+    }
+
+    const directCandidates = [
+      content.conversation,
+      content.extendedTextMessage && content.extendedTextMessage.text,
+      content.imageMessage && content.imageMessage.caption,
+      content.videoMessage && content.videoMessage.caption,
+      content.documentMessage && content.documentMessage.caption,
+      content.buttonsResponseMessage && content.buttonsResponseMessage.selectedDisplayText,
+      content.buttonsResponseMessage && content.buttonsResponseMessage.selectedButtonId,
+      content.listResponseMessage && content.listResponseMessage.title,
+      content.listResponseMessage &&
+        content.listResponseMessage.singleSelectReply &&
+        content.listResponseMessage.singleSelectReply.selectedRowId,
+      content.templateButtonReplyMessage && content.templateButtonReplyMessage.selectedDisplayText,
+      content.templateButtonReplyMessage && content.templateButtonReplyMessage.selectedId
+    ];
+
+    for (const candidate of directCandidates) {
+      if (typeof candidate === 'string' && candidate.trim()) {
+        return candidate.trim();
+      }
+    }
+
+    const interactiveParams =
+      content.interactiveResponseMessage &&
+      content.interactiveResponseMessage.nativeFlowResponseMessage &&
+      content.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson;
+
+    if (typeof interactiveParams === 'string' && interactiveParams.trim()) {
+      try {
+        const parsed = JSON.parse(interactiveParams);
+        const interactiveCandidates = [
+          parsed && parsed.id,
+          parsed && parsed.selectedId,
+          parsed && parsed.text,
+          parsed && parsed.title
+        ];
+        for (const candidate of interactiveCandidates) {
+          if (typeof candidate === 'string' && candidate.trim()) {
+            return candidate.trim();
+          }
+        }
+      } catch (error) {
+        return interactiveParams.trim();
+      }
+    }
+
+    const wrappers = [
+      content.ephemeralMessage && content.ephemeralMessage.message,
+      content.viewOnceMessage && content.viewOnceMessage.message,
+      content.viewOnceMessageV2 && content.viewOnceMessageV2.message,
+      content.viewOnceMessageV2Extension && content.viewOnceMessageV2Extension.message,
+      content.documentWithCaptionMessage && content.documentWithCaptionMessage.message,
+      content.editedMessage && content.editedMessage.message
+    ];
+
+    for (const wrapped of wrappers) {
+      const extracted = this.extractTextFromContent(wrapped, depth + 1);
+      if (extracted) {
+        return extracted;
+      }
+    }
+
+    return '';
+  }
+
   getMessageText(message) {
-    const msg = message.message;
-    return (
-      msg?.conversation ||
-      msg?.extendedTextMessage?.text ||
-      msg?.imageMessage?.caption ||
-      msg?.videoMessage?.caption ||
-      ''
-    );
+    const msg = message && (message.message || message);
+    if (!msg || typeof msg !== 'object') return '';
+    return this.extractTextFromContent(msg);
   }
   
   async markAsRead(jid, messageId) {
