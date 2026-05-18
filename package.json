@@ -18,7 +18,6 @@
   "license": "MIT",
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
-    "better-sqlite3": "^12.6.2",
     "dotenv": "^17.2.3",
     "pdfkit": "^0.17.2",
     "pg": "^8.20.0",

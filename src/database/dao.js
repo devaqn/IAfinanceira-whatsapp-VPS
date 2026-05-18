@@ -814,7 +814,7 @@ resetBalance(userId) {
 
 resetSavings(userId) {
   const user = this.getUserById(userId);
-  if (!user || user.savings_balance === 0) return false;
+  if (!user || !user.savings_balance || user.savings_balance <= 0) return false;
   
   this.db.run(
     'UPDATE users SET savings_balance = 0 WHERE id = ?',
@@ -833,7 +833,7 @@ resetSavings(userId) {
 
 resetEmergencyFund(userId) {
   const user = this.getUserById(userId);
-  if (!user || user.emergency_fund === 0) return false;
+  if (!user || !user.emergency_fund || user.emergency_fund <= 0) return false;
   
   this.db.run(
     'UPDATE users SET emergency_fund = 0 WHERE id = ?',
@@ -1159,18 +1159,23 @@ shouldAlert30Percent(card) {
 getCardsWithUpcomingDueDate(userId, daysAhead = 5) {
   const cards = this.getAllCardsByUserId(userId);
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const currentDay = today.getDate();
-  
+
   const upcoming = [];
-  
+
   for (const card of cards) {
     if (card.invoice_amount === 0) continue;
-    
-    let daysUntil = card.invoice_due_day - currentDay;
-    if (daysUntil < 0) {
-      daysUntil += 30; // Próximo mês
+
+    let daysUntil;
+    if (card.invoice_due_day >= currentDay) {
+      daysUntil = card.invoice_due_day - currentDay;
+    } else {
+      // Vencimento é no próximo mês — calcular data real
+      const nextDue = new Date(today.getFullYear(), today.getMonth() + 1, card.invoice_due_day);
+      daysUntil = Math.round((nextDue - today) / (1000 * 60 * 60 * 24));
     }
-    
+
     if (daysUntil <= daysAhead) {
       upcoming.push({
         ...card,
@@ -1178,7 +1183,7 @@ getCardsWithUpcomingDueDate(userId, daysAhead = 5) {
       });
     }
   }
-  
+
   return upcoming.sort((a, b) => a.daysUntilDue - b.daysUntilDue);
 }
 

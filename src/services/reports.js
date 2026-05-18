@@ -689,11 +689,16 @@ class ReportGenerator {
   help += '• `/zerar reserva` - Zerar reserva ⚠️\n\n';
 
   help += '💳 *CARTÃO DE CRÉDITO*\n';
-  help += '• `/cartao` - Ver informações do cartão\n';
-  help += '• `/cartao limite 5000` - Definir limite\n';
-  help += '• `/pagar fatura` - Pagar fatura do cartão\n';
-  help += '• `/zerar cartao` - Zerar cartão ⚠️\n';
-  help += '_💡 Gastos perguntam se foram no cartão_\n\n';
+  help += '• `/cartao criar` - Cadastrar novo cartão\n';
+  help += '• `/cartoes` - Listar todos os cartões\n';
+  help += '• `/cartao [nome]` - Ver detalhes de um cartão\n';
+  help += '• `/cartao [nome] limite 5000` - Atualizar limite\n';
+  help += '• `/pagar fatura` - Pagar fatura (1 cartão)\n';
+  help += '• `/pagar fatura [nome]` - Pagar fatura específica\n';
+  help += '• `/deletar cartao [nome]` - Deletar cartão\n';
+  help += '• `/zerar cartao [nome]` - Zerar cartão ⚠️\n';
+  help += '• `/vencimentos` - Ver vencimentos próximos\n';
+  help += '_💡 Gastos perguntam qual cartão ou saldo_\n\n';
 
   help += '📦 *PARCELAMENTOS*\n';
   help += '• "comprei celular por 1200 em 12x"\n';
